@@ -86,3 +86,7 @@ Let's configure an identity called alice. You can use any name you want, but it 
 You can see the public key of alice with:
 
 `stellar keys address alice`
+
+# Test
+For execute any test, yo have you join in your terminal and go to the root of Trustless, then:
+`cargo test`
