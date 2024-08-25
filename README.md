@@ -87,6 +87,6 @@ You can see the public key of alice with:
 
 `stellar keys address alice`
 
-# Test
+### Test
 For execute any test, yo have you join in your terminal and go to the root of Trustless, then:
 `cargo test`
