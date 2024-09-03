@@ -1,5 +1,5 @@
 use soroban_sdk::{
-    contract, contractimpl, Address, Env, Vec, Map, String, symbol_short
+    contract, contractimpl, symbol_short, Address, Env, Map, String, Vec
 };
 
 use crate::storage::{get_project, get_all_projects};
@@ -71,15 +71,15 @@ impl FreelanceContract {
             panic!("Only the client can mark the project as completed");
         }
 
-        if !project.completed {
+        if project.completed {
             panic!("Project is completed");
         }
 
-        if !project.cancelled {
+        if project.cancelled {
             panic!("Project is cancelled");
         }
 
-        if project.completed_objectives == project.objectives_count {
+        if project.completed_objectives != project.objectives_count {
             panic!("Not all objectives completed");
         }
 
@@ -124,7 +124,7 @@ impl FreelanceContract {
         usdc_client.transfer(
             &user,              
             &freelance_contract_address,
-            &(objective.price as i128)
+            &remaining_price
         );
 
         let expiration_ledger = e.ledger().sequence() + 1000;
@@ -132,7 +132,7 @@ impl FreelanceContract {
         usdc_client.transfer(
             &freelance_contract_address,
             &freelancer_address,
-            &remaining_price
+            &(objective.price as i128)
         );
     
         objective.completed = true;
@@ -154,11 +154,11 @@ impl FreelanceContract {
             panic!("Only the client can mark the project as completed");
         }
 
-        if !project.completed {
+        if project.completed {
             panic!("Project is completed");
         }
 
-        if !project.cancelled {
+        if project.cancelled {
             panic!("Project is cancelled");
         }
 
@@ -177,11 +177,11 @@ impl FreelanceContract {
             panic!("Only the client can add objectives");
         }
 
-        if !project.completed {
+        if project.completed {
             panic!("Project is completed");
         }
 
-        if !project.cancelled {
+        if project.cancelled {
             panic!("Project is cancelled");
         }
         
@@ -218,12 +218,19 @@ impl FreelanceContract {
     
         let half_price = (objective.price / 2) as i128;
         let usdc_client = TokenClient::new(&e, &usdc_contract);
+
+        let allowance = usdc_client.allowance(&user, &freelance_contract_address);
+        if allowance < half_price {
+            panic!("Not enough allowance to fund this objective. Please approve the amount first.");
+        }
     
         usdc_client.transfer(
             &user,              
             &freelance_contract_address,
             &half_price       
         );
+
+        usdc_client.approve(&user, &freelance_contract_address, &0, &e.ledger().sequence());
     
         objective.half_paid = half_price as u128;
         project.objectives.set(objective_id, objective);
@@ -232,7 +239,7 @@ impl FreelanceContract {
         objective_funded(&e, project_key, objective_id, half_price as u128);
     }
 
-    pub fn refund_remaining_funds(e: Env, project_id: u128, objective_id: u128, user: Address) {
+    pub fn refund_remaining_funds(e: Env, project_id: u128, objective_id: u128, user: Address, usdc_contract: Address, freelance_contract_address: Address) {
         user.require_auth();
         let (project, project_key) = get_project(&e, project_id);
 
@@ -247,27 +254,25 @@ impl FreelanceContract {
 
 
         let mut refundable_amount : i128 = 0;
-
         for _i in 0..project.objectives_count {
             let mut objective = project.objectives.get(objective_id).unwrap(); 
-
+            
             if !objective.completed && objective.half_paid > 0 {
                 refundable_amount += objective.half_paid as i128;
                 objective.half_paid = 0; 
             }
         }
-
-        let usdc_client = soroban_sdk::token::Client::new(&e, &user);
-        let contract_balance = usdc_client.balance(&e.current_contract_address());
-
-        if  contract_balance >= refundable_amount {
-            panic!("Insufficient contract balance");
+        
+        let usdc_client = TokenClient::new(&e, &usdc_contract);
+        let contract_balance = usdc_client.balance(&freelance_contract_address);
+        if  contract_balance == 0 {
+            panic!("The contract has no balance to repay");
         }
 
         usdc_client.transfer(
             &e.current_contract_address(),
             &project.client,
-            &(refundable_amount as i128) 
+            &(contract_balance as i128) 
         );
 
         project_refunded(&e, project_key, user.clone(), refundable_amount as u128);
@@ -276,22 +281,32 @@ impl FreelanceContract {
     
     pub fn get_projects_by_freelancer(e: Env, freelancer: Address) -> Vec<Project> {
         let all_projects: Vec<Project> = get_all_projects(e.clone());
-
+    
         let mut result: Vec<Project> = Vec::new(&e);
-        let mut index: u32 = 0;
-
-        for i in 0..all_projects.len() {
-            let project = all_projects.get(i).unwrap();
-
+    
+        for project in all_projects.iter() {
             if project.freelancer == freelancer {
-                result.set(index, project); 
-                index += 1;
+                result.push_back(project);
             }
         }
-
+    
         result
     }
+
+    pub fn get_projects_by_client(e: Env, client: Address) -> Vec<Project> {
+        let all_projects: Vec<Project> = get_all_projects(e.clone());
     
+        let mut result: Vec<Project> = Vec::new(&e);
+    
+        for project in all_projects.iter() {
+            if project.client == client {
+                result.push_back(project);
+            }
+        }
+    
+        result
+    }
+      
     pub fn register(e: Env, user_address: Address, name: String, email: String) -> bool {
         user_address.require_auth();
 
