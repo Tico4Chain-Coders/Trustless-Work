@@ -9,6 +9,7 @@ mod metadata;
 mod token;
 mod events;
 mod contract;
+mod utils;
 mod test;
 
 pub use crate::contract::FreelanceContractClient;

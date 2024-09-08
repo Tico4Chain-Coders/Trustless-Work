@@ -1,5 +1,5 @@
 use soroban_sdk::{
-    contract, contractimpl, symbol_short, Address, Env, Map, String, Vec
+    contract, contractimpl, symbol_short, Address, Bytes, BytesN, Env, IntoVal, Map, String, TryFromVal, Vec
 };
 
 use crate::storage::{get_project, get_all_projects};
@@ -34,6 +34,7 @@ impl FreelanceContract {
     
         project_count += 1;
         e.storage().instance().set(&contract_key, &project_count);
+        let project_id = Bytes::from_slice(&e, &project_count.to_be_bytes());
         let mut objectives: Map<u128, Objective> = Map::new(&e);
         for (i, price) in prices.iter().enumerate() {
             objectives.set(i as u128, Objective {
@@ -42,8 +43,8 @@ impl FreelanceContract {
                 completed: false,
             });
         }
-        
         let project = Project {
+            project_id,
             client: user.clone(),
             freelancer: freelancer.clone(),
             objectives_count: prices.len() as u128,
@@ -55,15 +56,14 @@ impl FreelanceContract {
             completed: false,
         };
         
-        let project_key = DataKey::Project(project_count);
+        let project_key = DataKey::Project(Bytes::from_slice(&e, &project_count.to_be_bytes()));
         e.storage().instance().set(&project_key, &project);
-
         project_created(&e, project_key, user.clone(), freelancer.clone(), prices);
 
-        project_count
+        u128::from_be_bytes(project_count.to_be_bytes())
     }
 
-    pub fn complete_project(e: Env, project_id: u128, user: Address) {
+    pub fn complete_project(e: Env, project_id: Bytes, user: Address) {
         let (mut project, project_key) = get_project(&e, project_id);
 
         let invoker = user;
@@ -88,10 +88,11 @@ impl FreelanceContract {
         project_completed(&e, project_key);
 
     }
+    
 
     pub fn complete_objective(
         e: Env,
-        project_id: u128,
+        project_id: Bytes,
         objective_id: u128,
         user: Address,
         usdc_contract: Address,
@@ -145,7 +146,7 @@ impl FreelanceContract {
         objective_completed(&e, project_key, objective_id, full_price);
     }
 
-    pub fn cancel_project(e: Env, project_id: u128, user: Address) {
+    pub fn cancel_project(e: Env, project_id: Bytes, user: Address) {
         user.require_auth();
         let (mut project, project_key) = get_project(&e, project_id);
 
@@ -168,7 +169,7 @@ impl FreelanceContract {
          project_cancelled(&e, project_key);
     }
 
-    pub fn add_objective(e: Env, project_id: u128, prices: Vec<u128>, user: Address) {
+    pub fn add_objective(e: Env, project_id: Bytes, prices: Vec<u128>, user: Address) {
         user.require_auth();
         let (mut project, project_key) = get_project(&e, project_id);
 
@@ -201,7 +202,7 @@ impl FreelanceContract {
         e.storage().instance().set(&project_key, &project);
     }
 
-    pub fn fund_objective(e: Env, project_id: u128, objective_id: u128, user: Address, usdc_contract: Address, freelance_contract_address: Address) {
+    pub fn fund_objective(e: Env, project_id: Bytes, objective_id: u128, user: Address, usdc_contract: Address, freelance_contract_address: Address) {
         user.require_auth();
     
         let project_key = DataKey::Project(project_id);
@@ -239,7 +240,7 @@ impl FreelanceContract {
         objective_funded(&e, project_key, objective_id, half_price as u128);
     }
 
-    pub fn refund_remaining_funds(e: Env, project_id: u128, objective_id: u128, user: Address, usdc_contract: Address, freelance_contract_address: Address) {
+    pub fn refund_remaining_funds(e: Env, project_id: Bytes, objective_id: u128, user: Address, usdc_contract: Address, freelance_contract_address: Address) {
         user.require_auth();
         let (project, project_key) = get_project(&e, project_id);
 
@@ -360,5 +361,4 @@ impl FreelanceContract {
             soroban_sdk::String::from_str(&e, "User not found")
         }
     }
-
 }
