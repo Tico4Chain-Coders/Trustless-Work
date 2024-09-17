@@ -52,7 +52,7 @@ fn test_create_fund_complete_objectives() {
     assert_eq!(token.allowance(&client_address, &freelance_contract_address), 100);
 
     let prices: Vec<u128> = Vec::from_array(&env, [100_u128, 100_u128]);
-    let project_id = freelance_client.create_project(&freelancer_address, &prices, &client_address);
+    let project_id = freelance_client.initialize_escrow(&freelancer_address, &prices, &client_address);
     let project_id_in_bytes = u128_to_bytes(&env, project_id);
 
     freelance_client.fund_objective(&project_id_in_bytes, &0, &client_address, &usdc_contract_address, &freelance_contract_address);
@@ -120,7 +120,7 @@ fn test_client_can_recover_funds_if_freelancer_does_not_complete_all_objectives(
     let full_price = 100;
 
     let prices: Vec<u128> = Vec::from_array(&env, [100_u128, 100_u128, 100_u128]);
-    let project_id = freelance_client.create_project(&freelancer_address, &prices, &client_address);
+    let project_id = freelance_client.initialize_escrow(&freelancer_address, &prices, &client_address);
     let project_id_in_bytes = u128_to_bytes(&env, project_id);
 
     token.approve(&client_address, &freelance_contract_address, &full_price, &expiration_ledger);
@@ -199,7 +199,7 @@ fn test_add_new_objectives_and_complete_them() {
     let full_price = 100;
 
     let prices: Vec<u128> = Vec::from_array(&env, [100_u128, 100_u128]);
-    let project_id = freelance_client.create_project(&freelancer_address, &prices, &client_address);
+    let project_id = freelance_client.initialize_escrow(&freelancer_address, &prices, &client_address);
     let project_id_in_bytes = u128_to_bytes(&env, project_id);
 
     token.approve(&client_address, &freelance_contract_address, &full_price, &expiration_ledger);
@@ -269,7 +269,7 @@ fn test_complete_project_after_all_objectives_completed() {
     let full_price = 100;
 
     let prices: Vec<u128> = Vec::from_array(&env, [100_u128, 100_u128]);
-    let project_id = freelance_client.create_project(&freelancer_address, &prices, &client_address);
+    let project_id = freelance_client.initialize_escrow(&freelancer_address, &prices, &client_address);
     let project_id_in_bytes = u128_to_bytes(&env, project_id);
 
     token.approve(&client_address, &freelance_contract_address, &full_price, &expiration_ledger);
@@ -330,8 +330,8 @@ fn test_get_projects_by_freelancer() {
     assert_eq!(token.balance(&client_address), 1000);
 
     let prices: Vec<u128> = Vec::from_array(&env, [100_u128, 100_u128]);
-    freelance_client.create_project(&freelancer_address, &prices, &client_address);
-    freelance_client.create_project(&freelancer_address, &prices, &another_client_address);
+    freelance_client.initialize_escrow(&freelancer_address, &prices, &client_address);
+    freelance_client.initialize_escrow(&freelancer_address, &prices, &another_client_address);
 
     let projects = freelance_client.get_projects_by_freelancer(&freelancer_address);
 
@@ -371,8 +371,8 @@ fn test_get_projects_by_client() {
     assert_eq!(token.balance(&client_address), 1000);
 
     let prices: Vec<u128> = Vec::from_array(&env, [100_u128, 100_u128]);
-    freelance_client.create_project(&freelancer_address, &prices, &client_address);
-    freelance_client.create_project(&another_freelancer_address, &prices, &client_address);
+    freelance_client.initialize_escrow(&freelancer_address, &prices, &client_address);
+    freelance_client.initialize_escrow(&another_freelancer_address, &prices, &client_address);
 
     let projects = freelance_client.get_projects_by_spender(&client_address);
     assert_eq!(projects.len(), 2);

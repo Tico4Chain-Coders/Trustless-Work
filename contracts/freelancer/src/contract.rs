@@ -13,7 +13,7 @@ pub struct FreelanceContract;
 #[contractimpl]
 impl FreelanceContract {
 
-    pub fn create_project(
+    pub fn initialize_escrow(
         e: Env,
         freelancer: Address,
         prices: Vec<u128>,
