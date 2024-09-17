@@ -2,7 +2,7 @@
 
 extern crate std;
 
-use crate::storage_types::{Project, DataKey};
+use crate::storage_types::{Escrow, DataKey};
 use crate::{contract::FreelanceContract, FreelanceContractClient};
 use soroban_sdk::{testutils::{Address as _, AuthorizedFunction, AuthorizedInvocation}, Address, Env, Vec, IntoVal, symbol_short};
 use crate::token::{ Token, TokenClient };
@@ -57,18 +57,18 @@ fn test_create_fund_complete_objectives() {
 
     freelance_client.fund_objective(&project_id_in_bytes, &0, &client_address, &usdc_contract_address, &freelance_contract_address);
     env.as_contract(&freelance_contract_address, || {
-        let project_key = DataKey::Project(project_id_in_bytes.clone());
-        let project: Project = env.storage().instance().get(&project_key).unwrap();
-        let first_objective = project.objectives.get(0).unwrap();
+        let project_key = DataKey::Escrow(project_id_in_bytes.clone());
+        let project: Escrow = env.storage().instance().get(&project_key).unwrap();
+        let first_objective = project.parties.get(0).unwrap();
         assert_eq!(first_objective.half_paid, 50);
     });
 
     freelance_client.complete_objective(&project_id_in_bytes, &0, &client_address, &usdc_contract_address, &freelance_contract_address, &freelancer_address);
     
     env.as_contract(&freelance_contract_address, || {
-        let project_key = DataKey::Project(project_id_in_bytes.clone());
-        let project: Project = env.storage().instance().get(&project_key).unwrap();
-        let first_objective = project.objectives.get(0).unwrap();
+        let project_key = DataKey::Escrow(project_id_in_bytes.clone());
+        let project: Escrow = env.storage().instance().get(&project_key).unwrap();
+        let first_objective = project.parties.get(0).unwrap();
         assert_eq!(first_objective.completed, true);
     });
     
@@ -77,9 +77,9 @@ fn test_create_fund_complete_objectives() {
     freelance_client.complete_objective(&project_id_in_bytes, &1, &client_address, &usdc_contract_address, &freelance_contract_address, &freelancer_address);
     
     env.as_contract(&freelance_contract_address, || {
-        let project_key = DataKey::Project(project_id_in_bytes.clone());
-        let project: Project = env.storage().instance().get(&project_key).unwrap();
-        let second_objective = project.objectives.get(1).unwrap();
+        let project_key = DataKey::Escrow(project_id_in_bytes.clone());
+        let project: Escrow = env.storage().instance().get(&project_key).unwrap();
+        let second_objective = project.parties.get(1).unwrap();
         assert_eq!(second_objective.completed, true);
     });
 }
@@ -126,9 +126,9 @@ fn test_client_can_recover_funds_if_freelancer_does_not_complete_all_objectives(
     token.approve(&client_address, &freelance_contract_address, &full_price, &expiration_ledger);
     freelance_client.fund_objective(&project_id_in_bytes, &0, &client_address, &usdc_contract_address, &freelance_contract_address);
     env.as_contract(&freelance_contract_address, || {
-        let project_key = DataKey::Project(project_id_in_bytes.clone());
-        let project: Project = env.storage().instance().get(&project_key).unwrap();
-        let first_objective = project.objectives.get(0).unwrap();
+        let project_key = DataKey::Escrow(project_id_in_bytes.clone());
+        let project: Escrow = env.storage().instance().get(&project_key).unwrap();
+        let first_objective = project.parties.get(0).unwrap();
         assert_eq!(first_objective.half_paid, 50);
     });
 
@@ -205,9 +205,9 @@ fn test_add_new_objectives_and_complete_them() {
     token.approve(&client_address, &freelance_contract_address, &full_price, &expiration_ledger);
     freelance_client.fund_objective(&project_id_in_bytes, &0, &client_address, &usdc_contract_address, &freelance_contract_address);
     env.as_contract(&freelance_contract_address, || {
-        let project_key = DataKey::Project(project_id_in_bytes.clone());
-        let project: Project = env.storage().instance().get(&project_key).unwrap();
-        let first_objective = project.objectives.get(0).unwrap();
+        let project_key = DataKey::Escrow(project_id_in_bytes.clone());
+        let project: Escrow = env.storage().instance().get(&project_key).unwrap();
+        let first_objective = project.parties.get(0).unwrap();
         assert_eq!(first_objective.half_paid, 50);
     });
 
@@ -275,9 +275,9 @@ fn test_complete_project_after_all_objectives_completed() {
     token.approve(&client_address, &freelance_contract_address, &full_price, &expiration_ledger);
     freelance_client.fund_objective(&project_id_in_bytes, &0, &client_address, &usdc_contract_address, &freelance_contract_address);
     env.as_contract(&freelance_contract_address, || {
-        let project_key = DataKey::Project(project_id_in_bytes.clone());
-        let project: Project = env.storage().instance().get(&project_key).unwrap();
-        let first_objective = project.objectives.get(0).unwrap();
+        let project_key = DataKey::Escrow(project_id_in_bytes.clone());
+        let project: Escrow = env.storage().instance().get(&project_key).unwrap();
+        let first_objective = project.parties.get(0).unwrap();
         assert_eq!(first_objective.half_paid, 50);
     });
 
@@ -291,8 +291,8 @@ fn test_complete_project_after_all_objectives_completed() {
     freelance_client.complete_project(&project_id_in_bytes, &client_address);
 
     env.as_contract(&freelance_contract_address, || {
-        let project_key = DataKey::Project(project_id_in_bytes);
-        let project: Project = env.storage().instance().get(&project_key).unwrap();
+        let project_key = DataKey::Escrow(project_id_in_bytes);
+        let project: Escrow = env.storage().instance().get(&project_key).unwrap();
         assert_eq!(project.completed, true);
     });
 }
@@ -374,6 +374,6 @@ fn test_get_projects_by_client() {
     freelance_client.create_project(&freelancer_address, &prices, &client_address);
     freelance_client.create_project(&another_freelancer_address, &prices, &client_address);
 
-    let projects = freelance_client.get_projects_by_client(&client_address);
+    let projects = freelance_client.get_projects_by_spender(&client_address);
     assert_eq!(projects.len(), 2);
 }
