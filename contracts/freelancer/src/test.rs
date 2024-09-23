@@ -333,9 +333,16 @@ fn test_get_projects_by_freelancer() {
     freelance_client.initialize_escrow(&freelancer_address, &prices, &client_address);
     freelance_client.initialize_escrow(&freelancer_address, &prices, &another_client_address);
 
-    let projects = freelance_client.get_projects_by_freelancer(&freelancer_address);
-
+    let page = 0;
+    let limit = 2;
+    let projects = freelance_client.get_projects_by_from(&freelancer_address, &page, &limit);
     assert_eq!(projects.len(), 2);
+
+    let another_client_address2 = Address::generate(&env);
+    freelance_client.initialize_escrow(&freelancer_address, &prices, &another_client_address2);
+
+    let projects_page_2 = freelance_client.get_projects_by_from(&freelancer_address, &1, &2);
+    assert_eq!(projects_page_2.len(), 1); 
 }
 
 #[test]
@@ -374,6 +381,14 @@ fn test_get_projects_by_client() {
     freelance_client.initialize_escrow(&freelancer_address, &prices, &client_address);
     freelance_client.initialize_escrow(&another_freelancer_address, &prices, &client_address);
 
-    let projects = freelance_client.get_projects_by_spender(&client_address);
+    let page = 0;
+    let limit = 2;
+    let projects = freelance_client.get_projects_by_spender(&client_address, &page, &limit);
     assert_eq!(projects.len(), 2);
+
+    let another_freelancer_address2 = Address::generate(&env);
+    freelance_client.initialize_escrow(&another_freelancer_address2, &prices, &client_address);
+
+    let projects_page_2 = freelance_client.get_projects_by_spender(&client_address, &1, &2);
+    assert_eq!(projects_page_2.len(), 1); 
 }

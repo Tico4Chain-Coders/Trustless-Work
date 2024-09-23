@@ -1,6 +1,6 @@
 {
   "generators": {
-    "address": 6,
+    "address": 7,
     "nonce": 0
   },
   "auth": [
@@ -38,7 +38,7 @@
           "function": {
             "contract_fn": {
               "contract_address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDR4",
-              "function_name": "create_project",
+              "function_name": "initialize_escrow",
               "args": [
                 {
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
@@ -76,7 +76,7 @@
           "function": {
             "contract_fn": {
               "contract_address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDR4",
-              "function_name": "create_project",
+              "function_name": "initialize_escrow",
               "args": [
                 {
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
@@ -99,6 +99,45 @@
                 },
                 {
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
+                }
+              ]
+            }
+          },
+          "sub_invocations": []
+        }
+      ]
+    ],
+    [],
+    [
+      [
+        "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOLZM",
+        {
+          "function": {
+            "contract_fn": {
+              "contract_address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDR4",
+              "function_name": "initialize_escrow",
+              "args": [
+                {
+                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
+                },
+                {
+                  "vec": [
+                    {
+                      "u128": {
+                        "hi": 0,
+                        "lo": 100
+                      }
+                    },
+                    {
+                      "u128": {
+                        "hi": 0,
+                        "lo": 100
+                      }
+                    }
+                  ]
+                },
+                {
+                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOLZM"
                 }
               ]
             }
@@ -374,7 +413,7 @@
                         "val": {
                           "u128": {
                             "hi": 0,
-                            "lo": 2
+                            "lo": 3
                           }
                         }
                       },
@@ -382,7 +421,7 @@
                         "key": {
                           "vec": [
                             {
-                              "symbol": "Project"
+                              "symbol": "Escrow"
                             },
                             {
                               "bytes": "00000000000000000000000000000001"
@@ -401,14 +440,6 @@
                             },
                             {
                               "key": {
-                                "symbol": "client"
-                              },
-                              "val": {
-                                "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
-                              }
-                            },
-                            {
-                              "key": {
                                 "symbol": "completed"
                               },
                               "val": {
@@ -417,7 +448,7 @@
                             },
                             {
                               "key": {
-                                "symbol": "completed_objectives"
+                                "symbol": "completed_parties"
                               },
                               "val": {
                                 "u128": {
@@ -450,7 +481,15 @@
                             },
                             {
                               "key": {
-                                "symbol": "freelancer"
+                                "symbol": "escrow_id"
+                              },
+                              "val": {
+                                "bytes": "00000000000000000000000000000001"
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "from"
                               },
                               "val": {
                                 "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
@@ -458,7 +497,7 @@
                             },
                             {
                               "key": {
-                                "symbol": "objectives"
+                                "symbol": "parties"
                               },
                               "val": {
                                 "map": [
@@ -551,7 +590,7 @@
                             },
                             {
                               "key": {
-                                "symbol": "objectives_count"
+                                "symbol": "parties_count"
                               },
                               "val": {
                                 "u128": {
@@ -562,10 +601,10 @@
                             },
                             {
                               "key": {
-                                "symbol": "project_id"
+                                "symbol": "spender"
                               },
                               "val": {
-                                "bytes": "00000000000000000000000000000001"
+                                "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
                               }
                             }
                           ]
@@ -575,7 +614,7 @@
                         "key": {
                           "vec": [
                             {
-                              "symbol": "Project"
+                              "symbol": "Escrow"
                             },
                             {
                               "bytes": "00000000000000000000000000000002"
@@ -594,14 +633,6 @@
                             },
                             {
                               "key": {
-                                "symbol": "client"
-                              },
-                              "val": {
-                                "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
-                              }
-                            },
-                            {
-                              "key": {
                                 "symbol": "completed"
                               },
                               "val": {
@@ -610,7 +641,7 @@
                             },
                             {
                               "key": {
-                                "symbol": "completed_objectives"
+                                "symbol": "completed_parties"
                               },
                               "val": {
                                 "u128": {
@@ -643,7 +674,15 @@
                             },
                             {
                               "key": {
-                                "symbol": "freelancer"
+                                "symbol": "escrow_id"
+                              },
+                              "val": {
+                                "bytes": "00000000000000000000000000000002"
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "from"
                               },
                               "val": {
                                 "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
@@ -651,7 +690,7 @@
                             },
                             {
                               "key": {
-                                "symbol": "objectives"
+                                "symbol": "parties"
                               },
                               "val": {
                                 "map": [
@@ -744,7 +783,7 @@
                             },
                             {
                               "key": {
-                                "symbol": "objectives_count"
+                                "symbol": "parties_count"
                               },
                               "val": {
                                 "u128": {
@@ -755,10 +794,203 @@
                             },
                             {
                               "key": {
-                                "symbol": "project_id"
+                                "symbol": "spender"
                               },
                               "val": {
-                                "bytes": "00000000000000000000000000000002"
+                                "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "key": {
+                          "vec": [
+                            {
+                              "symbol": "Escrow"
+                            },
+                            {
+                              "bytes": "00000000000000000000000000000003"
+                            }
+                          ]
+                        },
+                        "val": {
+                          "map": [
+                            {
+                              "key": {
+                                "symbol": "cancelled"
+                              },
+                              "val": {
+                                "bool": false
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "completed"
+                              },
+                              "val": {
+                                "bool": false
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "completed_parties"
+                              },
+                              "val": {
+                                "u128": {
+                                  "hi": 0,
+                                  "lo": 0
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "contract_balance"
+                              },
+                              "val": {
+                                "u128": {
+                                  "hi": 0,
+                                  "lo": 0
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "earned_amount"
+                              },
+                              "val": {
+                                "u128": {
+                                  "hi": 0,
+                                  "lo": 0
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "escrow_id"
+                              },
+                              "val": {
+                                "bytes": "00000000000000000000000000000003"
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "from"
+                              },
+                              "val": {
+                                "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "parties"
+                              },
+                              "val": {
+                                "map": [
+                                  {
+                                    "key": {
+                                      "u128": {
+                                        "hi": 0,
+                                        "lo": 0
+                                      }
+                                    },
+                                    "val": {
+                                      "map": [
+                                        {
+                                          "key": {
+                                            "symbol": "completed"
+                                          },
+                                          "val": {
+                                            "bool": false
+                                          }
+                                        },
+                                        {
+                                          "key": {
+                                            "symbol": "half_paid"
+                                          },
+                                          "val": {
+                                            "u128": {
+                                              "hi": 0,
+                                              "lo": 0
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "key": {
+                                            "symbol": "price"
+                                          },
+                                          "val": {
+                                            "u128": {
+                                              "hi": 0,
+                                              "lo": 100
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  {
+                                    "key": {
+                                      "u128": {
+                                        "hi": 0,
+                                        "lo": 1
+                                      }
+                                    },
+                                    "val": {
+                                      "map": [
+                                        {
+                                          "key": {
+                                            "symbol": "completed"
+                                          },
+                                          "val": {
+                                            "bool": false
+                                          }
+                                        },
+                                        {
+                                          "key": {
+                                            "symbol": "half_paid"
+                                          },
+                                          "val": {
+                                            "u128": {
+                                              "hi": 0,
+                                              "lo": 0
+                                            }
+                                          }
+                                        },
+                                        {
+                                          "key": {
+                                            "symbol": "price"
+                                          },
+                                          "val": {
+                                            "u128": {
+                                              "hi": 0,
+                                              "lo": 100
+                                            }
+                                          }
+                                        }
+                                      ]
+                                    }
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "parties_count"
+                              },
+                              "val": {
+                                "u128": {
+                                  "hi": 0,
+                                  "lo": 2
+                                }
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "spender"
+                              },
+                              "val": {
+                                "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOLZM"
                               }
                             }
                           ]
@@ -772,6 +1004,39 @@
             "ext": "v0"
           },
           4095
+        ]
+      ],
+      [
+        {
+          "contract_data": {
+            "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOLZM",
+            "key": {
+              "ledger_key_nonce": {
+                "nonce": 4837995959683129791
+              }
+            },
+            "durability": "temporary"
+          }
+        },
+        [
+          {
+            "last_modified_ledger_seq": 0,
+            "data": {
+              "contract_data": {
+                "ext": "v0",
+                "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOLZM",
+                "key": {
+                  "ledger_key_nonce": {
+                    "nonce": 4837995959683129791
+                  }
+                },
+                "durability": "temporary",
+                "val": "void"
+              }
+            },
+            "ext": "v0"
+          },
+          6311999
         ]
       ],
       [
@@ -1011,7 +1276,7 @@
                 "bytes": "0000000000000000000000000000000000000000000000000000000000000006"
               },
               {
-                "symbol": "create_project"
+                "symbol": "initialize_escrow"
               }
             ],
             "data": {
@@ -1062,7 +1327,7 @@
                 {
                   "vec": [
                     {
-                      "symbol": "Project"
+                      "symbol": "Escrow"
                     },
                     {
                       "bytes": "00000000000000000000000000000001"
@@ -1110,7 +1375,7 @@
                 "symbol": "fn_return"
               },
               {
-                "symbol": "create_project"
+                "symbol": "initialize_escrow"
               }
             ],
             "data": {
@@ -1139,7 +1404,7 @@
                 "bytes": "0000000000000000000000000000000000000000000000000000000000000006"
               },
               {
-                "symbol": "create_project"
+                "symbol": "initialize_escrow"
               }
             ],
             "data": {
@@ -1190,7 +1455,7 @@
                 {
                   "vec": [
                     {
-                      "symbol": "Project"
+                      "symbol": "Escrow"
                     },
                     {
                       "bytes": "00000000000000000000000000000002"
@@ -1238,7 +1503,7 @@
                 "symbol": "fn_return"
               },
               {
-                "symbol": "create_project"
+                "symbol": "initialize_escrow"
               }
             ],
             "data": {
@@ -1267,11 +1532,411 @@
                 "bytes": "0000000000000000000000000000000000000000000000000000000000000006"
               },
               {
-                "symbol": "get_projects_by_freelancer"
+                "symbol": "get_projects_by_from"
               }
             ],
             "data": {
-              "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
+              "vec": [
+                {
+                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
+                },
+                {
+                  "u32": 0
+                },
+                {
+                  "u32": 2
+                }
+              ]
+            }
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": "0000000000000000000000000000000000000000000000000000000000000006",
+        "type_": "contract",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "p_by_spdr"
+              }
+            ],
+            "data": {
+              "vec": [
+                {
+                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
+                },
+                {
+                  "vec": [
+                    {
+                      "map": [
+                        {
+                          "key": {
+                            "symbol": "cancelled"
+                          },
+                          "val": {
+                            "bool": false
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "completed"
+                          },
+                          "val": {
+                            "bool": false
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "completed_parties"
+                          },
+                          "val": {
+                            "u128": {
+                              "hi": 0,
+                              "lo": 0
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "contract_balance"
+                          },
+                          "val": {
+                            "u128": {
+                              "hi": 0,
+                              "lo": 0
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "earned_amount"
+                          },
+                          "val": {
+                            "u128": {
+                              "hi": 0,
+                              "lo": 0
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "escrow_id"
+                          },
+                          "val": {
+                            "bytes": "00000000000000000000000000000001"
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "from"
+                          },
+                          "val": {
+                            "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "parties"
+                          },
+                          "val": {
+                            "map": [
+                              {
+                                "key": {
+                                  "u128": {
+                                    "hi": 0,
+                                    "lo": 0
+                                  }
+                                },
+                                "val": {
+                                  "map": [
+                                    {
+                                      "key": {
+                                        "symbol": "completed"
+                                      },
+                                      "val": {
+                                        "bool": false
+                                      }
+                                    },
+                                    {
+                                      "key": {
+                                        "symbol": "half_paid"
+                                      },
+                                      "val": {
+                                        "u128": {
+                                          "hi": 0,
+                                          "lo": 0
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "key": {
+                                        "symbol": "price"
+                                      },
+                                      "val": {
+                                        "u128": {
+                                          "hi": 0,
+                                          "lo": 100
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "key": {
+                                  "u128": {
+                                    "hi": 0,
+                                    "lo": 1
+                                  }
+                                },
+                                "val": {
+                                  "map": [
+                                    {
+                                      "key": {
+                                        "symbol": "completed"
+                                      },
+                                      "val": {
+                                        "bool": false
+                                      }
+                                    },
+                                    {
+                                      "key": {
+                                        "symbol": "half_paid"
+                                      },
+                                      "val": {
+                                        "u128": {
+                                          "hi": 0,
+                                          "lo": 0
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "key": {
+                                        "symbol": "price"
+                                      },
+                                      "val": {
+                                        "u128": {
+                                          "hi": 0,
+                                          "lo": 100
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "parties_count"
+                          },
+                          "val": {
+                            "u128": {
+                              "hi": 0,
+                              "lo": 2
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "spender"
+                          },
+                          "val": {
+                            "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "map": [
+                        {
+                          "key": {
+                            "symbol": "cancelled"
+                          },
+                          "val": {
+                            "bool": false
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "completed"
+                          },
+                          "val": {
+                            "bool": false
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "completed_parties"
+                          },
+                          "val": {
+                            "u128": {
+                              "hi": 0,
+                              "lo": 0
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "contract_balance"
+                          },
+                          "val": {
+                            "u128": {
+                              "hi": 0,
+                              "lo": 0
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "earned_amount"
+                          },
+                          "val": {
+                            "u128": {
+                              "hi": 0,
+                              "lo": 0
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "escrow_id"
+                          },
+                          "val": {
+                            "bytes": "00000000000000000000000000000002"
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "from"
+                          },
+                          "val": {
+                            "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "parties"
+                          },
+                          "val": {
+                            "map": [
+                              {
+                                "key": {
+                                  "u128": {
+                                    "hi": 0,
+                                    "lo": 0
+                                  }
+                                },
+                                "val": {
+                                  "map": [
+                                    {
+                                      "key": {
+                                        "symbol": "completed"
+                                      },
+                                      "val": {
+                                        "bool": false
+                                      }
+                                    },
+                                    {
+                                      "key": {
+                                        "symbol": "half_paid"
+                                      },
+                                      "val": {
+                                        "u128": {
+                                          "hi": 0,
+                                          "lo": 0
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "key": {
+                                        "symbol": "price"
+                                      },
+                                      "val": {
+                                        "u128": {
+                                          "hi": 0,
+                                          "lo": 100
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "key": {
+                                  "u128": {
+                                    "hi": 0,
+                                    "lo": 1
+                                  }
+                                },
+                                "val": {
+                                  "map": [
+                                    {
+                                      "key": {
+                                        "symbol": "completed"
+                                      },
+                                      "val": {
+                                        "bool": false
+                                      }
+                                    },
+                                    {
+                                      "key": {
+                                        "symbol": "half_paid"
+                                      },
+                                      "val": {
+                                        "u128": {
+                                          "hi": 0,
+                                          "lo": 0
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "key": {
+                                        "symbol": "price"
+                                      },
+                                      "val": {
+                                        "u128": {
+                                          "hi": 0,
+                                          "lo": 100
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "parties_count"
+                          },
+                          "val": {
+                            "u128": {
+                              "hi": 0,
+                              "lo": 2
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "spender"
+                          },
+                          "val": {
+                            "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             }
           }
         }
@@ -1290,7 +1955,7 @@
                 "symbol": "fn_return"
               },
               {
-                "symbol": "get_projects_by_freelancer"
+                "symbol": "get_projects_by_from"
               }
             ],
             "data": {
@@ -1307,14 +1972,6 @@
                     },
                     {
                       "key": {
-                        "symbol": "client"
-                      },
-                      "val": {
-                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
-                      }
-                    },
-                    {
-                      "key": {
                         "symbol": "completed"
                       },
                       "val": {
@@ -1323,7 +1980,7 @@
                     },
                     {
                       "key": {
-                        "symbol": "completed_objectives"
+                        "symbol": "completed_parties"
                       },
                       "val": {
                         "u128": {
@@ -1356,7 +2013,15 @@
                     },
                     {
                       "key": {
-                        "symbol": "freelancer"
+                        "symbol": "escrow_id"
+                      },
+                      "val": {
+                        "bytes": "00000000000000000000000000000001"
+                      }
+                    },
+                    {
+                      "key": {
+                        "symbol": "from"
                       },
                       "val": {
                         "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
@@ -1364,7 +2029,7 @@
                     },
                     {
                       "key": {
-                        "symbol": "objectives"
+                        "symbol": "parties"
                       },
                       "val": {
                         "map": [
@@ -1457,7 +2122,7 @@
                     },
                     {
                       "key": {
-                        "symbol": "objectives_count"
+                        "symbol": "parties_count"
                       },
                       "val": {
                         "u128": {
@@ -1468,10 +2133,10 @@
                     },
                     {
                       "key": {
-                        "symbol": "project_id"
+                        "symbol": "spender"
                       },
                       "val": {
-                        "bytes": "00000000000000000000000000000001"
+                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
                       }
                     }
                   ]
@@ -1488,14 +2153,6 @@
                     },
                     {
                       "key": {
-                        "symbol": "client"
-                      },
-                      "val": {
-                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
-                      }
-                    },
-                    {
-                      "key": {
                         "symbol": "completed"
                       },
                       "val": {
@@ -1504,7 +2161,7 @@
                     },
                     {
                       "key": {
-                        "symbol": "completed_objectives"
+                        "symbol": "completed_parties"
                       },
                       "val": {
                         "u128": {
@@ -1537,7 +2194,15 @@
                     },
                     {
                       "key": {
-                        "symbol": "freelancer"
+                        "symbol": "escrow_id"
+                      },
+                      "val": {
+                        "bytes": "00000000000000000000000000000002"
+                      }
+                    },
+                    {
+                      "key": {
+                        "symbol": "from"
                       },
                       "val": {
                         "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
@@ -1545,7 +2210,7 @@
                     },
                     {
                       "key": {
-                        "symbol": "objectives"
+                        "symbol": "parties"
                       },
                       "val": {
                         "map": [
@@ -1638,7 +2303,7 @@
                     },
                     {
                       "key": {
-                        "symbol": "objectives_count"
+                        "symbol": "parties_count"
                       },
                       "val": {
                         "u128": {
@@ -1649,10 +2314,588 @@
                     },
                     {
                       "key": {
-                        "symbol": "project_id"
+                        "symbol": "spender"
                       },
                       "val": {
-                        "bytes": "00000000000000000000000000000002"
+                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": null,
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_call"
+              },
+              {
+                "bytes": "0000000000000000000000000000000000000000000000000000000000000006"
+              },
+              {
+                "symbol": "initialize_escrow"
+              }
+            ],
+            "data": {
+              "vec": [
+                {
+                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
+                },
+                {
+                  "vec": [
+                    {
+                      "u128": {
+                        "hi": 0,
+                        "lo": 100
+                      }
+                    },
+                    {
+                      "u128": {
+                        "hi": 0,
+                        "lo": 100
+                      }
+                    }
+                  ]
+                },
+                {
+                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOLZM"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": "0000000000000000000000000000000000000000000000000000000000000006",
+        "type_": "contract",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "p_created"
+              }
+            ],
+            "data": {
+              "vec": [
+                {
+                  "vec": [
+                    {
+                      "symbol": "Escrow"
+                    },
+                    {
+                      "bytes": "00000000000000000000000000000003"
+                    }
+                  ]
+                },
+                {
+                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOLZM"
+                },
+                {
+                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
+                },
+                {
+                  "vec": [
+                    {
+                      "u128": {
+                        "hi": 0,
+                        "lo": 100
+                      }
+                    },
+                    {
+                      "u128": {
+                        "hi": 0,
+                        "lo": 100
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": "0000000000000000000000000000000000000000000000000000000000000006",
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_return"
+              },
+              {
+                "symbol": "initialize_escrow"
+              }
+            ],
+            "data": {
+              "u128": {
+                "hi": 0,
+                "lo": 3
+              }
+            }
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": null,
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_call"
+              },
+              {
+                "bytes": "0000000000000000000000000000000000000000000000000000000000000006"
+              },
+              {
+                "symbol": "get_projects_by_from"
+              }
+            ],
+            "data": {
+              "vec": [
+                {
+                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
+                },
+                {
+                  "u32": 1
+                },
+                {
+                  "u32": 2
+                }
+              ]
+            }
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": "0000000000000000000000000000000000000000000000000000000000000006",
+        "type_": "contract",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "p_by_spdr"
+              }
+            ],
+            "data": {
+              "vec": [
+                {
+                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
+                },
+                {
+                  "vec": [
+                    {
+                      "map": [
+                        {
+                          "key": {
+                            "symbol": "cancelled"
+                          },
+                          "val": {
+                            "bool": false
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "completed"
+                          },
+                          "val": {
+                            "bool": false
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "completed_parties"
+                          },
+                          "val": {
+                            "u128": {
+                              "hi": 0,
+                              "lo": 0
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "contract_balance"
+                          },
+                          "val": {
+                            "u128": {
+                              "hi": 0,
+                              "lo": 0
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "earned_amount"
+                          },
+                          "val": {
+                            "u128": {
+                              "hi": 0,
+                              "lo": 0
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "escrow_id"
+                          },
+                          "val": {
+                            "bytes": "00000000000000000000000000000003"
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "from"
+                          },
+                          "val": {
+                            "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "parties"
+                          },
+                          "val": {
+                            "map": [
+                              {
+                                "key": {
+                                  "u128": {
+                                    "hi": 0,
+                                    "lo": 0
+                                  }
+                                },
+                                "val": {
+                                  "map": [
+                                    {
+                                      "key": {
+                                        "symbol": "completed"
+                                      },
+                                      "val": {
+                                        "bool": false
+                                      }
+                                    },
+                                    {
+                                      "key": {
+                                        "symbol": "half_paid"
+                                      },
+                                      "val": {
+                                        "u128": {
+                                          "hi": 0,
+                                          "lo": 0
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "key": {
+                                        "symbol": "price"
+                                      },
+                                      "val": {
+                                        "u128": {
+                                          "hi": 0,
+                                          "lo": 100
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              },
+                              {
+                                "key": {
+                                  "u128": {
+                                    "hi": 0,
+                                    "lo": 1
+                                  }
+                                },
+                                "val": {
+                                  "map": [
+                                    {
+                                      "key": {
+                                        "symbol": "completed"
+                                      },
+                                      "val": {
+                                        "bool": false
+                                      }
+                                    },
+                                    {
+                                      "key": {
+                                        "symbol": "half_paid"
+                                      },
+                                      "val": {
+                                        "u128": {
+                                          "hi": 0,
+                                          "lo": 0
+                                        }
+                                      }
+                                    },
+                                    {
+                                      "key": {
+                                        "symbol": "price"
+                                      },
+                                      "val": {
+                                        "u128": {
+                                          "hi": 0,
+                                          "lo": 100
+                                        }
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "parties_count"
+                          },
+                          "val": {
+                            "u128": {
+                              "hi": 0,
+                              "lo": 2
+                            }
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "spender"
+                          },
+                          "val": {
+                            "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOLZM"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      },
+      "failed_call": false
+    },
+    {
+      "event": {
+        "ext": "v0",
+        "contract_id": "0000000000000000000000000000000000000000000000000000000000000006",
+        "type_": "diagnostic",
+        "body": {
+          "v0": {
+            "topics": [
+              {
+                "symbol": "fn_return"
+              },
+              {
+                "symbol": "get_projects_by_from"
+              }
+            ],
+            "data": {
+              "vec": [
+                {
+                  "map": [
+                    {
+                      "key": {
+                        "symbol": "cancelled"
+                      },
+                      "val": {
+                        "bool": false
+                      }
+                    },
+                    {
+                      "key": {
+                        "symbol": "completed"
+                      },
+                      "val": {
+                        "bool": false
+                      }
+                    },
+                    {
+                      "key": {
+                        "symbol": "completed_parties"
+                      },
+                      "val": {
+                        "u128": {
+                          "hi": 0,
+                          "lo": 0
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "symbol": "contract_balance"
+                      },
+                      "val": {
+                        "u128": {
+                          "hi": 0,
+                          "lo": 0
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "symbol": "earned_amount"
+                      },
+                      "val": {
+                        "u128": {
+                          "hi": 0,
+                          "lo": 0
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "symbol": "escrow_id"
+                      },
+                      "val": {
+                        "bytes": "00000000000000000000000000000003"
+                      }
+                    },
+                    {
+                      "key": {
+                        "symbol": "from"
+                      },
+                      "val": {
+                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
+                      }
+                    },
+                    {
+                      "key": {
+                        "symbol": "parties"
+                      },
+                      "val": {
+                        "map": [
+                          {
+                            "key": {
+                              "u128": {
+                                "hi": 0,
+                                "lo": 0
+                              }
+                            },
+                            "val": {
+                              "map": [
+                                {
+                                  "key": {
+                                    "symbol": "completed"
+                                  },
+                                  "val": {
+                                    "bool": false
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "symbol": "half_paid"
+                                  },
+                                  "val": {
+                                    "u128": {
+                                      "hi": 0,
+                                      "lo": 0
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "symbol": "price"
+                                  },
+                                  "val": {
+                                    "u128": {
+                                      "hi": 0,
+                                      "lo": 100
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          },
+                          {
+                            "key": {
+                              "u128": {
+                                "hi": 0,
+                                "lo": 1
+                              }
+                            },
+                            "val": {
+                              "map": [
+                                {
+                                  "key": {
+                                    "symbol": "completed"
+                                  },
+                                  "val": {
+                                    "bool": false
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "symbol": "half_paid"
+                                  },
+                                  "val": {
+                                    "u128": {
+                                      "hi": 0,
+                                      "lo": 0
+                                    }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "symbol": "price"
+                                  },
+                                  "val": {
+                                    "u128": {
+                                      "hi": 0,
+                                      "lo": 100
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "key": {
+                        "symbol": "parties_count"
+                      },
+                      "val": {
+                        "u128": {
+                          "hi": 0,
+                          "lo": 2
+                        }
+                      }
+                    },
+                    {
+                      "key": {
+                        "symbol": "spender"
+                      },
+                      "val": {
+                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOLZM"
                       }
                     }
                   ]

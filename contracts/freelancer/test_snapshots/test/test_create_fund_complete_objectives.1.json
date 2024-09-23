@@ -70,7 +70,7 @@
           "function": {
             "contract_fn": {
               "contract_address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAK3IM",
-              "function_name": "create_project",
+              "function_name": "initialize_escrow",
               "args": [
                 {
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
@@ -1158,7 +1158,7 @@
                         "key": {
                           "vec": [
                             {
-                              "symbol": "Project"
+                              "symbol": "Escrow"
                             },
                             {
                               "bytes": "00000000000000000000000000000001"
@@ -1177,14 +1177,6 @@
                             },
                             {
                               "key": {
-                                "symbol": "client"
-                              },
-                              "val": {
-                                "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
-                              }
-                            },
-                            {
-                              "key": {
                                 "symbol": "completed"
                               },
                               "val": {
@@ -1193,7 +1185,7 @@
                             },
                             {
                               "key": {
-                                "symbol": "completed_objectives"
+                                "symbol": "completed_parties"
                               },
                               "val": {
                                 "u128": {
@@ -1226,7 +1218,15 @@
                             },
                             {
                               "key": {
-                                "symbol": "freelancer"
+                                "symbol": "escrow_id"
+                              },
+                              "val": {
+                                "bytes": "00000000000000000000000000000001"
+                              }
+                            },
+                            {
+                              "key": {
+                                "symbol": "from"
                               },
                               "val": {
                                 "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
@@ -1234,7 +1234,7 @@
                             },
                             {
                               "key": {
-                                "symbol": "objectives"
+                                "symbol": "parties"
                               },
                               "val": {
                                 "map": [
@@ -1327,7 +1327,7 @@
                             },
                             {
                               "key": {
-                                "symbol": "objectives_count"
+                                "symbol": "parties_count"
                               },
                               "val": {
                                 "u128": {
@@ -1338,10 +1338,10 @@
                             },
                             {
                               "key": {
-                                "symbol": "project_id"
+                                "symbol": "spender"
                               },
                               "val": {
-                                "bytes": "00000000000000000000000000000001"
+                                "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
                               }
                             }
                           ]
@@ -1752,7 +1752,7 @@
                 "bytes": "0000000000000000000000000000000000000000000000000000000000000005"
               },
               {
-                "symbol": "create_project"
+                "symbol": "initialize_escrow"
               }
             ],
             "data": {
@@ -1803,7 +1803,7 @@
                 {
                   "vec": [
                     {
-                      "symbol": "Project"
+                      "symbol": "Escrow"
                     },
                     {
                       "bytes": "00000000000000000000000000000001"
@@ -1851,7 +1851,7 @@
                 "symbol": "fn_return"
               },
               {
-                "symbol": "create_project"
+                "symbol": "initialize_escrow"
               }
             ],
             "data": {
@@ -2174,7 +2174,7 @@
                 {
                   "vec": [
                     {
-                      "symbol": "Project"
+                      "symbol": "Escrow"
                     },
                     {
                       "bytes": "00000000000000000000000000000001"
@@ -2563,7 +2563,7 @@
                 {
                   "vec": [
                     {
-                      "symbol": "Project"
+                      "symbol": "Escrow"
                     },
                     {
                       "bytes": "00000000000000000000000000000001"
@@ -3018,7 +3018,7 @@
                 {
                   "vec": [
                     {
-                      "symbol": "Project"
+                      "symbol": "Escrow"
                     },
                     {
                       "bytes": "00000000000000000000000000000001"
@@ -3407,7 +3407,7 @@
                 {
                   "vec": [
                     {
-                      "symbol": "Project"
+                      "symbol": "Escrow"
                     },
                     {
                       "bytes": "00000000000000000000000000000001"
