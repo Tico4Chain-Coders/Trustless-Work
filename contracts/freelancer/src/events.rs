@@ -1,5 +1,5 @@
 use soroban_sdk::{Env, vec, IntoVal, Val, Address, Vec, symbol_short};
-use crate::storage_types::DataKey;
+use crate::storage_types::{DataKey, Escrow};
 
 // Event for project created
 pub (crate) fn project_created(e: &Env, project_id: DataKey, client: Address, freelancer: Address, prices: Vec<u128>) {
@@ -40,6 +40,16 @@ pub (crate) fn project_refunded(e: &Env, project_id: DataKey, client: Address, p
 
     let event_payload = vec![e, project_id_val, client_val, price_val];
 
+    e.events().publish(topics, event_payload);
+}
+
+pub(crate) fn projects_by_address(e: &Env, spender: Address, escrows: Vec<Escrow>) {
+    let topics = (symbol_short!("p_by_spdr"),);
+    
+    let spender_val: Val = spender.into_val(e);
+    let escrows_val: Val = escrows.into_val(e);
+
+    let event_payload = vec![e, spender_val, escrows_val];
     e.events().publish(topics, event_payload);
 }
 

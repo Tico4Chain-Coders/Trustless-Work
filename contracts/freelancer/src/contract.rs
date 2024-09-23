@@ -5,7 +5,7 @@ use soroban_sdk::{
 use crate::storage::{get_escrow, get_all_escrows};
 use crate::storage_types::{Objective, Escrow, DataKey, User};
 // use crate::token::TokenClient;
-use crate::events::{project_created, objective_added, objective_completed, objective_funded, project_cancelled, project_completed, project_refunded};
+use crate::events::{project_created, objective_added, objective_completed, objective_funded, project_cancelled, project_completed, project_refunded, projects_by_address};
 
 #[contract]
 pub struct FreelanceContract;
@@ -280,31 +280,38 @@ impl FreelanceContract {
 
     }
     
-    pub fn get_projects_by_freelancer(e: Env, freelancer: Address) -> Vec<Escrow> {
-        let all_projects: Vec<Escrow> = get_all_escrows(e.clone());
-    
-        let mut result: Vec<Escrow> = Vec::new(&e);
-    
-        for project in all_projects.iter() {
-            if project.from == freelancer {
-                result.push_back(project);
-            }
-        }
-    
-        result
-    }
-
-    pub fn get_projects_by_spender(e: Env, spender: Address) -> Vec<Escrow> {
+    pub fn get_projects_by_from(e: Env, from: Address, page: u32, limit: u32) -> Vec<Escrow> {
         let all_escrows: Vec<Escrow> = get_all_escrows(e.clone());
     
         let mut result: Vec<Escrow> = Vec::new(&e);
-    
-        for escrow in all_escrows.iter() {
-            if escrow.spender == spender {
+
+        let start = (page * limit) as usize;
+        let end = start + limit as usize;
+
+        for (i, escrow) in all_escrows.iter().enumerate() {
+            if i >= start && i < end && escrow.from == from {
+                result.push_back(escrow);
+            }
+        }
+        projects_by_address(&e, from, result.clone());
+        result
+    }
+
+    pub fn get_projects_by_spender(e: Env, spender: Address, page: u32, limit: u32) -> Vec<Escrow> {
+        let all_escrows: Vec<Escrow> = get_all_escrows(e.clone());
+
+        let mut result: Vec<Escrow> = Vec::new(&e);
+
+        let start = (page * limit) as usize;
+        let end = start + limit as usize;
+
+        for (i, escrow) in all_escrows.iter().enumerate() {
+            if i >= start && i < end && escrow.spender == spender {
                 result.push_back(escrow);
             }
         }
     
+        projects_by_address(&e, spender, result.clone());
         result
     }
       
