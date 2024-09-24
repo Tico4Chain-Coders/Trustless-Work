@@ -1,7 +1,6 @@
 use soroban_sdk::{Env, vec, IntoVal, Val, Address, Vec, symbol_short};
 use crate::storage_types::{DataKey, Escrow};
 
-// Event for project created
 pub (crate) fn project_created(e: &Env, project_id: DataKey, client: Address, freelancer: Address, prices: Vec<u128>) {
     let topics = (symbol_short!("p_created"),);
 
@@ -14,7 +13,6 @@ pub (crate) fn project_created(e: &Env, project_id: DataKey, client: Address, fr
     e.events().publish(topics, event_payload);
 }
 
-// Event for project completed
 pub (crate) fn project_completed(e: &Env, project_id: DataKey) {
     let topics = (symbol_short!("p_c"),); // c -> completed
 
@@ -22,7 +20,6 @@ pub (crate) fn project_completed(e: &Env, project_id: DataKey) {
     e.events().publish(topics, project_id_val);
 }
 
-// Event for project cancelled
 pub (crate) fn project_cancelled(e: &Env, project_id: DataKey) {
     let topics = (symbol_short!("p_cd"),); // cd -> cancelled
 
@@ -30,7 +27,6 @@ pub (crate) fn project_cancelled(e: &Env, project_id: DataKey) {
     e.events().publish(topics, project_id_val);
 }
 
-// Event for project refunded
 pub (crate) fn project_refunded(e: &Env, project_id: DataKey, client: Address, price: u128) {
     let topics = (symbol_short!("p_rd"),); // rd -> refunded
 
@@ -43,7 +39,7 @@ pub (crate) fn project_refunded(e: &Env, project_id: DataKey, client: Address, p
     e.events().publish(topics, event_payload);
 }
 
-pub(crate) fn projects_by_address(e: &Env, spender: Address, escrows: Vec<Escrow>) {
+pub (crate) fn projects_by_address(e: &Env, spender: Address, escrows: Vec<Escrow>) {
     let topics = (symbol_short!("p_by_spdr"),);
     
     let spender_val: Val = spender.into_val(e);
@@ -56,7 +52,6 @@ pub(crate) fn projects_by_address(e: &Env, spender: Address, escrows: Vec<Escrow
 
 // ------ Objectives
 
-// Event for objective added
 pub (crate) fn objective_added(e: &Env, project_id: &DataKey, objective_id: u128, price: u128) {
     let topics = (symbol_short!("ob_added"),);
 
@@ -68,7 +63,6 @@ pub (crate) fn objective_added(e: &Env, project_id: &DataKey, objective_id: u128
     e.events().publish(topics, event_payload);
 }
 
-// Event for objective funded
 pub (crate) fn objective_funded(e: &Env, project_id: DataKey, objective_id: u128, half_price: u128) {
     let topics = (symbol_short!("ob_funded"),);
 
@@ -80,7 +74,6 @@ pub (crate) fn objective_funded(e: &Env, project_id: DataKey, objective_id: u128
     e.events().publish(topics, event_payload);
 }
 
-// Event for objective funded
 pub (crate) fn objective_completed(e: &Env, project_id: DataKey, objective_id: u128, full_price: u128) {
     let topics = (symbol_short!("ob_c"),); // c -> completed
 
@@ -89,5 +82,17 @@ pub (crate) fn objective_completed(e: &Env, project_id: DataKey, objective_id: u
     let full_price_val: Val = full_price.into_val(e);
 
     let event_payload = vec![e, project_id_val, objective_id_val, full_price_val];
+    e.events().publish(topics, event_payload);
+}
+
+// ------ Token
+
+pub (crate) fn balance_retrieved_event(e: &Env, address: Address, usdc_token_address: Address, balance: i128) {
+    let topics = (symbol_short!("balance"),); // Nombre del evento
+    let address_val: Val = address.into_val(e);
+    let token_address_val: Val = usdc_token_address.into_val(e);
+    let balance_val: Val = balance.into_val(e);
+
+    let event_payload = vec![e, address_val, token_address_val, balance_val];
     e.events().publish(topics, event_payload);
 }
