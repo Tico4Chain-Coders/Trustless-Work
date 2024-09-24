@@ -1,18 +1,20 @@
 use soroban_sdk::{
-    contract, contractimpl, symbol_short, Address, Bytes, Env, Map, String, Vec, token
+    contract, contractimpl, symbol_short, Address, Bytes, Env, Map, String, Vec
 };
+use soroban_sdk::token::Client as TokenClient;
 
 use crate::storage::{get_escrow, get_all_escrows};
 use crate::storage_types::{Objective, Escrow, DataKey, User};
-// use crate::token::TokenClient;
-use crate::events::{project_created, objective_added, objective_completed, objective_funded, project_cancelled, project_completed, project_refunded, projects_by_address};
+use crate::events::{
+    project_created, objective_added, objective_completed, objective_funded, project_cancelled, project_completed, 
+    project_refunded, projects_by_address, balance_retrieved_event
+};
 
 #[contract]
 pub struct FreelanceContract;
 
 #[contractimpl]
 impl FreelanceContract {
-
     pub fn initialize_escrow(
         e: Env,
         freelancer: Address,
@@ -86,7 +88,6 @@ impl FreelanceContract {
         project.completed = true;
         e.storage().instance().set(&project_key, &project);
         project_completed(&e, project_key);
-
     }
     
 
@@ -121,7 +122,7 @@ impl FreelanceContract {
         let remaining_price = (objective.price - objective.half_paid) as i128;
         let full_price = objective.price;
     
-        let usdc_client = token::Client::new(&e, &usdc_contract);
+        let usdc_client = TokenClient::new(&e, &usdc_contract);
         usdc_client.transfer(
             &user,              
             &freelance_contract_address,
@@ -202,6 +203,25 @@ impl FreelanceContract {
         e.storage().instance().set(&project_key, &project);
     }
 
+    pub fn approve_amounts(e: Env, from: Address, spender: Address, amount: i128, usdc_token_address: Address ) {
+        let expiration_ledger = e.ledger().sequence() + 1000;
+        let usdc_token = TokenClient::new(&e, &usdc_token_address);
+        usdc_token.approve(&from, &spender, &amount, &expiration_ledger);
+    }
+
+    pub fn get_allowance(e: Env, from: Address, spender: Address, usdc_token_address: Address ) -> i128 {
+        let usdc_token = TokenClient::new(&e, &usdc_token_address);
+        let allowance = usdc_token.allowance(&from, &spender);
+        allowance
+    }
+
+    pub fn get_balance(e: Env, address: Address, usdc_token_address: Address) -> i128 {
+        let usdc_token = TokenClient::new(&e, &usdc_token_address);
+        let balance = usdc_token.balance(&address);
+        balance_retrieved_event(&e, address, usdc_token_address, balance);
+        balance
+    }
+
     pub fn fund_objective(e: Env, escrow_id: Bytes, objective_id: u128, user: Address, usdc_contract: Address, freelance_contract_address: Address) {
         user.require_auth();
     
@@ -218,9 +238,10 @@ impl FreelanceContract {
         }
     
         let half_price = (objective.price / 2) as i128;
-        let usdc_client = token::Client::new(&e, &usdc_contract);
+        let usdc_client = TokenClient::new(&e, &usdc_contract);
 
         let allowance = usdc_client.allowance(&user, &freelance_contract_address);
+
         if allowance < half_price {
             panic!("Not enough allowance to fund this objective. Please approve the amount first.");
         }
@@ -264,7 +285,7 @@ impl FreelanceContract {
             }
         }
         
-        let usdc_client = token::Client::new(&e, &usdc_contract);
+        let usdc_client = TokenClient::new(&e, &usdc_contract);
         let contract_balance = usdc_client.balance(&freelance_contract_address);
         if  contract_balance == 0 {
             panic!("The contract has no balance to repay");
