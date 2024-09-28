@@ -1,5 +1,5 @@
 use soroban_sdk::{
-    contract, contractimpl, symbol_short, Address, Bytes, Env, Map, String, Vec
+    contract, contractimpl, symbol_short, Address, Bytes, Env, Map, String, Vec, BytesN
 };
 use soroban_sdk::token::Client as TokenClient;
 
@@ -7,7 +7,7 @@ use crate::storage::{get_escrow, get_all_escrows};
 use crate::storage_types::{Objective, Escrow, DataKey, User};
 use crate::events::{
     project_created, objective_added, objective_completed, objective_funded, project_cancelled, project_completed, 
-    project_refunded, projects_by_address, balance_retrieved_event
+    project_refunded, projects_by_address, balance_retrieved_event, allowance_retrieved_event
 };
 
 #[contract]
@@ -204,22 +204,22 @@ impl FreelanceContract {
     }
 
     pub fn approve_amounts(e: Env, from: Address, spender: Address, amount: i128, usdc_token_address: Address ) {
+        from.require_auth();
         let expiration_ledger = e.ledger().sequence() + 1000;
         let usdc_token = TokenClient::new(&e, &usdc_token_address);
         usdc_token.approve(&from, &spender, &amount, &expiration_ledger);
     }
 
-    pub fn get_allowance(e: Env, from: Address, spender: Address, usdc_token_address: Address ) -> i128 {
+    pub fn get_allowance(e: Env, from: Address, spender: Address, usdc_token_address: Address ) {
         let usdc_token = TokenClient::new(&e, &usdc_token_address);
         let allowance = usdc_token.allowance(&from, &spender);
-        allowance
+        allowance_retrieved_event(&e, from, spender, allowance);
     }
 
-    pub fn get_balance(e: Env, address: Address, usdc_token_address: Address) -> i128 {
+    pub fn get_balance(e: Env, address: Address, usdc_token_address: Address) {
         let usdc_token = TokenClient::new(&e, &usdc_token_address);
         let balance = usdc_token.balance(&address);
         balance_retrieved_event(&e, address, usdc_token_address, balance);
-        balance
     }
 
     pub fn fund_objective(e: Env, escrow_id: Bytes, objective_id: u128, user: Address, usdc_contract: Address, freelance_contract_address: Address) {
