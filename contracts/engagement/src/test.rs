@@ -46,11 +46,6 @@ fn test_create_fund_complete_escrows() {
 
     let usdc_contract_address = token.address.clone();
 
-    let expiration_ledger = env.ledger().sequence() + 1000;
-    let full_price = 100;
-    token.approve(&client_address, &engagement_contract_address, &full_price, &expiration_ledger);
-    assert_eq!(token.allowance(&client_address, &engagement_contract_address), 100);
-
     let prices: Vec<u128> = Vec::from_array(&env, [100_u128, 100_u128]);
     let engagement_id = engagement_client.initialize_escrow(&service_provider_address, &prices, &client_address);
     let engagement_id_in_bytes = u128_to_bytes(&env, engagement_id);
@@ -59,7 +54,7 @@ fn test_create_fund_complete_escrows() {
     env.as_contract(&engagement_contract_address, || {
         let engagement_key = DataKey::Engagement(engagement_id_in_bytes.clone());
         let engagement: Engagement = env.storage().instance().get(&engagement_key).unwrap();
-        let first_escrow = engagement.parties.get(0).unwrap();
+        let first_escrow = engagement.escrows.get(0).unwrap();
         assert_eq!(first_escrow.amount_paid, 50);
     });
 
@@ -68,18 +63,17 @@ fn test_create_fund_complete_escrows() {
     env.as_contract(&engagement_contract_address, || {
         let engagement_key = DataKey::Engagement(engagement_id_in_bytes.clone());
         let engagement: Engagement = env.storage().instance().get(&engagement_key).unwrap();
-        let second_escrow = engagement.parties.get(0).unwrap();
+        let second_escrow = engagement.escrows.get(0).unwrap();
         assert_eq!(second_escrow.completed, true);
     });
-    
-    token.approve(&client_address, &engagement_contract_address, &full_price, &expiration_ledger);
+
     engagement_client.fund_escrow(&engagement_id_in_bytes, &1, &client_address, &usdc_contract_address, &engagement_contract_address);
     engagement_client.complete_escrow(&engagement_id_in_bytes, &1, &client_address, &usdc_contract_address, &engagement_contract_address, &service_provider_address);
     
     env.as_contract(&engagement_contract_address, || {
         let engagement_key = DataKey::Engagement(engagement_id_in_bytes.clone());
         let engagement: Engagement = env.storage().instance().get(&engagement_key).unwrap();
-        let third_escrow = engagement.parties.get(1).unwrap();
+        let third_escrow = engagement.escrows.get(1).unwrap();
         assert_eq!(third_escrow.completed, true);
     });
 }
@@ -116,30 +110,25 @@ fn test_client_can_recover_funds_if_service_provider_does_not_complete_all_escro
     assert_eq!(token.balance(&client_address), 1000);
 
     let usdc_contract_address = token.address.clone();
-    let expiration_ledger = env.ledger().sequence() + 1000;
-    let full_price = 100;
 
     let prices: Vec<u128> = Vec::from_array(&env, [100_u128, 100_u128, 100_u128]);
     let engagement_id = engagement_client.initialize_escrow(&service_provider_address, &prices, &client_address);
     let engagement_id_in_bytes = u128_to_bytes(&env, engagement_id);
-
-    token.approve(&client_address, &engagement_contract_address, &full_price, &expiration_ledger);
+;
     engagement_client.fund_escrow(&engagement_id_in_bytes, &0, &client_address, &usdc_contract_address, &engagement_contract_address);
     env.as_contract(&engagement_contract_address, || {
         let engagement_key = DataKey::Engagement(engagement_id_in_bytes.clone());
         let engagement: Engagement = env.storage().instance().get(&engagement_key).unwrap();
-        let first_escrow = engagement.parties.get(0).unwrap();
+        let first_escrow = engagement.escrows.get(0).unwrap();
         assert_eq!(first_escrow.amount_paid, 50);
     });
 
     engagement_client.complete_escrow(&engagement_id_in_bytes, &0, &client_address, &usdc_contract_address, &engagement_contract_address, &service_provider_address);
 
-    token.approve(&client_address, &engagement_contract_address, &full_price, &expiration_ledger);
     engagement_client.fund_escrow(&engagement_id_in_bytes, &1, &client_address, &usdc_contract_address, &engagement_contract_address);
 
     engagement_client.complete_escrow(&engagement_id_in_bytes, &1, &client_address, &usdc_contract_address, &engagement_contract_address, &service_provider_address);
 
-    token.approve(&client_address, &engagement_contract_address, &full_price, &expiration_ledger);
     engagement_client.fund_escrow(&engagement_id_in_bytes, &2, &client_address, &usdc_contract_address, &engagement_contract_address);
 
     engagement_client.cancel_engagement(&engagement_id_in_bytes, &client_address);
@@ -195,25 +184,21 @@ fn test_add_new_escrows_and_complete_them() {
     assert_eq!(token.balance(&client_address), 1000);
 
     let usdc_contract_address = token.address.clone();
-    let expiration_ledger = env.ledger().sequence() + 1000;
-    let full_price = 100;
 
     let prices: Vec<u128> = Vec::from_array(&env, [100_u128, 100_u128]);
     let engagement_id = engagement_client.initialize_escrow(&service_provider_address, &prices, &client_address);
     let engagement_id_in_bytes = u128_to_bytes(&env, engagement_id);
 
-    token.approve(&client_address, &engagement_contract_address, &full_price, &expiration_ledger);
     engagement_client.fund_escrow(&engagement_id_in_bytes, &0, &client_address, &usdc_contract_address, &engagement_contract_address);
     env.as_contract(&engagement_contract_address, || {
         let engagement_key = DataKey::Engagement(engagement_id_in_bytes.clone());
         let engagement: Engagement = env.storage().instance().get(&engagement_key).unwrap();
-        let first_escrow = engagement.parties.get(0).unwrap();
+        let first_escrow = engagement.escrows.get(0).unwrap();
         assert_eq!(first_escrow.amount_paid, 50);
     });
 
     engagement_client.complete_escrow(&engagement_id_in_bytes, &0, &client_address, &usdc_contract_address, &engagement_contract_address, &service_provider_address);
 
-    token.approve(&client_address, &engagement_contract_address, &full_price, &expiration_ledger);
     engagement_client.fund_escrow(&engagement_id_in_bytes, &1, &client_address, &usdc_contract_address, &engagement_contract_address);
 
     engagement_client.complete_escrow(&engagement_id_in_bytes, &1, &client_address, &usdc_contract_address, &engagement_contract_address, &service_provider_address);
@@ -221,7 +206,6 @@ fn test_add_new_escrows_and_complete_them() {
     let new_prices: Vec<u128> = Vec::from_array(&env, [100_u128]);
     engagement_client.add_escrow(&engagement_id_in_bytes, &new_prices, &client_address);
 
-    token.approve(&client_address, &engagement_contract_address, &full_price, &expiration_ledger);
     engagement_client.fund_escrow(&engagement_id_in_bytes, &2, &client_address, &usdc_contract_address, &engagement_contract_address);
 
     engagement_client.complete_escrow(&engagement_id_in_bytes, &2, &client_address, &usdc_contract_address, &engagement_contract_address, &service_provider_address);
@@ -265,25 +249,21 @@ fn test_complete_engagement_after_all_escrows_completed() {
     assert_eq!(token.balance(&client_address), 1000);
 
     let usdc_contract_address = token.address.clone();
-    let expiration_ledger = env.ledger().sequence() + 1000;
-    let full_price = 100;
 
     let prices: Vec<u128> = Vec::from_array(&env, [100_u128, 100_u128]);
     let engagement_id = engagement_client.initialize_escrow(&service_provider_address, &prices, &client_address);
     let engagement_id_in_bytes = u128_to_bytes(&env, engagement_id);
 
-    token.approve(&client_address, &engagement_contract_address, &full_price, &expiration_ledger);
     engagement_client.fund_escrow(&engagement_id_in_bytes, &0, &client_address, &usdc_contract_address, &engagement_contract_address);
     env.as_contract(&engagement_contract_address, || {
         let engagement_key = DataKey::Engagement(engagement_id_in_bytes.clone());
         let engagement: Engagement = env.storage().instance().get(&engagement_key).unwrap();
-        let first_escrow = engagement.parties.get(0).unwrap();
+        let first_escrow = engagement.escrows.get(0).unwrap();
         assert_eq!(first_escrow.amount_paid, 50);
     });
 
     engagement_client.complete_escrow(&engagement_id_in_bytes, &0, &client_address, &usdc_contract_address, &engagement_contract_address, &service_provider_address);
 
-    token.approve(&client_address, &engagement_contract_address, &full_price, &expiration_ledger);
     engagement_client.fund_escrow(&engagement_id_in_bytes, &1, &client_address, &usdc_contract_address, &engagement_contract_address);
 
     engagement_client.complete_escrow(&engagement_id_in_bytes, &1, &client_address, &usdc_contract_address, &engagement_contract_address, &service_provider_address);

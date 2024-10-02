@@ -37,9 +37,9 @@ impl EngagementContract {
         engagement_count += 1;
         e.storage().instance().set(&contract_key, &engagement_count);
         let engagement_id = Bytes::from_slice(&e, &engagement_count.to_be_bytes());
-        let mut parties: Map<u128, Escrow> = Map::new(&e);
+        let mut escrows: Map<u128, Escrow> = Map::new(&e);
         for (i, price) in prices.iter().enumerate() {
-            parties.set(i as u128, Escrow {
+            escrows.set(i as u128, Escrow {
                 price: price as u128,
                 amount_paid: 0,
                 completed: false,
@@ -49,9 +49,9 @@ impl EngagementContract {
             engagement_id,
             client: client.clone(),
             service_provider: service_provider.clone(),
-            parties_count: prices.len() as u128,
-            parties,
-            completed_parties: 0,
+            escrows_count: prices.len() as u128,
+            escrows,
+            completed_escrows: 0,
             earned_amount: 0,
             contract_balance: 0,
             cancelled: false,
@@ -81,7 +81,7 @@ impl EngagementContract {
             panic!("Engagement is cancelled");
         }
 
-        if engagement.completed_parties != engagement.parties_count {
+        if engagement.completed_escrows != engagement.escrows_count {
             panic!("Not all escrows completed");
         }
 
@@ -109,7 +109,7 @@ impl EngagementContract {
             panic!("Only the service provider can complete escrows");
         }
     
-        let mut escrow = engagement.parties.get(escrow_id).unwrap();
+        let mut escrow = engagement.escrows.get(escrow_id).unwrap();
     
         if escrow.amount_paid == 0 {
             panic!("Escrow not funded");
@@ -123,14 +123,16 @@ impl EngagementContract {
         let full_price = escrow.price;
     
         let usdc_client = TokenClient::new(&e, &usdc_contract);
+        let expiration_ledger = e.ledger().sequence() + 1000;
+
+        usdc_client.approve(&client, &contract_address, &remaining_price, &expiration_ledger);
         usdc_client.transfer(
             &client,              
             &contract_address,
             &remaining_price
         );
 
-        let expiration_ledger = e.ledger().sequence() + 1000;
-        usdc_client.approve(&contract_address, &service_provider, &remaining_price, &expiration_ledger);
+        usdc_client.approve(&contract_address, &service_provider, &(escrow.price as i128), &expiration_ledger);
         usdc_client.transfer(
             &contract_address,
             &service_provider,
@@ -138,10 +140,10 @@ impl EngagementContract {
         );
     
         escrow.completed = true;
-        engagement.completed_parties += 1;
+        engagement.completed_escrows += 1;
         engagement.earned_amount += escrow.price;
     
-        engagement.parties.set(escrow_id, escrow);
+        engagement.escrows.set(escrow_id, escrow);
         e.storage().instance().set(&engagement_key, &engagement);
     
         escrow_completed(&e, engagement_key, escrow_id, full_price);
@@ -188,9 +190,9 @@ impl EngagementContract {
         }
         
         for (i, price) in prices.iter().enumerate() {
-            let escrow_id = engagement.parties_count + i as u128;
+            let escrow_id = engagement.escrows_count + i as u128;
 
-            engagement.parties.set(escrow_id, Escrow {
+            engagement.escrows.set(escrow_id, Escrow {
                 price: price,
                 amount_paid: 0,
                 completed: false,
@@ -199,7 +201,7 @@ impl EngagementContract {
             escrow_added(&e, &engagement_key, escrow_id, price);
         }
 
-        engagement.parties_count += prices.len() as u128;
+        engagement.escrows_count += prices.len() as u128;
         e.storage().instance().set(&engagement_key, &engagement);
     }
 
@@ -232,7 +234,7 @@ impl EngagementContract {
             panic!("Only the client can fund escrows");
         }
     
-        let mut escrow = engagement.parties.get(escrow_id).unwrap();
+        let mut escrow = engagement.escrows.get(escrow_id).unwrap();
         if escrow.amount_paid > 0 {
             panic!("Escrow already funded");
         }
@@ -240,11 +242,14 @@ impl EngagementContract {
         let half_price = (escrow.price / 2) as i128;
         let usdc_client = TokenClient::new(&e, &usdc_contract);
 
+        usdc_client.approve(&client, &contract_address, &half_price, &e.ledger().sequence());
+        
         let allowance = usdc_client.allowance(&client, &contract_address);
 
         if allowance < half_price {
             panic!("Not enough allowance to fund this escrow. Please approve the amount first.");
         }
+
     
         usdc_client.transfer(
             &client,              
@@ -252,10 +257,9 @@ impl EngagementContract {
             &half_price       
         );
 
-        usdc_client.approve(&client, &contract_address, &0, &e.ledger().sequence());
     
         escrow.amount_paid = half_price as u128;
-        engagement.parties.set(escrow_id, escrow);
+        engagement.escrows.set(escrow_id, escrow);
         e.storage().instance().set(&engagement_key, &engagement);
     
         escrow_funded(&e, engagement_key, escrow_id, half_price as u128);
@@ -276,8 +280,8 @@ impl EngagementContract {
 
 
         let mut refundable_amount : i128 = 0;
-        for _i in 0..engagement.parties_count {
-            let mut escrow = engagement.parties.get(escrow_id).unwrap(); 
+        for _i in 0..engagement.escrows_count {
+            let mut escrow = engagement.escrows.get(escrow_id).unwrap(); 
             
             if !escrow.completed && escrow.amount_paid > 0 {
                 refundable_amount += escrow.amount_paid as i128;
