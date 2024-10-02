@@ -12,4 +12,4 @@ mod contract;
 mod utils;
 mod test;
 
-pub use crate::contract::FreelanceContractClient;
+pub use crate::contract::EngagementContractClient;

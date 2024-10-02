@@ -41,44 +41,6 @@
               "function_name": "initialize_escrow",
               "args": [
                 {
-                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
-                },
-                {
-                  "vec": [
-                    {
-                      "u128": {
-                        "hi": 0,
-                        "lo": 100
-                      }
-                    },
-                    {
-                      "u128": {
-                        "hi": 0,
-                        "lo": 100
-                      }
-                    }
-                  ]
-                },
-                {
-                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
-                }
-              ]
-            }
-          },
-          "sub_invocations": []
-        }
-      ]
-    ],
-    [
-      [
-        "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4",
-        {
-          "function": {
-            "contract_fn": {
-              "contract_address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDR4",
-              "function_name": "initialize_escrow",
-              "args": [
-                {
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
                 },
                 {
@@ -107,10 +69,9 @@
         }
       ]
     ],
-    [],
     [
       [
-        "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4",
+        "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M",
         {
           "function": {
             "contract_fn": {
@@ -118,7 +79,7 @@
               "function_name": "initialize_escrow",
               "args": [
                 {
-                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOLZM"
+                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
                 },
                 {
                   "vec": [
@@ -137,7 +98,46 @@
                   ]
                 },
                 {
-                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
+                }
+              ]
+            }
+          },
+          "sub_invocations": []
+        }
+      ]
+    ],
+    [],
+    [
+      [
+        "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOLZM",
+        {
+          "function": {
+            "contract_fn": {
+              "contract_address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAMDR4",
+              "function_name": "initialize_escrow",
+              "args": [
+                {
+                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
+                },
+                {
+                  "vec": [
+                    {
+                      "u128": {
+                        "hi": 0,
+                        "lo": 100
+                      }
+                    },
+                    {
+                      "u128": {
+                        "hi": 0,
+                        "lo": 100
+                      }
+                    }
+                  ]
+                },
+                {
+                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOLZM"
                 }
               ]
             }
@@ -197,72 +197,6 @@
             "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4",
             "key": {
               "ledger_key_nonce": {
-                "nonce": 1033654523790656264
-              }
-            },
-            "durability": "temporary"
-          }
-        },
-        [
-          {
-            "last_modified_ledger_seq": 0,
-            "data": {
-              "contract_data": {
-                "ext": "v0",
-                "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4",
-                "key": {
-                  "ledger_key_nonce": {
-                    "nonce": 1033654523790656264
-                  }
-                },
-                "durability": "temporary",
-                "val": "void"
-              }
-            },
-            "ext": "v0"
-          },
-          6311999
-        ]
-      ],
-      [
-        {
-          "contract_data": {
-            "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4",
-            "key": {
-              "ledger_key_nonce": {
-                "nonce": 4837995959683129791
-              }
-            },
-            "durability": "temporary"
-          }
-        },
-        [
-          {
-            "last_modified_ledger_seq": 0,
-            "data": {
-              "contract_data": {
-                "ext": "v0",
-                "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4",
-                "key": {
-                  "ledger_key_nonce": {
-                    "nonce": 4837995959683129791
-                  }
-                },
-                "durability": "temporary",
-                "val": "void"
-              }
-            },
-            "ext": "v0"
-          },
-          6311999
-        ]
-      ],
-      [
-        {
-          "contract_data": {
-            "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4",
-            "key": {
-              "ledger_key_nonce": {
                 "nonce": 5541220902715666415
               }
             },
@@ -279,6 +213,39 @@
                 "key": {
                   "ledger_key_nonce": {
                     "nonce": 5541220902715666415
+                  }
+                },
+                "durability": "temporary",
+                "val": "void"
+              }
+            },
+            "ext": "v0"
+          },
+          6311999
+        ]
+      ],
+      [
+        {
+          "contract_data": {
+            "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M",
+            "key": {
+              "ledger_key_nonce": {
+                "nonce": 1033654523790656264
+              }
+            },
+            "durability": "temporary"
+          }
+        },
+        [
+          {
+            "last_modified_ledger_seq": 0,
+            "data": {
+              "contract_data": {
+                "ext": "v0",
+                "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M",
+                "key": {
+                  "ledger_key_nonce": {
+                    "nonce": 1033654523790656264
                   }
                 },
                 "durability": "temporary",
@@ -454,7 +421,7 @@
                         "key": {
                           "vec": [
                             {
-                              "symbol": "Escrow"
+                              "symbol": "Engagement"
                             },
                             {
                               "bytes": "00000000000000000000000000000001"
@@ -473,6 +440,14 @@
                             },
                             {
                               "key": {
+                                "symbol": "client"
+                              },
+                              "val": {
+                                "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                              }
+                            },
+                            {
+                              "key": {
                                 "symbol": "completed"
                               },
                               "val": {
@@ -514,18 +489,10 @@
                             },
                             {
                               "key": {
-                                "symbol": "escrow_id"
+                                "symbol": "engagement_id"
                               },
                               "val": {
                                 "bytes": "00000000000000000000000000000001"
-                              }
-                            },
-                            {
-                              "key": {
-                                "symbol": "from"
-                              },
-                              "val": {
-                                "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
                               }
                             },
                             {
@@ -545,21 +512,21 @@
                                       "map": [
                                         {
                                           "key": {
-                                            "symbol": "completed"
-                                          },
-                                          "val": {
-                                            "bool": false
-                                          }
-                                        },
-                                        {
-                                          "key": {
-                                            "symbol": "half_paid"
+                                            "symbol": "amount_paid"
                                           },
                                           "val": {
                                             "u128": {
                                               "hi": 0,
                                               "lo": 0
                                             }
+                                          }
+                                        },
+                                        {
+                                          "key": {
+                                            "symbol": "completed"
+                                          },
+                                          "val": {
+                                            "bool": false
                                           }
                                         },
                                         {
@@ -587,21 +554,21 @@
                                       "map": [
                                         {
                                           "key": {
-                                            "symbol": "completed"
-                                          },
-                                          "val": {
-                                            "bool": false
-                                          }
-                                        },
-                                        {
-                                          "key": {
-                                            "symbol": "half_paid"
+                                            "symbol": "amount_paid"
                                           },
                                           "val": {
                                             "u128": {
                                               "hi": 0,
                                               "lo": 0
                                             }
+                                          }
+                                        },
+                                        {
+                                          "key": {
+                                            "symbol": "completed"
+                                          },
+                                          "val": {
+                                            "bool": false
                                           }
                                         },
                                         {
@@ -634,10 +601,10 @@
                             },
                             {
                               "key": {
-                                "symbol": "spender"
+                                "symbol": "service_provider"
                               },
                               "val": {
-                                "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                                "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
                               }
                             }
                           ]
@@ -647,7 +614,7 @@
                         "key": {
                           "vec": [
                             {
-                              "symbol": "Escrow"
+                              "symbol": "Engagement"
                             },
                             {
                               "bytes": "00000000000000000000000000000002"
@@ -666,6 +633,14 @@
                             },
                             {
                               "key": {
+                                "symbol": "client"
+                              },
+                              "val": {
+                                "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
+                              }
+                            },
+                            {
+                              "key": {
                                 "symbol": "completed"
                               },
                               "val": {
@@ -707,18 +682,10 @@
                             },
                             {
                               "key": {
-                                "symbol": "escrow_id"
+                                "symbol": "engagement_id"
                               },
                               "val": {
                                 "bytes": "00000000000000000000000000000002"
-                              }
-                            },
-                            {
-                              "key": {
-                                "symbol": "from"
-                              },
-                              "val": {
-                                "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
                               }
                             },
                             {
@@ -738,21 +705,21 @@
                                       "map": [
                                         {
                                           "key": {
-                                            "symbol": "completed"
-                                          },
-                                          "val": {
-                                            "bool": false
-                                          }
-                                        },
-                                        {
-                                          "key": {
-                                            "symbol": "half_paid"
+                                            "symbol": "amount_paid"
                                           },
                                           "val": {
                                             "u128": {
                                               "hi": 0,
                                               "lo": 0
                                             }
+                                          }
+                                        },
+                                        {
+                                          "key": {
+                                            "symbol": "completed"
+                                          },
+                                          "val": {
+                                            "bool": false
                                           }
                                         },
                                         {
@@ -780,21 +747,21 @@
                                       "map": [
                                         {
                                           "key": {
-                                            "symbol": "completed"
-                                          },
-                                          "val": {
-                                            "bool": false
-                                          }
-                                        },
-                                        {
-                                          "key": {
-                                            "symbol": "half_paid"
+                                            "symbol": "amount_paid"
                                           },
                                           "val": {
                                             "u128": {
                                               "hi": 0,
                                               "lo": 0
                                             }
+                                          }
+                                        },
+                                        {
+                                          "key": {
+                                            "symbol": "completed"
+                                          },
+                                          "val": {
+                                            "bool": false
                                           }
                                         },
                                         {
@@ -827,10 +794,10 @@
                             },
                             {
                               "key": {
-                                "symbol": "spender"
+                                "symbol": "service_provider"
                               },
                               "val": {
-                                "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                                "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
                               }
                             }
                           ]
@@ -840,7 +807,7 @@
                         "key": {
                           "vec": [
                             {
-                              "symbol": "Escrow"
+                              "symbol": "Engagement"
                             },
                             {
                               "bytes": "00000000000000000000000000000003"
@@ -859,6 +826,14 @@
                             },
                             {
                               "key": {
+                                "symbol": "client"
+                              },
+                              "val": {
+                                "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOLZM"
+                              }
+                            },
+                            {
+                              "key": {
                                 "symbol": "completed"
                               },
                               "val": {
@@ -900,18 +875,10 @@
                             },
                             {
                               "key": {
-                                "symbol": "escrow_id"
+                                "symbol": "engagement_id"
                               },
                               "val": {
                                 "bytes": "00000000000000000000000000000003"
-                              }
-                            },
-                            {
-                              "key": {
-                                "symbol": "from"
-                              },
-                              "val": {
-                                "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOLZM"
                               }
                             },
                             {
@@ -931,21 +898,21 @@
                                       "map": [
                                         {
                                           "key": {
-                                            "symbol": "completed"
-                                          },
-                                          "val": {
-                                            "bool": false
-                                          }
-                                        },
-                                        {
-                                          "key": {
-                                            "symbol": "half_paid"
+                                            "symbol": "amount_paid"
                                           },
                                           "val": {
                                             "u128": {
                                               "hi": 0,
                                               "lo": 0
                                             }
+                                          }
+                                        },
+                                        {
+                                          "key": {
+                                            "symbol": "completed"
+                                          },
+                                          "val": {
+                                            "bool": false
                                           }
                                         },
                                         {
@@ -973,21 +940,21 @@
                                       "map": [
                                         {
                                           "key": {
-                                            "symbol": "completed"
-                                          },
-                                          "val": {
-                                            "bool": false
-                                          }
-                                        },
-                                        {
-                                          "key": {
-                                            "symbol": "half_paid"
+                                            "symbol": "amount_paid"
                                           },
                                           "val": {
                                             "u128": {
                                               "hi": 0,
                                               "lo": 0
                                             }
+                                          }
+                                        },
+                                        {
+                                          "key": {
+                                            "symbol": "completed"
+                                          },
+                                          "val": {
+                                            "bool": false
                                           }
                                         },
                                         {
@@ -1020,10 +987,10 @@
                             },
                             {
                               "key": {
-                                "symbol": "spender"
+                                "symbol": "service_provider"
                               },
                               "val": {
-                                "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                                "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
                               }
                             }
                           ]
@@ -1037,6 +1004,39 @@
             "ext": "v0"
           },
           4095
+        ]
+      ],
+      [
+        {
+          "contract_data": {
+            "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOLZM",
+            "key": {
+              "ledger_key_nonce": {
+                "nonce": 4837995959683129791
+              }
+            },
+            "durability": "temporary"
+          }
+        },
+        [
+          {
+            "last_modified_ledger_seq": 0,
+            "data": {
+              "contract_data": {
+                "ext": "v0",
+                "contract": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOLZM",
+                "key": {
+                  "ledger_key_nonce": {
+                    "nonce": 4837995959683129791
+                  }
+                },
+                "durability": "temporary",
+                "val": "void"
+              }
+            },
+            "ext": "v0"
+          },
+          6311999
         ]
       ],
       [
@@ -1282,7 +1282,7 @@
             "data": {
               "vec": [
                 {
-                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
+                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
                 },
                 {
                   "vec": [
@@ -1327,7 +1327,7 @@
                 {
                   "vec": [
                     {
-                      "symbol": "Escrow"
+                      "symbol": "Engagement"
                     },
                     {
                       "bytes": "00000000000000000000000000000001"
@@ -1338,7 +1338,7 @@
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
                 },
                 {
-                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
+                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
                 },
                 {
                   "vec": [
@@ -1429,7 +1429,7 @@
                   ]
                 },
                 {
-                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
                 }
               ]
             }
@@ -1455,7 +1455,7 @@
                 {
                   "vec": [
                     {
-                      "symbol": "Escrow"
+                      "symbol": "Engagement"
                     },
                     {
                       "bytes": "00000000000000000000000000000002"
@@ -1463,7 +1463,7 @@
                   ]
                 },
                 {
-                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
                 },
                 {
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
@@ -1532,13 +1532,13 @@
                 "bytes": "0000000000000000000000000000000000000000000000000000000000000006"
               },
               {
-                "symbol": "get_projects_by_spender"
+                "symbol": "get_engagements_by_provider"
               }
             ],
             "data": {
               "vec": [
                 {
-                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
                 },
                 {
                   "u32": 0
@@ -1568,7 +1568,7 @@
             "data": {
               "vec": [
                 {
-                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
                 },
                 {
                   "vec": [
@@ -1580,6 +1580,14 @@
                           },
                           "val": {
                             "bool": false
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "client"
+                          },
+                          "val": {
+                            "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
                           }
                         },
                         {
@@ -1625,18 +1633,10 @@
                         },
                         {
                           "key": {
-                            "symbol": "escrow_id"
+                            "symbol": "engagement_id"
                           },
                           "val": {
                             "bytes": "00000000000000000000000000000001"
-                          }
-                        },
-                        {
-                          "key": {
-                            "symbol": "from"
-                          },
-                          "val": {
-                            "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
                           }
                         },
                         {
@@ -1656,21 +1656,21 @@
                                   "map": [
                                     {
                                       "key": {
-                                        "symbol": "completed"
-                                      },
-                                      "val": {
-                                        "bool": false
-                                      }
-                                    },
-                                    {
-                                      "key": {
-                                        "symbol": "half_paid"
+                                        "symbol": "amount_paid"
                                       },
                                       "val": {
                                         "u128": {
                                           "hi": 0,
                                           "lo": 0
                                         }
+                                      }
+                                    },
+                                    {
+                                      "key": {
+                                        "symbol": "completed"
+                                      },
+                                      "val": {
+                                        "bool": false
                                       }
                                     },
                                     {
@@ -1698,21 +1698,21 @@
                                   "map": [
                                     {
                                       "key": {
-                                        "symbol": "completed"
-                                      },
-                                      "val": {
-                                        "bool": false
-                                      }
-                                    },
-                                    {
-                                      "key": {
-                                        "symbol": "half_paid"
+                                        "symbol": "amount_paid"
                                       },
                                       "val": {
                                         "u128": {
                                           "hi": 0,
                                           "lo": 0
                                         }
+                                      }
+                                    },
+                                    {
+                                      "key": {
+                                        "symbol": "completed"
+                                      },
+                                      "val": {
+                                        "bool": false
                                       }
                                     },
                                     {
@@ -1745,10 +1745,10 @@
                         },
                         {
                           "key": {
-                            "symbol": "spender"
+                            "symbol": "service_provider"
                           },
                           "val": {
-                            "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                            "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
                           }
                         }
                       ]
@@ -1765,6 +1765,14 @@
                         },
                         {
                           "key": {
+                            "symbol": "client"
+                          },
+                          "val": {
+                            "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
+                          }
+                        },
+                        {
+                          "key": {
                             "symbol": "completed"
                           },
                           "val": {
@@ -1806,18 +1814,10 @@
                         },
                         {
                           "key": {
-                            "symbol": "escrow_id"
+                            "symbol": "engagement_id"
                           },
                           "val": {
                             "bytes": "00000000000000000000000000000002"
-                          }
-                        },
-                        {
-                          "key": {
-                            "symbol": "from"
-                          },
-                          "val": {
-                            "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
                           }
                         },
                         {
@@ -1837,21 +1837,21 @@
                                   "map": [
                                     {
                                       "key": {
-                                        "symbol": "completed"
-                                      },
-                                      "val": {
-                                        "bool": false
-                                      }
-                                    },
-                                    {
-                                      "key": {
-                                        "symbol": "half_paid"
+                                        "symbol": "amount_paid"
                                       },
                                       "val": {
                                         "u128": {
                                           "hi": 0,
                                           "lo": 0
                                         }
+                                      }
+                                    },
+                                    {
+                                      "key": {
+                                        "symbol": "completed"
+                                      },
+                                      "val": {
+                                        "bool": false
                                       }
                                     },
                                     {
@@ -1879,21 +1879,21 @@
                                   "map": [
                                     {
                                       "key": {
-                                        "symbol": "completed"
-                                      },
-                                      "val": {
-                                        "bool": false
-                                      }
-                                    },
-                                    {
-                                      "key": {
-                                        "symbol": "half_paid"
+                                        "symbol": "amount_paid"
                                       },
                                       "val": {
                                         "u128": {
                                           "hi": 0,
                                           "lo": 0
                                         }
+                                      }
+                                    },
+                                    {
+                                      "key": {
+                                        "symbol": "completed"
+                                      },
+                                      "val": {
+                                        "bool": false
                                       }
                                     },
                                     {
@@ -1926,10 +1926,10 @@
                         },
                         {
                           "key": {
-                            "symbol": "spender"
+                            "symbol": "service_provider"
                           },
                           "val": {
-                            "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                            "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
                           }
                         }
                       ]
@@ -1955,7 +1955,7 @@
                 "symbol": "fn_return"
               },
               {
-                "symbol": "get_projects_by_spender"
+                "symbol": "get_engagements_by_provider"
               }
             ],
             "data": {
@@ -1972,6 +1972,14 @@
                     },
                     {
                       "key": {
+                        "symbol": "client"
+                      },
+                      "val": {
+                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                      }
+                    },
+                    {
+                      "key": {
                         "symbol": "completed"
                       },
                       "val": {
@@ -2013,18 +2021,10 @@
                     },
                     {
                       "key": {
-                        "symbol": "escrow_id"
+                        "symbol": "engagement_id"
                       },
                       "val": {
                         "bytes": "00000000000000000000000000000001"
-                      }
-                    },
-                    {
-                      "key": {
-                        "symbol": "from"
-                      },
-                      "val": {
-                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
                       }
                     },
                     {
@@ -2044,21 +2044,21 @@
                               "map": [
                                 {
                                   "key": {
-                                    "symbol": "completed"
-                                  },
-                                  "val": {
-                                    "bool": false
-                                  }
-                                },
-                                {
-                                  "key": {
-                                    "symbol": "half_paid"
+                                    "symbol": "amount_paid"
                                   },
                                   "val": {
                                     "u128": {
                                       "hi": 0,
                                       "lo": 0
                                     }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "symbol": "completed"
+                                  },
+                                  "val": {
+                                    "bool": false
                                   }
                                 },
                                 {
@@ -2086,21 +2086,21 @@
                               "map": [
                                 {
                                   "key": {
-                                    "symbol": "completed"
-                                  },
-                                  "val": {
-                                    "bool": false
-                                  }
-                                },
-                                {
-                                  "key": {
-                                    "symbol": "half_paid"
+                                    "symbol": "amount_paid"
                                   },
                                   "val": {
                                     "u128": {
                                       "hi": 0,
                                       "lo": 0
                                     }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "symbol": "completed"
+                                  },
+                                  "val": {
+                                    "bool": false
                                   }
                                 },
                                 {
@@ -2133,10 +2133,10 @@
                     },
                     {
                       "key": {
-                        "symbol": "spender"
+                        "symbol": "service_provider"
                       },
                       "val": {
-                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
                       }
                     }
                   ]
@@ -2153,6 +2153,14 @@
                     },
                     {
                       "key": {
+                        "symbol": "client"
+                      },
+                      "val": {
+                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
+                      }
+                    },
+                    {
+                      "key": {
                         "symbol": "completed"
                       },
                       "val": {
@@ -2194,18 +2202,10 @@
                     },
                     {
                       "key": {
-                        "symbol": "escrow_id"
+                        "symbol": "engagement_id"
                       },
                       "val": {
                         "bytes": "00000000000000000000000000000002"
-                      }
-                    },
-                    {
-                      "key": {
-                        "symbol": "from"
-                      },
-                      "val": {
-                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
                       }
                     },
                     {
@@ -2225,21 +2225,21 @@
                               "map": [
                                 {
                                   "key": {
-                                    "symbol": "completed"
-                                  },
-                                  "val": {
-                                    "bool": false
-                                  }
-                                },
-                                {
-                                  "key": {
-                                    "symbol": "half_paid"
+                                    "symbol": "amount_paid"
                                   },
                                   "val": {
                                     "u128": {
                                       "hi": 0,
                                       "lo": 0
                                     }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "symbol": "completed"
+                                  },
+                                  "val": {
+                                    "bool": false
                                   }
                                 },
                                 {
@@ -2267,21 +2267,21 @@
                               "map": [
                                 {
                                   "key": {
-                                    "symbol": "completed"
-                                  },
-                                  "val": {
-                                    "bool": false
-                                  }
-                                },
-                                {
-                                  "key": {
-                                    "symbol": "half_paid"
+                                    "symbol": "amount_paid"
                                   },
                                   "val": {
                                     "u128": {
                                       "hi": 0,
                                       "lo": 0
                                     }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "symbol": "completed"
+                                  },
+                                  "val": {
+                                    "bool": false
                                   }
                                 },
                                 {
@@ -2314,10 +2314,10 @@
                     },
                     {
                       "key": {
-                        "symbol": "spender"
+                        "symbol": "service_provider"
                       },
                       "val": {
-                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
                       }
                     }
                   ]
@@ -2350,7 +2350,7 @@
             "data": {
               "vec": [
                 {
-                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOLZM"
+                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
                 },
                 {
                   "vec": [
@@ -2369,7 +2369,7 @@
                   ]
                 },
                 {
-                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOLZM"
                 }
               ]
             }
@@ -2395,7 +2395,7 @@
                 {
                   "vec": [
                     {
-                      "symbol": "Escrow"
+                      "symbol": "Engagement"
                     },
                     {
                       "bytes": "00000000000000000000000000000003"
@@ -2403,10 +2403,10 @@
                   ]
                 },
                 {
-                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOLZM"
                 },
                 {
-                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOLZM"
+                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
                 },
                 {
                   "vec": [
@@ -2472,13 +2472,13 @@
                 "bytes": "0000000000000000000000000000000000000000000000000000000000000006"
               },
               {
-                "symbol": "get_projects_by_spender"
+                "symbol": "get_engagements_by_provider"
               }
             ],
             "data": {
               "vec": [
                 {
-                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
                 },
                 {
                   "u32": 1
@@ -2508,7 +2508,7 @@
             "data": {
               "vec": [
                 {
-                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                  "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
                 },
                 {
                   "vec": [
@@ -2520,6 +2520,14 @@
                           },
                           "val": {
                             "bool": false
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "client"
+                          },
+                          "val": {
+                            "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOLZM"
                           }
                         },
                         {
@@ -2565,18 +2573,10 @@
                         },
                         {
                           "key": {
-                            "symbol": "escrow_id"
+                            "symbol": "engagement_id"
                           },
                           "val": {
                             "bytes": "00000000000000000000000000000003"
-                          }
-                        },
-                        {
-                          "key": {
-                            "symbol": "from"
-                          },
-                          "val": {
-                            "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOLZM"
                           }
                         },
                         {
@@ -2596,21 +2596,21 @@
                                   "map": [
                                     {
                                       "key": {
-                                        "symbol": "completed"
-                                      },
-                                      "val": {
-                                        "bool": false
-                                      }
-                                    },
-                                    {
-                                      "key": {
-                                        "symbol": "half_paid"
+                                        "symbol": "amount_paid"
                                       },
                                       "val": {
                                         "u128": {
                                           "hi": 0,
                                           "lo": 0
                                         }
+                                      }
+                                    },
+                                    {
+                                      "key": {
+                                        "symbol": "completed"
+                                      },
+                                      "val": {
+                                        "bool": false
                                       }
                                     },
                                     {
@@ -2638,21 +2638,21 @@
                                   "map": [
                                     {
                                       "key": {
-                                        "symbol": "completed"
-                                      },
-                                      "val": {
-                                        "bool": false
-                                      }
-                                    },
-                                    {
-                                      "key": {
-                                        "symbol": "half_paid"
+                                        "symbol": "amount_paid"
                                       },
                                       "val": {
                                         "u128": {
                                           "hi": 0,
                                           "lo": 0
                                         }
+                                      }
+                                    },
+                                    {
+                                      "key": {
+                                        "symbol": "completed"
+                                      },
+                                      "val": {
+                                        "bool": false
                                       }
                                     },
                                     {
@@ -2685,10 +2685,10 @@
                         },
                         {
                           "key": {
-                            "symbol": "spender"
+                            "symbol": "service_provider"
                           },
                           "val": {
-                            "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                            "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
                           }
                         }
                       ]
@@ -2714,7 +2714,7 @@
                 "symbol": "fn_return"
               },
               {
-                "symbol": "get_projects_by_spender"
+                "symbol": "get_engagements_by_provider"
               }
             ],
             "data": {
@@ -2727,6 +2727,14 @@
                       },
                       "val": {
                         "bool": false
+                      }
+                    },
+                    {
+                      "key": {
+                        "symbol": "client"
+                      },
+                      "val": {
+                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOLZM"
                       }
                     },
                     {
@@ -2772,18 +2780,10 @@
                     },
                     {
                       "key": {
-                        "symbol": "escrow_id"
+                        "symbol": "engagement_id"
                       },
                       "val": {
                         "bytes": "00000000000000000000000000000003"
-                      }
-                    },
-                    {
-                      "key": {
-                        "symbol": "from"
-                      },
-                      "val": {
-                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOLZM"
                       }
                     },
                     {
@@ -2803,21 +2803,21 @@
                               "map": [
                                 {
                                   "key": {
-                                    "symbol": "completed"
-                                  },
-                                  "val": {
-                                    "bool": false
-                                  }
-                                },
-                                {
-                                  "key": {
-                                    "symbol": "half_paid"
+                                    "symbol": "amount_paid"
                                   },
                                   "val": {
                                     "u128": {
                                       "hi": 0,
                                       "lo": 0
                                     }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "symbol": "completed"
+                                  },
+                                  "val": {
+                                    "bool": false
                                   }
                                 },
                                 {
@@ -2845,21 +2845,21 @@
                               "map": [
                                 {
                                   "key": {
-                                    "symbol": "completed"
-                                  },
-                                  "val": {
-                                    "bool": false
-                                  }
-                                },
-                                {
-                                  "key": {
-                                    "symbol": "half_paid"
+                                    "symbol": "amount_paid"
                                   },
                                   "val": {
                                     "u128": {
                                       "hi": 0,
                                       "lo": 0
                                     }
+                                  }
+                                },
+                                {
+                                  "key": {
+                                    "symbol": "completed"
+                                  },
+                                  "val": {
+                                    "bool": false
                                   }
                                 },
                                 {
@@ -2892,10 +2892,10 @@
                     },
                     {
                       "key": {
-                        "symbol": "spender"
+                        "symbol": "service_provider"
                       },
                       "val": {
-                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
+                        "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
                       }
                     }
                   ]

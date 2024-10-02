@@ -6,20 +6,20 @@ pub(crate) const INSTANCE_LIFETIME_THRESHOLD: u32 = INSTANCE_BUMP_AMOUNT - DAY_I
 
 #[contracttype]
 #[derive(Clone)]
-pub struct Objective {
+pub struct Escrow {
     pub price: u128,
-    pub half_paid: u128,
+    pub amount_paid: u128,
     pub completed: bool,
 }
 
 #[contracttype]
 #[derive(Clone)]
-pub struct Escrow {
-    pub escrow_id: Bytes,
-    pub spender: Address,
-    pub from: Address,
+pub struct Engagement {
+    pub engagement_id: Bytes,
+    pub client: Address,
+    pub service_provider: Address,
     pub parties_count: u128,
-    pub parties: Map<u128, Objective>,
+    pub parties: Map<u128, Escrow>,
     pub completed_parties: u128,
     pub earned_amount: u128,
     pub contract_balance: u128,
@@ -55,7 +55,7 @@ pub struct User {
 #[derive(Clone)]
 #[contracttype]
 pub enum DataKey {
-    Escrow(Bytes),
+    Engagement(Bytes),
     Balance(Address),
     Allowance(AllowanceDataKey),
     Admin,
