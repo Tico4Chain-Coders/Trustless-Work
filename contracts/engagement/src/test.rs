@@ -2,11 +2,10 @@
 
 extern crate std;
 
-use crate::storage_types::{Engagement, DataKey};
+use crate::storage_types::{Escrow, DataKey};
 use crate::{contract::EngagementContract, EngagementContractClient};
-use soroban_sdk::{testutils::{Address as _, AuthorizedFunction, AuthorizedInvocation}, Address, Env, Vec, IntoVal, symbol_short};
+use soroban_sdk::{testutils::{Address as _, AuthorizedFunction, AuthorizedInvocation}, Address, Env, IntoVal, String, symbol_short};
 use crate::token::{ Token, TokenClient };
-use crate::utils::u128_to_bytes;
 
 fn create_token<'a>(e: &Env, admin: &Address) -> TokenClient<'a> {
     let token = TokenClient::new(e, &e.register_contract(None, Token {}));
@@ -20,14 +19,15 @@ fn test_create_fund_complete_escrows() {
     env.mock_all_auths();
 
     let admin1 = Address::generate(&env);
-    let client_address = Address::generate(&env);
+    let signer_address = Address::generate(&env);
+    let issuer_address = Address::generate(&env);
     let service_provider_address = Address::generate(&env);
     let token = create_token(&env, &admin1);
 
     let engagement_contract_address = env.register_contract(None, EngagementContract); 
     let engagement_client = EngagementContractClient::new(&env, &engagement_contract_address);
 
-    token.mint(&client_address, &1000);
+    token.mint(&signer_address, &1000);
     assert_eq!(
         env.auths(),
         std::vec![(
@@ -36,45 +36,35 @@ fn test_create_fund_complete_escrows() {
                 function: AuthorizedFunction::Contract((
                     token.address.clone(),
                     symbol_short!("mint"),
-                    (&client_address, 1000_i128).into_val(&env),
+                    (&signer_address, 1000_i128).into_val(&env),
                 )),
                 sub_invocations: std::vec![]
             }
         )]
     );
-    assert_eq!(token.balance(&client_address), 1000);
+    assert_eq!(token.balance(&signer_address), 1000);
 
     let usdc_contract_address = token.address.clone();
+    let engagement_id = String::from_str(&env, "41431");
 
-    let prices: Vec<u128> = Vec::from_array(&env, [100_u128, 100_u128]);
-    let engagement_id = engagement_client.initialize_escrow(&service_provider_address, &prices, &client_address);
-    let engagement_id_in_bytes = u128_to_bytes(&env, engagement_id);
-
-    engagement_client.fund_escrow(&engagement_id_in_bytes, &0, &client_address, &usdc_contract_address, &engagement_contract_address);
+    let amount: u128 = 100_u128;
+    let engagement_id = engagement_client.initialize_escrow(&engagement_id.clone(), &issuer_address, &service_provider_address, &amount, &signer_address);
+    let engagement_id_copy = engagement_id.clone();
+    
+    engagement_client.fund_escrow(&engagement_id, &signer_address, &usdc_contract_address, &engagement_contract_address);
     env.as_contract(&engagement_contract_address, || {
-        let engagement_key = DataKey::Engagement(engagement_id_in_bytes.clone());
-        let engagement: Engagement = env.storage().instance().get(&engagement_key).unwrap();
-        let first_escrow = engagement.escrows.get(0).unwrap();
-        assert_eq!(first_escrow.amount_paid, 50);
+        let engagement_key = DataKey::Escrow(engagement_id);
+        let engagement: Escrow = env.storage().instance().get(&engagement_key).unwrap();
+        assert_eq!(engagement.balance, 50);
     });
 
-    engagement_client.complete_escrow(&engagement_id_in_bytes, &0, &client_address, &usdc_contract_address, &engagement_contract_address, &service_provider_address);
+    engagement_client.complete_escrow(&engagement_id_copy, &signer_address, &usdc_contract_address, &engagement_contract_address, &service_provider_address);
     
     env.as_contract(&engagement_contract_address, || {
-        let engagement_key = DataKey::Engagement(engagement_id_in_bytes.clone());
-        let engagement: Engagement = env.storage().instance().get(&engagement_key).unwrap();
-        let second_escrow = engagement.escrows.get(0).unwrap();
-        assert_eq!(second_escrow.completed, true);
-    });
-
-    engagement_client.fund_escrow(&engagement_id_in_bytes, &1, &client_address, &usdc_contract_address, &engagement_contract_address);
-    engagement_client.complete_escrow(&engagement_id_in_bytes, &1, &client_address, &usdc_contract_address, &engagement_contract_address, &service_provider_address);
-    
-    env.as_contract(&engagement_contract_address, || {
-        let engagement_key = DataKey::Engagement(engagement_id_in_bytes.clone());
-        let engagement: Engagement = env.storage().instance().get(&engagement_key).unwrap();
-        let third_escrow = engagement.escrows.get(1).unwrap();
-        assert_eq!(third_escrow.completed, true);
+        let engagement_key = DataKey::Escrow(engagement_id_copy.clone());
+        let engagement: Escrow = env.storage().instance().get(&engagement_key).unwrap();
+        assert_eq!(engagement.completed, true);
+        assert_eq!(engagement.balance, engagement.amount);
     });
 }
 
@@ -84,14 +74,15 @@ fn test_client_can_recover_funds_if_service_provider_does_not_complete_all_escro
     env.mock_all_auths();
 
     let admin1 = Address::generate(&env);
-    let client_address = Address::generate(&env);
+    let signer_address = Address::generate(&env);
+    let issuer_address = Address::generate(&env);
     let service_provider_address = Address::generate(&env);
     let token = create_token(&env, &admin1);
 
     let engagement_contract_address = env.register_contract(None, EngagementContract); 
     let engagement_client = EngagementContractClient::new(&env, &engagement_contract_address);
 
-    token.mint(&client_address, &1000);
+    token.mint(&signer_address, &1000);
 
     assert_eq!(
         env.auths(),
@@ -101,181 +92,41 @@ fn test_client_can_recover_funds_if_service_provider_does_not_complete_all_escro
                 function: AuthorizedFunction::Contract((
                     token.address.clone(),
                     symbol_short!("mint"),
-                    (&client_address, 1000_i128).into_val(&env),
+                    (&signer_address, 1000_i128).into_val(&env),
                 )),
                 sub_invocations: std::vec![]
             }
         )]
     );
-    assert_eq!(token.balance(&client_address), 1000);
+    assert_eq!(token.balance(&signer_address), 1000);
 
     let usdc_contract_address = token.address.clone();
+    let engagement_id = String::from_str(&env, "41431");
 
-    let prices: Vec<u128> = Vec::from_array(&env, [100_u128, 100_u128, 100_u128]);
-    let engagement_id = engagement_client.initialize_escrow(&service_provider_address, &prices, &client_address);
-    let engagement_id_in_bytes = u128_to_bytes(&env, engagement_id);
-;
-    engagement_client.fund_escrow(&engagement_id_in_bytes, &0, &client_address, &usdc_contract_address, &engagement_contract_address);
+    let amount: u128 = 100_u128;
+    let engagement_id = engagement_client.initialize_escrow(&engagement_id.clone(), &issuer_address, &service_provider_address, &amount, &signer_address);
+    let engagement_id_copy = engagement_id.clone();
+
+    engagement_client.fund_escrow(&engagement_id, &signer_address, &usdc_contract_address, &engagement_contract_address);
     env.as_contract(&engagement_contract_address, || {
-        let engagement_key = DataKey::Engagement(engagement_id_in_bytes.clone());
-        let engagement: Engagement = env.storage().instance().get(&engagement_key).unwrap();
-        let first_escrow = engagement.escrows.get(0).unwrap();
-        assert_eq!(first_escrow.amount_paid, 50);
+        let engagement_key = DataKey::Escrow(engagement_id);
+        let engagement: Escrow = env.storage().instance().get(&engagement_key).unwrap();
+        assert_eq!(engagement.balance, 50);
     });
 
-    engagement_client.complete_escrow(&engagement_id_in_bytes, &0, &client_address, &usdc_contract_address, &engagement_contract_address, &service_provider_address);
-
-    engagement_client.fund_escrow(&engagement_id_in_bytes, &1, &client_address, &usdc_contract_address, &engagement_contract_address);
-
-    engagement_client.complete_escrow(&engagement_id_in_bytes, &1, &client_address, &usdc_contract_address, &engagement_contract_address, &service_provider_address);
-
-    engagement_client.fund_escrow(&engagement_id_in_bytes, &2, &client_address, &usdc_contract_address, &engagement_contract_address);
-
-    engagement_client.cancel_engagement(&engagement_id_in_bytes, &client_address);
+    engagement_client.refund_remaining_funds(&engagement_id_copy, &signer_address, &usdc_contract_address, &engagement_contract_address);
+    engagement_client.cancel_escrow(&engagement_id_copy, &signer_address);
 
     env.as_contract(&engagement_contract_address, || {
-        let balance = token.balance(&engagement_contract_address);
-        assert_eq!(balance, 50);
+        let engagement_key = DataKey::Escrow(engagement_id_copy);
+        let engagement: Escrow = env.storage().instance().get(&engagement_key).unwrap();
+        let contract_balance = token.balance(&engagement_contract_address);
+        let signer_balance = token.balance(&signer_address);
+        assert_eq!(contract_balance, 0);
+        assert_eq!(signer_balance, 1000);
+        assert_eq!(engagement.cancelled, true);
     });
-    
-    engagement_client.refund_remaining_funds(&engagement_id_in_bytes, &2, &client_address, &usdc_contract_address, &engagement_contract_address);
-
-    env.as_contract(&engagement_contract_address, || {
-        let balance = token.balance(&engagement_contract_address);
-        assert_eq!(balance, 0);
-    });
-
-    let client_balance = token.balance(&client_address);
-    let service_provider_balance = token.balance(&service_provider_address);
-
-    assert_eq!(client_balance, 800);
-    assert_eq!(service_provider_balance, 200);
-}
-
-#[test]
-fn test_add_new_escrows_and_complete_them() {
-    let env = Env::default();
-    env.mock_all_auths();
-
-    let admin1 = Address::generate(&env);
-    let client_address = Address::generate(&env);
-    let service_provider_address = Address::generate(&env);
-    let token = create_token(&env, &admin1);
-
-    let engagement_contract_address = env.register_contract(None, EngagementContract); 
-    let engagement_client = EngagementContractClient::new(&env, &engagement_contract_address);
-
-    token.mint(&client_address, &1000);
-
-    assert_eq!(
-        env.auths(),
-        std::vec![(
-            admin1.clone(),
-            AuthorizedInvocation {
-                function: AuthorizedFunction::Contract((
-                    token.address.clone(),
-                    symbol_short!("mint"),
-                    (&client_address, 1000_i128).into_val(&env),
-                )),
-                sub_invocations: std::vec![]
-            }
-        )]
-    );
-    assert_eq!(token.balance(&client_address), 1000);
-
-    let usdc_contract_address = token.address.clone();
-
-    let prices: Vec<u128> = Vec::from_array(&env, [100_u128, 100_u128]);
-    let engagement_id = engagement_client.initialize_escrow(&service_provider_address, &prices, &client_address);
-    let engagement_id_in_bytes = u128_to_bytes(&env, engagement_id);
-
-    engagement_client.fund_escrow(&engagement_id_in_bytes, &0, &client_address, &usdc_contract_address, &engagement_contract_address);
-    env.as_contract(&engagement_contract_address, || {
-        let engagement_key = DataKey::Engagement(engagement_id_in_bytes.clone());
-        let engagement: Engagement = env.storage().instance().get(&engagement_key).unwrap();
-        let first_escrow = engagement.escrows.get(0).unwrap();
-        assert_eq!(first_escrow.amount_paid, 50);
-    });
-
-    engagement_client.complete_escrow(&engagement_id_in_bytes, &0, &client_address, &usdc_contract_address, &engagement_contract_address, &service_provider_address);
-
-    engagement_client.fund_escrow(&engagement_id_in_bytes, &1, &client_address, &usdc_contract_address, &engagement_contract_address);
-
-    engagement_client.complete_escrow(&engagement_id_in_bytes, &1, &client_address, &usdc_contract_address, &engagement_contract_address, &service_provider_address);
-
-    let new_prices: Vec<u128> = Vec::from_array(&env, [100_u128]);
-    engagement_client.add_escrow(&engagement_id_in_bytes, &new_prices, &client_address);
-
-    engagement_client.fund_escrow(&engagement_id_in_bytes, &2, &client_address, &usdc_contract_address, &engagement_contract_address);
-
-    engagement_client.complete_escrow(&engagement_id_in_bytes, &2, &client_address, &usdc_contract_address, &engagement_contract_address, &service_provider_address);
-
-    let client_balance = token.balance(&client_address);
-    let service_provider_balance = token.balance(&service_provider_address);
-
-    assert_eq!(client_balance, 700);
-    assert_eq!(service_provider_balance, 300);
-}
-
-#[test]
-fn test_complete_engagement_after_all_escrows_completed() {
-    let env = Env::default();
-    env.mock_all_auths();
-
-    let admin1 = Address::generate(&env);
-    let client_address = Address::generate(&env);
-    let service_provider_address = Address::generate(&env);
-    let token = create_token(&env, &admin1);
-
-    let engagement_contract_address = env.register_contract(None, EngagementContract); 
-    let engagement_client = EngagementContractClient::new(&env, &engagement_contract_address);
-
-    token.mint(&client_address, &1000);
-
-    assert_eq!(
-        env.auths(),
-        std::vec![(
-            admin1.clone(),
-            AuthorizedInvocation {
-                function: AuthorizedFunction::Contract((
-                    token.address.clone(),
-                    symbol_short!("mint"),
-                    (&client_address, 1000_i128).into_val(&env),
-                )),
-                sub_invocations: std::vec![]
-            }
-        )]
-    );
-    assert_eq!(token.balance(&client_address), 1000);
-
-    let usdc_contract_address = token.address.clone();
-
-    let prices: Vec<u128> = Vec::from_array(&env, [100_u128, 100_u128]);
-    let engagement_id = engagement_client.initialize_escrow(&service_provider_address, &prices, &client_address);
-    let engagement_id_in_bytes = u128_to_bytes(&env, engagement_id);
-
-    engagement_client.fund_escrow(&engagement_id_in_bytes, &0, &client_address, &usdc_contract_address, &engagement_contract_address);
-    env.as_contract(&engagement_contract_address, || {
-        let engagement_key = DataKey::Engagement(engagement_id_in_bytes.clone());
-        let engagement: Engagement = env.storage().instance().get(&engagement_key).unwrap();
-        let first_escrow = engagement.escrows.get(0).unwrap();
-        assert_eq!(first_escrow.amount_paid, 50);
-    });
-
-    engagement_client.complete_escrow(&engagement_id_in_bytes, &0, &client_address, &usdc_contract_address, &engagement_contract_address, &service_provider_address);
-
-    engagement_client.fund_escrow(&engagement_id_in_bytes, &1, &client_address, &usdc_contract_address, &engagement_contract_address);
-
-    engagement_client.complete_escrow(&engagement_id_in_bytes, &1, &client_address, &usdc_contract_address, &engagement_contract_address, &service_provider_address);
-
-    engagement_client.complete_engagement(&engagement_id_in_bytes, &client_address);
-
-    env.as_contract(&engagement_contract_address, || {
-        let engagement_key = DataKey::Engagement(engagement_id_in_bytes.clone());
-        let engagement: Engagement = env.storage().instance().get(&engagement_key).unwrap();
-        assert_eq!(engagement.completed, true);
-    });
-}
+}  
 
 #[test]
 fn test_get_engagements_by_service_provider() {
@@ -283,15 +134,15 @@ fn test_get_engagements_by_service_provider() {
     env.mock_all_auths();
 
     let admin1 = Address::generate(&env);
-    let client_address = Address::generate(&env);
-    let another_client_address = Address::generate(&env);
+    let signer_address = Address::generate(&env);
+    let issuer_address = Address::generate(&env);
     let service_provider_address = Address::generate(&env);
     let token = create_token(&env, &admin1);
 
     let engagement_contract_address = env.register_contract(None, EngagementContract); 
     let engagement_client = EngagementContractClient::new(&env, &engagement_contract_address);
 
-    token.mint(&client_address, &1000);
+    token.mint(&signer_address, &1000);
 
     assert_eq!(
         env.auths(),
@@ -301,74 +152,21 @@ fn test_get_engagements_by_service_provider() {
                 function: AuthorizedFunction::Contract((
                     token.address.clone(),
                     symbol_short!("mint"),
-                    (&client_address, 1000_i128).into_val(&env),
+                    (&signer_address, 1000_i128).into_val(&env),
                 )),
                 sub_invocations: std::vec![]
             }
         )]
     );
-    assert_eq!(token.balance(&client_address), 1000);
+    assert_eq!(token.balance(&signer_address), 1000);
 
-    let prices: Vec<u128> = Vec::from_array(&env, [100_u128, 100_u128]);
-    engagement_client.initialize_escrow(&service_provider_address, &prices, &client_address);
-    engagement_client.initialize_escrow(&service_provider_address, &prices, &another_client_address);
+    let engagement_id = String::from_str(&env, "41431");
+    let amount: u128 = 100_u128;
+    let engagement_id = engagement_client.initialize_escrow(&engagement_id.clone(), &issuer_address, &service_provider_address, &amount, &signer_address);
 
-    let page = 0;
-    let limit = 2;
-    let engagements = engagement_client.get_engagements_by_provider(&service_provider_address, &page, &limit);
-    assert_eq!(engagements.len(), 2);
-
-    let another_client_address2 = Address::generate(&env);
-    engagement_client.initialize_escrow(&service_provider_address, &prices, &another_client_address2);
-
-    let engagements_page_2 = engagement_client.get_engagements_by_provider(&service_provider_address, &1, &2);
-    assert_eq!(engagements_page_2.len(), 1); 
-}
-
-#[test]
-fn test_get_engagements_by_client() {
-    let env = Env::default();
-    env.mock_all_auths();
-
-    let admin1 = Address::generate(&env);
-    let client_address = Address::generate(&env);
-    let service_provider_address = Address::generate(&env);
-    let another_service_provider_address = Address::generate(&env);
-    let token = create_token(&env, &admin1);
-
-    let engagement_contract_address = env.register_contract(None, EngagementContract); 
-    let engagement_client = EngagementContractClient::new(&env, &engagement_contract_address);
-
-    token.mint(&client_address, &1000);
-
-    assert_eq!(
-        env.auths(),
-        std::vec![(
-            admin1.clone(),
-            AuthorizedInvocation {
-                function: AuthorizedFunction::Contract((
-                    token.address.clone(),
-                    symbol_short!("mint"),
-                    (&client_address, 1000_i128).into_val(&env),
-                )),
-                sub_invocations: std::vec![]
-            }
-        )]
-    );
-    assert_eq!(token.balance(&client_address), 1000);
-
-    let prices: Vec<u128> = Vec::from_array(&env, [100_u128, 100_u128]);
-    engagement_client.initialize_escrow(&service_provider_address, &prices, &client_address);
-    engagement_client.initialize_escrow(&another_service_provider_address, &prices, &client_address);
-
-    let page = 0;
-    let limit = 2;
-    let engagements = engagement_client.get_engagements_by_client(&client_address, &page, &limit);
-    assert_eq!(engagements.len(), 2);
-
-    let another_service_provider_address2 = Address::generate(&env);
-    engagement_client.initialize_escrow(&another_service_provider_address2, &prices, &client_address);
-
-    let engagements_page_2 = engagement_client.get_engagements_by_client(&client_address, &1, &2);
-    assert_eq!(engagements_page_2.len(), 1); 
+    let escrow = engagement_client.get_escrow_by_id(&engagement_id);
+    assert_eq!(escrow.engagement_id, engagement_id);
+    assert_eq!(escrow.issuer, issuer_address);
+    assert_eq!(escrow.signer, signer_address);
+    assert_eq!(escrow.service_provider, service_provider_address);
 }
