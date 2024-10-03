@@ -8,6 +8,7 @@ pub(crate) const INSTANCE_LIFETIME_THRESHOLD: u32 = INSTANCE_BUMP_AMOUNT - DAY_I
 #[derive(Clone)]
 pub struct Escrow {
     pub engagement_id: String,
+    pub description: String,
     pub issuer: Address,
     pub signer: Address,
     pub service_provider: Address,

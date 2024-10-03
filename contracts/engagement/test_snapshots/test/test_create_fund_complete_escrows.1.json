@@ -44,6 +44,9 @@
                   "string": "41431"
                 },
                 {
+                  "string": "Any description"
+                },
+                {
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
                 },
                 {
@@ -865,6 +868,14 @@
                             },
                             {
                               "key": {
+                                "symbol": "description"
+                              },
+                              "val": {
+                                "string": "Any description"
+                              }
+                            },
+                            {
+                              "key": {
                                 "symbol": "engagement_id"
                               },
                               "val": {
@@ -1152,6 +1163,9 @@
               "vec": [
                 {
                   "string": "41431"
+                },
+                {
+                  "string": "Any description"
                 },
                 {
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"

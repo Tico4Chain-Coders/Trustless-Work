@@ -17,6 +17,7 @@ impl EngagementContract {
     pub fn initialize_escrow(
         e: Env,
         engagement_id: String,
+        description: String,
         issuer: Address,
         service_provider: Address,
         amount: u128,
@@ -31,10 +32,11 @@ impl EngagementContract {
         let engagement_id_copy = engagement_id.clone();
         let escrow = Escrow {
             engagement_id: engagement_id.clone(),
-            issuer: issuer,
+            description,
+            issuer,
             signer: signer.clone(),
             service_provider: service_provider.clone(),
-            amount: amount,
+            amount,
             balance: 0,
             cancelled: false,
             completed: false,

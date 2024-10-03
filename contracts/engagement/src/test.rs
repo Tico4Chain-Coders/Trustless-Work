@@ -46,9 +46,10 @@ fn test_create_fund_complete_escrows() {
 
     let usdc_contract_address = token.address.clone();
     let engagement_id = String::from_str(&env, "41431");
+    let description = String::from_str(&env, "Any description");
 
     let amount: u128 = 100_u128;
-    let engagement_id = engagement_client.initialize_escrow(&engagement_id.clone(), &issuer_address, &service_provider_address, &amount, &signer_address);
+    let engagement_id = engagement_client.initialize_escrow(&engagement_id.clone(), &description, &issuer_address, &service_provider_address, &amount, &signer_address);
     let engagement_id_copy = engagement_id.clone();
     
     engagement_client.fund_escrow(&engagement_id, &signer_address, &usdc_contract_address, &engagement_contract_address);
@@ -102,9 +103,10 @@ fn test_client_can_recover_funds_if_service_provider_does_not_complete_all_escro
 
     let usdc_contract_address = token.address.clone();
     let engagement_id = String::from_str(&env, "41431");
+    let description = String::from_str(&env, "Any description");
 
     let amount: u128 = 100_u128;
-    let engagement_id = engagement_client.initialize_escrow(&engagement_id.clone(), &issuer_address, &service_provider_address, &amount, &signer_address);
+    let engagement_id = engagement_client.initialize_escrow(&engagement_id.clone(), &description, &issuer_address, &service_provider_address, &amount, &signer_address);
     let engagement_id_copy = engagement_id.clone();
 
     engagement_client.fund_escrow(&engagement_id, &signer_address, &usdc_contract_address, &engagement_contract_address);
@@ -161,8 +163,10 @@ fn test_get_engagements_by_service_provider() {
     assert_eq!(token.balance(&signer_address), 1000);
 
     let engagement_id = String::from_str(&env, "41431");
+    let description = String::from_str(&env, "Any description");
+
     let amount: u128 = 100_u128;
-    let engagement_id = engagement_client.initialize_escrow(&engagement_id.clone(), &issuer_address, &service_provider_address, &amount, &signer_address);
+    let engagement_id = engagement_client.initialize_escrow(&engagement_id.clone(), &description, &issuer_address, &service_provider_address, &amount, &signer_address);
 
     let escrow = engagement_client.get_escrow_by_id(&engagement_id);
     assert_eq!(escrow.engagement_id, engagement_id);
