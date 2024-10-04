@@ -1,5 +1,5 @@
 use soroban_sdk::{
-    contract, contractimpl, Address, Env, String
+    contract, contractimpl, log, Address, Env, String
 };
 use soroban_sdk::token::Client as TokenClient;
 
@@ -25,9 +25,9 @@ impl EngagementContract {
     ) -> String {
         signer.require_auth(); 
 
-        if e.storage().instance().has(&DataKey::Admin) {
-            panic!("An escrow has already been initialized for this contract");
-        }
+        // if e.storage().instance().has(&DataKey::Admin) {
+        //     panic!("An escrow has already been initialized for this contract");
+        // }
 
         if amount == 0 {
             panic!("Prices cannot be zero");
@@ -47,8 +47,8 @@ impl EngagementContract {
         };
         
         e.storage().instance().set(&DataKey::Escrow(engagement_id.clone().into()), &escrow);
-        e.storage().instance().set(&DataKey::Admin, &true);
-        
+        // e.storage().instance().set(&DataKey::Admin, &true);
+
         escrow_created(&e, engagement_id, signer.clone(), service_provider.clone(), amount);
 
         engagement_id_copy
@@ -72,22 +72,27 @@ impl EngagementContract {
             panic!("This escrow has already been fully funded.");
         }
 
-        let half_price = (escrow.amount / 2) as i128;
+        let half_price_in_micro_usdc = (escrow.amount as i128) / 2;
         let usdc_client = TokenClient::new(&e, &usdc_contract);
 
-        usdc_client.approve(&signer, &contract_address, &half_price, &e.ledger().sequence());
-        
-        let allowance = usdc_client.allowance(&signer, &contract_address);
+        let signer_balance = usdc_client.balance(&signer);
+        if signer_balance < half_price_in_micro_usdc {
+            panic!("The signer does not have sufficient funds to finance this escrow.");
+        }
 
-        if allowance < half_price {
+        usdc_client.approve(&signer, &contract_address, &half_price_in_micro_usdc, &e.ledger().sequence());
+
+        let allowance = usdc_client.allowance(&signer, &contract_address);
+        if allowance < half_price_in_micro_usdc {
             panic!("Not enough allowance to fund this escrow. Please approve the amount first.");
         }
 
-        usdc_client.transfer(&signer, &contract_address, &half_price);
+        usdc_client.transfer(&signer, &contract_address, &half_price_in_micro_usdc);
 
-        escrow.balance = half_price as u128;
+        escrow.balance = half_price_in_micro_usdc as u128;
         e.storage().instance().set(&escrow_key, &escrow);
-        escrow_funded(&e, engagement_id, half_price as u128);
+
+        escrow_funded(&e, engagement_id, half_price_in_micro_usdc as u128);
     }
 
     pub fn complete_escrow(
@@ -96,7 +101,6 @@ impl EngagementContract {
         signer: Address,
         usdc_contract: Address,
         contract_address: Address,
-        service_provider: Address
     ) {
         signer.require_auth();
     
@@ -119,6 +123,12 @@ impl EngagementContract {
         let full_price = escrow.amount;
     
         let usdc_client = TokenClient::new(&e, &usdc_contract);
+
+        let signer_balance = usdc_client.balance(&escrow.signer);
+        if signer_balance < remaining_price {
+            panic!("The signer does not have sufficient funds to complete this escrow.");
+        }
+
         let expiration_ledger = e.ledger().sequence() + 1000;
 
         usdc_client.approve(&signer, &contract_address, &remaining_price, &expiration_ledger);
@@ -128,10 +138,10 @@ impl EngagementContract {
             &remaining_price
         );
 
-        usdc_client.approve(&contract_address, &service_provider, &(escrow.amount as i128), &expiration_ledger);
+        usdc_client.approve(&contract_address, &escrow.service_provider, &(escrow.amount as i128), &expiration_ledger);
         usdc_client.transfer(
             &contract_address,
-            &service_provider,
+            &escrow.service_provider,
             &(escrow.amount as i128)
         );
 
