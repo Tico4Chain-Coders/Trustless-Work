@@ -25,6 +25,10 @@ impl EngagementContract {
     ) -> String {
         signer.require_auth(); 
 
+        if e.storage().instance().has(&DataKey::Admin) {
+            panic!("An escrow has already been initialized for this contract");
+        }
+
         if amount == 0 {
             panic!("Prices cannot be zero");
         }
@@ -43,6 +47,8 @@ impl EngagementContract {
         };
         
         e.storage().instance().set(&DataKey::Escrow(engagement_id.clone().into()), &escrow);
+        e.storage().instance().set(&DataKey::Admin, &true);
+        
         escrow_created(&e, engagement_id, signer.clone(), service_provider.clone(), amount);
 
         engagement_id_copy
