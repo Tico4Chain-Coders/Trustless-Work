@@ -23,8 +23,6 @@ impl EngagementContract {
         amount: u128,
         signer: Address,
     ) -> String {
-        signer.require_auth(); 
-
         // if e.storage().instance().has(&DataKey::Admin) {
         //     panic!("An escrow has already been initialized for this contract");
         // }
@@ -153,7 +151,6 @@ impl EngagementContract {
     }
 
     pub fn cancel_escrow(e: Env, engagement_id: String, signer: Address) {
-        signer.require_auth();
         let escrow_key = DataKey::Escrow(engagement_id.clone());
         let mut escrow: Escrow = e.storage().instance().get(&escrow_key).unwrap();
 
