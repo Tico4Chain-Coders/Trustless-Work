@@ -132,8 +132,8 @@ fn test_client_can_recover_funds_if_service_provider_does_not_complete_all_escro
         assert_eq!(engagement.balance, 50);
     });
 
-    engagement_client.refund_remaining_funds(&engagement_id_copy, &signer_address, &usdc_contract_address, &engagement_contract_address);
     engagement_client.cancel_escrow(&engagement_id_copy, &signer_address);
+    engagement_client.refund_remaining_funds(&engagement_id_copy, &signer_address, &usdc_contract_address, &engagement_contract_address);
 
     env.as_contract(&engagement_contract_address, || {
         let engagement_key = DataKey::Escrow(engagement_id_copy);

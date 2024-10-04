@@ -186,8 +186,8 @@ impl EngagementContract {
         if invoker != escrow.signer {
             panic!("Only the client can mark the engagement as completed");
         }
-        if escrow.cancelled {
-            panic!("Engagement is cancelled");
+        if !escrow.cancelled {
+            panic!("The escrow must be cancelled in order to refund the amounts");
         }
 
         let usdc_client = TokenClient::new(&e, &usdc_contract);
