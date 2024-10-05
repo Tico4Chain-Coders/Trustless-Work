@@ -177,7 +177,7 @@ impl EngagementContract {
         signer.require_auth();
 
         let escrow_key = DataKey::Escrow(engagement_id.clone());
-        let escrow: Escrow = e.storage().instance().get(&escrow_key).unwrap();
+        let mut escrow: Escrow = e.storage().instance().get(&escrow_key).unwrap();
         
         let invoker = signer.clone();
         if invoker != escrow.signer {
@@ -200,6 +200,9 @@ impl EngagementContract {
             &escrow.signer,
             &(contract_balance as i128) 
         );
+
+        escrow.balance = 0;
+        e.storage().instance().set(&escrow_key, &escrow);
 
         escrow_refunded(&e, escrow_key, signer.clone(), contract_balance as u128);
     }

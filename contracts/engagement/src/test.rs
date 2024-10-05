@@ -150,6 +150,7 @@ fn test_client_can_recover_funds_if_service_provider_does_not_complete_all_escro
         assert_eq!(contract_balance, 0);
         assert_eq!(signer_balance, 1000);
         assert_eq!(engagement.cancelled, true);
+        assert_eq!(engagement.balance, 0);
     });
 }  
 
