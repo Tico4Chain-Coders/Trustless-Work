@@ -4,6 +4,7 @@ extern crate std;
 
 use crate::storage_types::{Escrow, DataKey};
 use crate::{contract::EngagementContract, EngagementContractClient};
+use crate::error::ContractError;
 use soroban_sdk::{testutils::{Address as _, AuthorizedFunction, AuthorizedInvocation}, Address, Env, IntoVal, String, symbol_short};
 use crate::token::{ Token, TokenClient };
 
@@ -83,6 +84,31 @@ fn test_create_fund_complete_escrows() {
         assert_eq!(engagement.completed, true);
         assert_eq!(engagement.balance, engagement.amount);
     });
+}
+
+#[test]
+fn test_initialize_escrow_prices_cannot_be_zero() {
+    let env = Env::default();
+    
+    let issuer = Address::generate(&env);
+    let service_provider = Address::generate(&env);
+    let signer = Address::generate(&env);
+    
+    let description = String::from_str(&env, "Test escrow");
+
+    let result = EngagementContract::initialize_escrow(
+        env.clone(),
+        String::from_str(&env, "engagement_1"),
+        description,
+        issuer,
+        service_provider,
+        0,
+        signer,
+    );
+
+    assert!(result.is_err());
+    let error = result.unwrap_err();
+    assert_eq!(error, ContractError::PricesCannotBeZero);
 }
 
 #[test]

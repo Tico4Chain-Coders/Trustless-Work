@@ -1,12 +1,12 @@
 use soroban_sdk::{
-    contract, contractimpl, log, Address, Env, String
+    contract, contractimpl, Address, Env, String
 };
 use soroban_sdk::token::Client as TokenClient;
 
 use crate::storage_types::{Escrow, DataKey, User};
+use crate::error::ContractError;
 use crate::events::{
-    escrow_created, escrow_completed, escrow_funded, escrow_cancelled,
-    escrow_refunded, escrows_by_engagement_id, balance_retrieved_event, allowance_retrieved_event
+    escrows_by_engagement_id, balance_retrieved_event, allowance_retrieved_event
 };
 
 #[contract]
@@ -22,13 +22,14 @@ impl EngagementContract {
         service_provider: Address,
         amount: u128,
         signer: Address,
-    ) -> String {
+    ) -> Result<String, ContractError> {
         // if e.storage().instance().has(&DataKey::Admin) {
         //     panic!("An escrow has already been initialized for this contract");
         // }
 
         if amount == 0 {
-            panic!("Prices cannot be zero");
+            return Err(ContractError::PricesCannotBeZero);
+            // panic!("Prices cannot be zero");
         }
 
         let engagement_id_copy = engagement_id.clone();
@@ -47,27 +48,25 @@ impl EngagementContract {
         e.storage().instance().set(&DataKey::Escrow(engagement_id.clone().into()), &escrow);
         // e.storage().instance().set(&DataKey::Admin, &true);
 
-        escrow_created(&e, engagement_id, signer.clone(), service_provider.clone(), amount);
-
-        engagement_id_copy
+        Ok(engagement_id_copy)
     }
     
-    pub fn fund_escrow(e: Env, engagement_id: String, signer: Address, usdc_contract: Address, contract_address: Address) {
+    pub fn fund_escrow(e: Env, engagement_id: String, signer: Address, usdc_contract: Address, contract_address: Address) -> Result<(), ContractError> {
         signer.require_auth();
     
         let escrow_key = DataKey::Escrow(engagement_id.clone());
         let mut escrow: Escrow = e.storage().instance().get(&escrow_key).unwrap();
     
         if signer != escrow.signer {
-            panic!("Only the signer can fund escrows");
+            return Err(ContractError::OnlySignerCanFundEscrow);
         }
 
         if escrow.balance > 0 {
-            panic!("Escrow already funded");
+            return Err(ContractError::EscrowAlreadyFunded);
         }
 
         if escrow.balance == escrow.amount {
-            panic!("This escrow has already been fully funded.");
+            return Err(ContractError::EscrowFullyFunded);
         }
 
         let half_price_in_micro_usdc = (escrow.amount as i128) / 2;
@@ -75,22 +74,21 @@ impl EngagementContract {
 
         let signer_balance = usdc_client.balance(&signer);
         if signer_balance < half_price_in_micro_usdc {
-            panic!("The signer does not have sufficient funds to finance this escrow.");
+            return Err(ContractError::SignerInsufficientFunds);
         }
 
         usdc_client.approve(&signer, &contract_address, &half_price_in_micro_usdc, &e.ledger().sequence());
 
         let allowance = usdc_client.allowance(&signer, &contract_address);
         if allowance < half_price_in_micro_usdc {
-            panic!("Not enough allowance to fund this escrow. Please approve the amount first.");
+            return Err(ContractError::NotEnoughAllowance);
         }
 
         usdc_client.transfer(&signer, &contract_address, &half_price_in_micro_usdc);
 
         escrow.balance = half_price_in_micro_usdc as u128;
         e.storage().instance().set(&escrow_key, &escrow);
-
-        escrow_funded(&e, engagement_id, half_price_in_micro_usdc as u128);
+        Ok(())
     }
 
     pub fn complete_escrow(
@@ -99,32 +97,31 @@ impl EngagementContract {
         signer: Address,
         usdc_contract: Address,
         contract_address: Address,
-    ) {
+    ) -> Result<(), ContractError> {
         signer.require_auth();
     
         let escrow_key = DataKey::Escrow(engagement_id.clone());
         let mut escrow: Escrow = e.storage().instance().get(&escrow_key).unwrap();
     
         if signer != escrow.signer {
-            panic!("Only the signer can complete the escrow");
+            return Err(ContractError::OnlySignerCanCompleteEscrow);
         }
     
         if escrow.balance == 0 {
-            panic!("Escrow not funded");
+            return Err(ContractError::EscrowNotFunded);
         }
     
         if escrow.completed {
-            panic!("Escrow already completed");
+            return Err(ContractError::EscrowAlreadyCompleted);
         }
     
         let remaining_price = (escrow.amount - escrow.balance) as i128;
-        let full_price = escrow.amount;
     
         let usdc_client = TokenClient::new(&e, &usdc_contract);
 
         let signer_balance = usdc_client.balance(&escrow.signer);
         if signer_balance < remaining_price {
-            panic!("The signer does not have sufficient funds to complete this escrow.");
+            return Err(ContractError::SignerInsufficientFunds);
         }
 
         let expiration_ledger = e.ledger().sequence() + 1000;
@@ -147,33 +144,33 @@ impl EngagementContract {
         escrow.balance = escrow.amount;
     
         e.storage().instance().set(&escrow_key, &escrow);
-        escrow_completed(&e, engagement_id, full_price);
+        Ok(())
     }
 
-    pub fn cancel_escrow(e: Env, engagement_id: String, signer: Address) {
+    pub fn cancel_escrow(e: Env, engagement_id: String, signer: Address) -> Result<(), ContractError> {
         let escrow_key = DataKey::Escrow(engagement_id.clone());
         let mut escrow: Escrow = e.storage().instance().get(&escrow_key).unwrap();
 
         let invoker = signer;
         if invoker != escrow.signer {
-            panic!("Only the signer can mark the escrow as completed");
+            return Err(ContractError::OnlySignerCanCancelEscrow);
         }
 
         if escrow.completed {
-            panic!("The escrow is completed");
+            return Err(ContractError::EscrowAlreadyCompleted);
         }
 
         if escrow.cancelled {
-            panic!("The escrow is cancelled");
+            return Err(ContractError::EscrowAlreadyCancelled);
         }
 
         escrow.cancelled = true;
 
         e.storage().instance().set(&escrow_key, &escrow);
-        escrow_cancelled(&e, escrow_key);
+        Ok(())
     }
 
-    pub fn refund_remaining_funds(e: Env, engagement_id: String, signer: Address, usdc_contract: Address, contract_address: Address) {
+    pub fn refund_remaining_funds(e: Env, engagement_id: String, signer: Address, usdc_contract: Address, contract_address: Address) -> Result<(), ContractError> {
         signer.require_auth();
 
         let escrow_key = DataKey::Escrow(engagement_id.clone());
@@ -181,17 +178,17 @@ impl EngagementContract {
         
         let invoker = signer.clone();
         if invoker != escrow.signer {
-            panic!("Only the client can mark the engagement as completed");
+            return Err(ContractError::OnlySignerCanRequestRefund);
         }
         if !escrow.cancelled {
-            panic!("The escrow must be cancelled in order to refund the amounts");
+            return Err(ContractError::EscrowNotCancelled);
         }
 
         let usdc_client = TokenClient::new(&e, &usdc_contract);
         let contract_balance = usdc_client.balance(&contract_address);
 
         if  contract_balance == 0 {
-            panic!("The contract has no balance to repay");
+            return Err(ContractError::ContractHasInsufficientBalance);
         }
 
         usdc_client.approve(&signer, &contract_address, &contract_balance, &e.ledger().sequence());
@@ -204,7 +201,7 @@ impl EngagementContract {
         escrow.balance = 0;
         e.storage().instance().set(&escrow_key, &escrow);
 
-        escrow_refunded(&e, escrow_key, signer.clone(), contract_balance as u128);
+        Ok(())
     }
 
     pub fn get_escrow_by_id(e: Env, engagement_id: String) -> Escrow {
