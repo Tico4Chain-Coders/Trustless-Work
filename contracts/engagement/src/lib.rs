@@ -10,6 +10,7 @@ mod token;
 mod events;
 mod contract;
 mod utils;
+mod error;
 mod test;
 
 pub use crate::contract::EngagementContractClient;
