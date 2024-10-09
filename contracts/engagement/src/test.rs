@@ -230,3 +230,22 @@ fn test_get_engagements_by_service_provider() {
     assert_eq!(escrow.signer, signer_address);
     assert_eq!(escrow.service_provider, service_provider_address);
 }
+
+#[test]
+fn test_get_escrow_by_invalid_id() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let invalid_engagement_id = String::from_str(&env, "99999");
+
+    let engagement_contract_address = env.register_contract(None, EngagementContract);
+
+    env.as_contract(&engagement_contract_address, || {
+        let result = EngagementContract::get_escrow_by_id(env.clone(), invalid_engagement_id);
+    
+        assert!(result.is_err());
+        let error_message = result.unwrap_err();
+        
+        assert_eq!(error_message, ContractError::EscrowNotFound);
+    });
+}
