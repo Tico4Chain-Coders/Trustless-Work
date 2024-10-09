@@ -55,7 +55,12 @@ impl EngagementContract {
         signer.require_auth();
     
         let escrow_key = DataKey::Escrow(engagement_id.clone());
-        let mut escrow: Escrow = e.storage().instance().get(&escrow_key).unwrap();
+        let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id);
+    
+        let mut escrow = match escrow_result {
+            Ok(esc) => esc,
+            Err(err) => return Err(err),
+        };
     
         if signer != escrow.signer {
             return Err(ContractError::OnlySignerCanFundEscrow);
@@ -101,7 +106,12 @@ impl EngagementContract {
         signer.require_auth();
     
         let escrow_key = DataKey::Escrow(engagement_id.clone());
-        let mut escrow: Escrow = e.storage().instance().get(&escrow_key).unwrap();
+        let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id);
+    
+        let mut escrow = match escrow_result {
+            Ok(esc) => esc,
+            Err(err) => return Err(err),
+        };
     
         if signer != escrow.signer {
             return Err(ContractError::OnlySignerCanCompleteEscrow);
@@ -149,7 +159,12 @@ impl EngagementContract {
 
     pub fn cancel_escrow(e: Env, engagement_id: String, signer: Address) -> Result<(), ContractError> {
         let escrow_key = DataKey::Escrow(engagement_id.clone());
-        let mut escrow: Escrow = e.storage().instance().get(&escrow_key).unwrap();
+        let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id);
+    
+        let mut escrow = match escrow_result {
+            Ok(esc) => esc,
+            Err(err) => return Err(err),
+        };
 
         let invoker = signer;
         if invoker != escrow.signer {
@@ -174,7 +189,12 @@ impl EngagementContract {
         signer.require_auth();
 
         let escrow_key = DataKey::Escrow(engagement_id.clone());
-        let mut escrow: Escrow = e.storage().instance().get(&escrow_key).unwrap();
+        let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id);
+    
+        let mut escrow = match escrow_result {
+            Ok(esc) => esc,
+            Err(err) => return Err(err),
+        };
         
         let invoker = signer.clone();
         if invoker != escrow.signer {
@@ -204,12 +224,14 @@ impl EngagementContract {
         Ok(())
     }
 
-    pub fn get_escrow_by_id(e: Env, engagement_id: String) -> Escrow {
+    pub fn get_escrow_by_id(e: Env, engagement_id: String) -> Result<Escrow, ContractError> {
         let escrow_key = DataKey::Escrow(engagement_id.clone());
-        let escrow: Escrow = e.storage().instance().get(&escrow_key).unwrap();
-        
-        escrows_by_engagement_id(&e, engagement_id.clone(), escrow.clone());
-        escrow
+        if let Some(escrow) = e.storage().instance().get::<DataKey, Escrow>(&escrow_key) {
+            escrows_by_engagement_id(&e, engagement_id.clone(), escrow.clone());
+            Ok(escrow)
+        } else {
+            return Err(ContractError::EscrowNotFound)
+        }
     }
 
     pub fn approve_amounts(e: Env, from: Address, spender: Address, amount: i128, usdc_token_address: Address ) {
