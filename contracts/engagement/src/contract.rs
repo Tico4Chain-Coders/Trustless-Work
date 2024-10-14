@@ -53,7 +53,7 @@ impl EngagementContract {
     
     pub fn fund_escrow(e: Env, engagement_id: String, signer: Address, usdc_contract: Address, contract_address: Address) -> Result<(), ContractError> {
         signer.require_auth();
-    
+
         let escrow_key = DataKey::Escrow(engagement_id.clone());
         let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id);
     
@@ -61,38 +61,40 @@ impl EngagementContract {
             Ok(esc) => esc,
             Err(err) => return Err(err),
         };
+
+        if escrow.cancelled == true {
+            return Err(ContractError::EscrowAlreadyCancelled);
+        }
+
+        if escrow.completed == true {
+            return Err(ContractError::EscrowAlreadyCompleted);
+        }
     
         if signer != escrow.signer {
             return Err(ContractError::OnlySignerCanFundEscrow);
         }
-
+    
         if escrow.balance > 0 {
             return Err(ContractError::EscrowAlreadyFunded);
         }
-
+    
         if escrow.balance == escrow.amount {
             return Err(ContractError::EscrowFullyFunded);
         }
-
+    
         let half_price_in_micro_usdc = (escrow.amount as i128) / 2;
         let usdc_client = TokenClient::new(&e, &usdc_contract);
-
+    
         let signer_balance = usdc_client.balance(&signer);
         if signer_balance < half_price_in_micro_usdc {
             return Err(ContractError::SignerInsufficientFunds);
         }
-
-        usdc_client.approve(&signer, &contract_address, &half_price_in_micro_usdc, &e.ledger().sequence());
-
-        let allowance = usdc_client.allowance(&signer, &contract_address);
-        if allowance < half_price_in_micro_usdc {
-            return Err(ContractError::NotEnoughAllowance);
-        }
-
+    
         usdc_client.transfer(&signer, &contract_address, &half_price_in_micro_usdc);
-
+    
         escrow.balance = half_price_in_micro_usdc as u128;
         e.storage().instance().set(&escrow_key, &escrow);
+    
         Ok(())
     }
 
@@ -112,6 +114,10 @@ impl EngagementContract {
             Ok(esc) => esc,
             Err(err) => return Err(err),
         };
+
+        if escrow.cancelled == true {
+            return Err(ContractError::EscrowAlreadyCancelled);
+        }
     
         if signer != escrow.signer {
             return Err(ContractError::OnlySignerCanCompleteEscrow);
@@ -134,16 +140,12 @@ impl EngagementContract {
             return Err(ContractError::SignerInsufficientFunds);
         }
 
-        let expiration_ledger = e.ledger().sequence() + 1000;
-
-        usdc_client.approve(&signer, &contract_address, &remaining_price, &expiration_ledger);
         usdc_client.transfer(
             &signer,              
             &contract_address,
             &remaining_price
         );
 
-        usdc_client.approve(&contract_address, &escrow.service_provider, &(escrow.amount as i128), &expiration_ledger);
         usdc_client.transfer(
             &contract_address,
             &escrow.service_provider,
@@ -204,6 +206,10 @@ impl EngagementContract {
             return Err(ContractError::EscrowNotCancelled);
         }
 
+        if escrow.completed {
+            return Err(ContractError::EscrowAlreadyCompleted);
+        }
+
         let usdc_client = TokenClient::new(&e, &usdc_contract);
         let contract_balance = usdc_client.balance(&contract_address);
 
@@ -211,11 +217,10 @@ impl EngagementContract {
             return Err(ContractError::ContractHasInsufficientBalance);
         }
 
-        usdc_client.approve(&signer, &contract_address, &contract_balance, &e.ledger().sequence());
         usdc_client.transfer(
             &e.current_contract_address(),
             &escrow.signer,
-            &(contract_balance as i128) 
+            &contract_balance
         );
 
         escrow.balance = 0;
