@@ -108,7 +108,7 @@ fn test_initialize_escrow_prices_cannot_be_zero() {
 
     assert!(result.is_err());
     let error = result.unwrap_err();
-    assert_eq!(error, ContractError::PricesCannotBeZero);
+    assert_eq!(error, ContractError::AmountCannotBeZero);
 }
 
 #[test]

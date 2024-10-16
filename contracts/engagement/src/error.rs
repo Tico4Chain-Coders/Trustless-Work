@@ -5,7 +5,7 @@ use core::fmt;
 #[contracterror]
 pub enum ContractError {
     EscrowNotFunded = 1,
-    PricesCannotBeZero = 2,
+    AmountCannotBeZero = 2,
     EscrowAlreadyInitialized = 3,
     OnlySignerCanFundEscrow = 4,
     EscrowAlreadyFunded = 5,
@@ -28,7 +28,7 @@ impl fmt::Display for ContractError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             ContractError::EscrowNotFunded => write!(f, "Escrow not funded"),
-            ContractError::PricesCannotBeZero => write!(f, "Prices cannot be zero"),
+            ContractError::AmountCannotBeZero => write!(f, "Amount cannot be zero"),
             ContractError::EscrowAlreadyInitialized => write!(f, "Escrow already initialized"),
             ContractError::OnlySignerCanFundEscrow => write!(f, "Only the signer can fund the escrow"),
             ContractError::EscrowAlreadyFunded => write!(f, "Escrow already funded"),

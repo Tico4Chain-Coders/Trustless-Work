@@ -51,8 +51,7 @@ impl EngagementContract {
         // }
 
         if amount == 0 {
-            return Err(ContractError::PricesCannotBeZero);
-            // panic!("Prices cannot be zero");
+            return Err(ContractError::AmountCannotBeZero);
         }
 
         let engagement_id_copy = engagement_id.clone();
