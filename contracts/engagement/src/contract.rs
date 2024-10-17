@@ -220,7 +220,7 @@ impl EngagementContract {
         Ok(())
     }
 
-    pub fn cancel_escrow(e: Env, engagement_id: String, signer: Address) -> Result<(), ContractError> {
+    pub fn cancel_escrow(e: Env, engagement_id: String, service_provider:Address) -> Result<(), ContractError> {
         let escrow_key = DataKey::Escrow(engagement_id.clone());
         let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id);
     
@@ -229,9 +229,9 @@ impl EngagementContract {
             Err(err) => return Err(err),
         };
 
-        let invoker = signer;
-        if invoker != escrow.signer {
-            return Err(ContractError::OnlySignerCanCancelEscrow);
+        let invoker = service_provider;
+        if invoker != escrow.service_provider {
+            return Err(ContractError::OnlyServiceProviderCanCancelEscrow);
         }
 
         if escrow.completed {
