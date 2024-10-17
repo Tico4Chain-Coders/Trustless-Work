@@ -76,13 +76,22 @@ fn test_create_fund_complete_escrows() {
         &usdc_contract_address, 
         &engagement_contract_address, 
     );
+
+    engagement_client.claim_escrow_earnings(
+        &engagement_id_copy, 
+        &service_provider_address, 
+        &usdc_contract_address, 
+        &engagement_contract_address, 
+    );
     
     env.as_contract(&engagement_contract_address, || {
         let engagement_key = DataKey::Escrow(engagement_id_copy.clone());
         let engagement: Escrow = env.storage().instance().get(&engagement_key).unwrap();
-        
+        let service_provider_balance = token.balance(&service_provider_address);
+
+        assert_eq!(service_provider_balance, engagement.amount as i128);
         assert_eq!(engagement.completed, true);
-        assert_eq!(engagement.balance, engagement.amount);
+        assert_eq!(engagement.balance, 0);
     });
 }
 
