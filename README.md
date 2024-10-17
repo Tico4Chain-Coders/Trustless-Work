@@ -1,3 +1,9 @@
+<p align="center">
+  <a href="#" target="blank">
+    <img src="https://github.com/user-attachments/assets/7b1db62c-6d39-4922-9d0c-4ba4b522b49a" width="120" alt="Nest Logo" />
+  </a>
+</p>
+
 <h1 style="text-align: center;">Trustless Work</h1>
 
 ## Contents
@@ -6,7 +12,7 @@
 - [Install the Stellar CLI](#install-stellar-cli)
 - [Configuring the CLI for Testnet](#configuring-the-cli-for-testnet)
 - [Configure an idenity](#configure-an-identity)
-- [Run project](#run-project)
+- [Deploy project on Testenet](#deploy-project-on-testnet)
 
 ## Installing Rust
 
@@ -107,4 +113,86 @@ stellar keys address alice
 
 You can use this [link](https://stellar.expert/explorer/testnet) to verify the identity you create for the testnet.
 
-## Run Project
+
+
+## Deploy Project on Testnet
+
+
+
+### Build contract
+
+Once you have fully set up the contract in your local environment, installed all the necessary tools, and properly configured your user for the testnet, you will be ready to perform the initial deployment to the Testnet and run tests directly on the contract.
+
+The first step is to compile the contract and generate the `.wasm` file, which can be done using the following command:
+
+```bash
+stellar contract build
+```
+
+### Install contract
+
+Before deploying the contract, you must first install it. This means uploading a version of your code to the Stellar network, which you can later use for deployment.
+
+When you execute the following command with the parameters specific to your local environment, it will return a hash. You will need to save this hash, as it will be required in the next step.
+
+### macOS/Linux
+
+```bash
+stellar contract install \
+   --network <network> \
+   --source <source_account> \
+   --wasm <path_to_wasm_file>
+```
+
+### Windows (PowerShell)
+
+```bash
+stellar contract install `
+   --network <network> `
+   --source <source_account> `
+   --wasm <path_to_wasm_file>
+```
+
+Where:
+
+- `<network>` is the name of the network you are working on (e.g., testnet).
+- `<source_account>` is the account from which the installation will be made (you need to provide your own account).
+- `<path_to_wasm_file>` is the path to the `.wasm` file generated when compiling the contract."
+
+Response:
+
+```
+d36cd70c3b9c999e172ecc4648e616d9a49fd5dbbae8c28bef0b90bbb32fc762
+```
+
+
+
+### Deploy contract
+
+Finally, to deploy the contract, you will need to use the output from the previous command as the input parameter for this command.
+
+Once you execute this command, you will receive another hash, which will be the contract ID. With this ID, you can query platforms such as https://stellar.expert/explorer/testnet and continuously monitor the interactions made with the deployed contract.
+
+### macOS/Linux
+
+```bash
+stellar contract deploy \
+   --wasm-hash <wasm_hash> \
+   --source <source_account> \
+   --network <network>
+```
+
+### Windows (PowerShell)
+
+```bash
+stellar contract deploy `
+   --wasm-hash <wasm_hash> `
+   --source <source_account> `
+   --network <network>
+```
+
+Where:
+
+- `<wasm_hash>` is the hash of the `.wasm` file generated during the contract installation.
+- `<source_account>` is the account from which the deployment will be made.
+- `<network>` is the network you are working on (e.g., testnet).
