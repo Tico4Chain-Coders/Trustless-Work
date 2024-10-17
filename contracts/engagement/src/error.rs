@@ -22,6 +22,10 @@ pub enum ContractError {
     NoFundsToRefund = 16,
     ContractHasInsufficientBalance = 17,
     EscrowNotFound = 18,
+    OnlyServiceProviderCanClaimEarnings = 19,
+    EscrowNotCompleted = 20,
+    EscrowBalanceNotSufficienteToSendEarnings = 21,
+    ContractInsufficientFunds = 22,
 }
 
 impl fmt::Display for ContractError {
@@ -44,7 +48,11 @@ impl fmt::Display for ContractError {
             ContractError::EscrowNotCancelled => write!(f, "The escrow must be cancelled to refund the amounts"),
             ContractError::NoFundsToRefund => write!(f, "No funds available to refund"),
             ContractError::ContractHasInsufficientBalance => write!(f, "The contract has no balance to repay"), 
-            ContractError::EscrowNotFound => write!(f, "Escrow not found")
+            ContractError::EscrowNotFound => write!(f, "Escrow not found"),
+            ContractError::OnlyServiceProviderCanClaimEarnings => write!(f, "Only the service provider can claim escrow earnings"),
+            ContractError::EscrowNotCompleted => write!(f, "The escrow must be completed to claim earnings"),
+            ContractError::EscrowBalanceNotSufficienteToSendEarnings => write!(f, "The escrow balance must be equal to the amount of earnings defined for the escrow"),
+            ContractError::ContractInsufficientFunds => write!(f, "The contract does not have sufficient funds")
         }
     }
 }
