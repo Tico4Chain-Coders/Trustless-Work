@@ -168,15 +168,54 @@ impl EngagementContract {
             &remaining_price
         );
 
+        escrow.completed = true;
+        escrow.balance = escrow.amount;
+    
+        e.storage().instance().set(&escrow_key, &escrow);
+        Ok(())
+    }
+
+    pub fn claim_escrow_earnings(e: Env, engagement_id: String, service_provider: Address, usdc_contract: Address, contract_address: Address) -> Result<(), ContractError> {
+        let escrow_key = DataKey::Escrow(engagement_id.clone());
+        let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id);
+
+        let mut escrow = match escrow_result {
+            Ok(esc) => esc,
+            Err(err) => return Err(err),
+        };
+
+        let invoker = service_provider;
+        if invoker != escrow.service_provider {
+            return Err(ContractError::OnlyServiceProviderCanClaimEarnings);
+        }
+
+        if escrow.cancelled == true {
+            return Err(ContractError::EscrowAlreadyCancelled);
+        }
+
+        if escrow.completed == false {
+            return Err(ContractError::EscrowNotCompleted);
+        }
+
+        if escrow.balance != escrow.amount {
+            return Err(ContractError::EscrowBalanceNotSufficienteToSendEarnings);
+        }
+
+        let usdc_client = TokenClient::new(&e, &usdc_contract);
+
+        let escrow_balance = usdc_client.balance(&contract_address);
+        if escrow_balance < escrow.amount as i128 {
+            return Err(ContractError::ContractInsufficientFunds);
+        }
+
         usdc_client.transfer(
             &contract_address,
             &escrow.service_provider,
             &(escrow.amount as i128)
         );
 
-        escrow.completed = true;
-        escrow.balance = escrow.amount;
-    
+        escrow.balance = 0;
+
         e.storage().instance().set(&escrow_key, &escrow);
         Ok(())
     }
