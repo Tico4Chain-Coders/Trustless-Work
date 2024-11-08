@@ -1,10 +1,7 @@
-<p align="center">
-  <a href="#" target="blank">
-    <img src="https://github.com/user-attachments/assets/7b1db62c-6d39-4922-9d0c-4ba4b522b49a" width="120" alt="Nest Logo" />
-  </a>
-</p>
+<p align="center"> <img src="https://github.com/user-attachments/assets/5b182044-dceb-41f5-acf0-da22dea7c98a" alt="CLR-S (2)"> </p>
 
-<h1 style="text-align: center;">Trustless Work</h1>
+# Trustless Work | [API Documentation](https://docs.trustlesswork.com/trustless-work)
+It enables trustless payments via smart contracts, securing funds in escrow until milestones are approved by clients. Stablecoins like USDC are used to ensure stability and ease of use.
 
 ## Contents
 
