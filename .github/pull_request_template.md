@@ -6,7 +6,7 @@
 
 <!-- Provide the link to the related issue here -->
 
-[Issue #X](LINK_TO_ISSUE)
+- Closes #(issue number)
 
 ---
 
