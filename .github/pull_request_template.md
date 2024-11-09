@@ -26,23 +26,15 @@
 
 ---
 
-## 4. Evidence Before Solution
+## 4. Evidence After Solution
 
-<!-- Record a video using Loom showing the behavior or bug before applying the solution. Provide a link to the Loom video here. -->
-
-[Loom Video - Before Solution](LINK_TO_VIDEO_BEFORE)
-
----
-
-## 5. Evidence After Solution
-
-<!-- Record a video using Loom showing the corrected behavior after the solution. Provide a link to the Loom video here. -->
+<!-- Record a video using Loom showing the corrected behavior after the solution. Provide a link to the Loom video here. Or you can provide another type of evidence, but it should be very clear -->
 
 [Loom Video - After Solution](LINK_TO_VIDEO_AFTER)
 
 ---
 
-## 6. Important Notes
+## 5. Important Notes
 
 <!-- Any other relevant information that reviewers should be aware of, such as potential impacts, related issues, dependencies, or additional setup instructions. -->
 
@@ -51,6 +43,4 @@
 - Note 3
 
 
-
-# Please make sure that you complete the options of the right sidebar (Labels, Assigns and Reviewers)
 # If you don't use this template, you'd be ignored
