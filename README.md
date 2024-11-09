@@ -3,7 +3,7 @@
 # Trustless Work | [API Documentation](https://docs.trustlesswork.com/trustless-work)
 It enables trustless payments via smart contracts, securing funds in escrow until milestones are approved by clients. Stablecoins like USDC are used to ensure stability and ease of use.
 
-# Mantainers | [Telegram](https://t.me/+kmr8tGegxLU0NTA5)
+# Maintainers | [Telegram](https://t.me/+kmr8tGegxLU0NTA5)
 
 <table align="center">
   <tr>
