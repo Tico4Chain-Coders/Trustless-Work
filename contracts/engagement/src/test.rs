@@ -110,7 +110,6 @@ fn test_create_fund_complete_escrows() {
         let service_provider_balance = token.balance(&service_provider_address);
 
         assert_eq!(service_provider_balance, engagement.amount as i128);
-        // assert_eq!(engagement.completed, true);
         assert_eq!(engagement.balance, 0);
     });
 }
@@ -120,7 +119,6 @@ fn test_initialize_escrow_prices_cannot_be_zero() {
     let env = Env::default();
     let contract_id = env.register_contract(None, EngagementContract);
     
-    // Create test addresses and data
     let client = Address::generate(&env);
     let service_provider = Address::generate(&env);
     let platform_address = Address::generate(&env);
@@ -141,7 +139,6 @@ fn test_initialize_escrow_prices_cannot_be_zero() {
         },
     ];
     
-    // Wrap the contract call in as_contract
     env.as_contract(&contract_id, || {
         let result = EngagementContract::initialize_escrow(
             env.clone(),
@@ -149,14 +146,14 @@ fn test_initialize_escrow_prices_cannot_be_zero() {
             client,
             service_provider,
             platform_address,
-            0, // amount (zero to test the error case)
-            10, // platform_fee
+            0, 
+            10,
             milestones,
             release_signer,
             dispute_resolver,
         );
         
-        assert!(result.is_err()); // or whatever assertion you need
+        assert!(result.is_err());
     });
 }
 
@@ -167,7 +164,6 @@ fn test_client_can_recover_funds_if_service_provider_does_not_complete_all_escro
 
     let admin1 = Address::generate(&env);
     let client_address = Address::generate(&env);
-    let signer_address = Address::generate(&env);
     let platform_address = Address::generate(&env);
     let service_provider_address = Address::generate(&env);
     let release_signer_address = Address::generate(&env);
@@ -300,7 +296,6 @@ fn test_get_engagements_by_service_provider() {
     assert_eq!(token.balance(&signer_address), 1_000_000_000);
 
     let engagement_id = String::from_str(&env, "41431");
-    let description = String::from_str(&env, "Any description");
 
     let amount: u128 = 100_u128;
     let engagement_id = engagement_client.initialize_escrow(
@@ -339,4 +334,83 @@ fn test_get_escrow_by_invalid_id() {
         
         assert_eq!(error_message, ContractError::EscrowNotFound);
     });
+}
+
+
+#[test]
+fn test_initialize_excrow() {
+
+    let env = Env::default();
+    env.mock_all_auths();
+    
+    let admin1 = Address::generate(&env);
+    let client_address = Address::generate(&env);
+    let platform_address = Address::generate(&env);
+    let amount: u128 = 100_000_000;
+    let service_provider_address = Address::generate(&env);
+    let release_signer_address = Address::generate(&env);
+    let dispute_resolver_address = Address::generate(&env);
+    let platform_fee = (0.3 * 10u128.pow(18) as f64) as u128;
+    let token = create_token(&env, &admin1);
+
+    let milestones = vec![
+        &env,
+        Milestone {
+            description: String::from_str(&env, "First milestone"),
+            status: String::from_str(&env, "Pending"),
+            flag: false,
+        },
+        Milestone {
+            description: String::from_str(&env, "Second milestone"),
+            status: String::from_str(&env, "Pending"),
+            flag: false,
+        },
+    ];
+
+    let engagement_contract_address = env.register_contract(None, EngagementContract); 
+    let engagement_client = EngagementContractClient::new(&env, &engagement_contract_address);
+
+    token.mint(&release_signer_address, &1_000_000_000);
+    assert_eq!(
+        env.auths(),
+        std::vec![(
+            admin1.clone(),
+            AuthorizedInvocation {
+                function: AuthorizedFunction::Contract((
+                    token.address.clone(),
+                    symbol_short!("mint"),
+                    (&release_signer_address, 1_000_000_000_i128).into_val(&env),
+                )),
+                sub_invocations: std::vec![]
+            }
+        )]
+    );
+    assert_eq!(token.balance(&release_signer_address), 1_000_000_000);
+
+    let engagement_id = String::from_str(&env, "41431");
+
+    let engagement_id = engagement_client.initialize_escrow(
+        &engagement_id.clone(), 
+        &client_address, 
+        &service_provider_address, 
+        &platform_address, 
+        &amount, 
+        &platform_fee,
+        &milestones,
+        &release_signer_address,
+        &dispute_resolver_address
+    );
+
+    let escrow = engagement_client.get_escrow_by_id(&engagement_id);
+    assert_eq!(escrow.engagement_id, engagement_id);
+    assert_eq!(escrow.client, client_address);
+    assert_eq!(escrow.service_provider, service_provider_address);
+    assert_eq!(escrow.platform_address, platform_address);
+    assert_eq!(escrow.amount, amount);
+    assert_eq!(escrow.platform_fee, platform_fee);
+    assert_eq!(escrow.milestones, milestones);
+    assert_eq!(escrow.release_signer, release_signer_address);
+    assert_eq!(escrow.dispute_resolver, dispute_resolver_address);
+
+
 }
