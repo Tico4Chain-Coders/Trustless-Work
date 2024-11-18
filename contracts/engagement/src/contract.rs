@@ -3,7 +3,7 @@ use soroban_sdk::{
 };
 use soroban_sdk::token::Client as TokenClient;
 
-use crate::storage_types::{Escrow, DataKey, User};
+use crate::storage_types::{DataKey, Escrow, Milestone, User};
 use crate::error::ContractError;
 use crate::events::{
     escrows_by_engagement_id, balance_retrieved_event, allowance_retrieved_event
@@ -40,15 +40,20 @@ impl EngagementContract {
     pub fn initialize_escrow(
         e: Env,
         engagement_id: String,
-        description: String,
-        issuer: Address,
+        client: Address,
         service_provider: Address,
+        platform_address: Address,
         amount: u128,
-        signer: Address,
+        platform_fee: u128,
+        milestones: Vec<Milestone>,
+        release_signer: Address,
+        dispute_resolver: Address,
     ) -> Result<String, ContractError> {
-        // if e.storage().instance().has(&DataKey::Admin) {
-        //     panic!("An escrow has already been initialized for this contract");
-        // }
+
+        if e.storage().instance().has(&DataKey::Admin) {
+            panic!("An escrow has already been initialized for this contract");
+        }
+
 
         if amount == 0 {
             return Err(ContractError::AmountCannotBeZero);
@@ -57,14 +62,17 @@ impl EngagementContract {
         let engagement_id_copy = engagement_id.clone();
         let escrow = Escrow {
             engagement_id: engagement_id.clone(),
-            description,
-            issuer,
-            signer: signer.clone(),
+            client: client.clone(),
+            platform_address,
+            release_signer: release_signer.clone(),
             service_provider: service_provider.clone(),
             amount,
             balance: 0,
-            cancelled: false,
-            completed: false,
+            tw_fee: (0.3 * 10u128.pow(18) as f64) as u128,
+            platform_fee: platform_fee,
+            milestones: milestones,
+            dispute_resolver: dispute_resolver.clone(),
+            dispute_flag: false,
         };
         
         e.storage().instance().set(&DataKey::Escrow(engagement_id.clone().into()), &escrow);
@@ -84,25 +92,25 @@ impl EngagementContract {
             Err(err) => return Err(err),
         };
 
-        if escrow.cancelled == true {
-            return Err(ContractError::EscrowAlreadyCancelled);
-        }
+        // if escrow.cancelled == true {
+        //     return Err(ContractError::EscrowAlreadyCancelled);
+        // }
 
-        if escrow.completed == true {
-            return Err(ContractError::EscrowAlreadyCompleted);
-        }
+        // if escrow.completed == true {
+        //     return Err(ContractError::EscrowAlreadyCompleted);
+        // }
     
-        if signer != escrow.signer {
-            return Err(ContractError::OnlySignerCanFundEscrow);
-        }
+        // if signer != escrow.signer {
+        //     return Err(ContractError::OnlySignerCanFundEscrow);
+        // }
     
-        if escrow.balance > 0 {
-            return Err(ContractError::EscrowAlreadyFunded);
-        }
+        // if escrow.balance > 0 {
+        //     return Err(ContractError::EscrowAlreadyFunded);
+        // }
     
-        if escrow.balance == escrow.amount {
-            return Err(ContractError::EscrowFullyFunded);
-        }
+        // if escrow.balance == escrow.amount {
+        //     return Err(ContractError::EscrowFullyFunded);
+        // }
     
         let half_price_in_micro_usdc = (escrow.amount as i128) / 2;
         let usdc_client = TokenClient::new(&e, &usdc_contract);
@@ -137,27 +145,27 @@ impl EngagementContract {
             Err(err) => return Err(err),
         };
 
-        if escrow.cancelled == true {
-            return Err(ContractError::EscrowAlreadyCancelled);
-        }
+        // if escrow.cancelled == true {
+        //     return Err(ContractError::EscrowAlreadyCancelled);
+        // }
     
-        if signer != escrow.signer {
-            return Err(ContractError::OnlySignerCanCompleteEscrow);
-        }
+        // if signer != escrow.signer {
+        //     return Err(ContractError::OnlySignerCanCompleteEscrow);
+        // }
     
-        if escrow.balance == 0 {
-            return Err(ContractError::EscrowNotFunded);
-        }
+        // if escrow.balance == 0 {
+        //     return Err(ContractError::EscrowNotFunded);
+        // }
     
-        if escrow.completed {
-            return Err(ContractError::EscrowAlreadyCompleted);
-        }
+        // if escrow.completed {
+        //     return Err(ContractError::EscrowAlreadyCompleted);
+        // }
     
         let remaining_price = (escrow.amount - escrow.balance) as i128;
     
         let usdc_client = TokenClient::new(&e, &usdc_contract);
 
-        let signer_balance = usdc_client.balance(&escrow.signer);
+        let signer_balance = usdc_client.balance(&escrow.release_signer);
         if signer_balance < remaining_price {
             return Err(ContractError::SignerInsufficientFunds);
         }
@@ -168,7 +176,7 @@ impl EngagementContract {
             &remaining_price
         );
 
-        escrow.completed = true;
+        // escrow.completed = true;
         escrow.balance = escrow.amount;
     
         e.storage().instance().set(&escrow_key, &escrow);
@@ -189,13 +197,13 @@ impl EngagementContract {
             return Err(ContractError::OnlyServiceProviderCanClaimEarnings);
         }
 
-        if escrow.cancelled == true {
-            return Err(ContractError::EscrowAlreadyCancelled);
-        }
+        // if escrow.cancelled == true {
+        //     return Err(ContractError::EscrowAlreadyCancelled);
+        // }
 
-        if escrow.completed == false {
-            return Err(ContractError::EscrowNotCompleted);
-        }
+        // if escrow.completed == false {
+        //     return Err(ContractError::EscrowNotCompleted);
+        // }
 
         if escrow.balance != escrow.amount {
             return Err(ContractError::EscrowBalanceNotSufficienteToSendEarnings);
@@ -234,15 +242,15 @@ impl EngagementContract {
             return Err(ContractError::OnlyServiceProviderCanCancelEscrow);
         }
 
-        if escrow.completed {
-            return Err(ContractError::EscrowAlreadyCompleted);
-        }
+        // if escrow.completed {
+        //     return Err(ContractError::EscrowAlreadyCompleted);
+        // }
 
-        if escrow.cancelled {
-            return Err(ContractError::EscrowAlreadyCancelled);
-        }
+        // if escrow.cancelled {
+        //     return Err(ContractError::EscrowAlreadyCancelled);
+        // }
 
-        escrow.cancelled = true;
+        // escrow.cancelled = true;
 
         e.storage().instance().set(&escrow_key, &escrow);
         Ok(())
@@ -260,16 +268,16 @@ impl EngagementContract {
         };
         
         let invoker = signer.clone();
-        if invoker != escrow.signer {
+        if invoker != escrow.release_signer {
             return Err(ContractError::OnlySignerCanRequestRefund);
         }
-        if !escrow.cancelled {
-            return Err(ContractError::EscrowNotCancelled);
-        }
+        // if !escrow.cancelled {
+        //     return Err(ContractError::EscrowNotCancelled);
+        // }
 
-        if escrow.completed {
-            return Err(ContractError::EscrowAlreadyCompleted);
-        }
+        // if escrow.completed {
+        //     return Err(ContractError::EscrowAlreadyCompleted);
+        // }
 
         let usdc_client = TokenClient::new(&e, &usdc_contract);
         let contract_balance = usdc_client.balance(&contract_address);
@@ -280,7 +288,7 @@ impl EngagementContract {
 
         usdc_client.transfer(
             &e.current_contract_address(),
-            &escrow.signer,
+            &escrow.release_signer,
             &contract_balance
         );
 
@@ -319,57 +327,4 @@ impl EngagementContract {
         balance_retrieved_event(&e, address, usdc_token_address, balance);
     }
       
-    pub fn register(e: Env, user_address: Address, name: String, email: String) -> bool {
-        user_address.require_auth();
-
-        let key = DataKey::User(user_address.clone());
-
-        if e.storage().persistent().has(&key) {
-            return false;
-        }
-
-        let user_id = e
-            .storage()
-            .persistent()
-            .get(&DataKey::UserCounter)
-            .unwrap_or(0)
-            + 1;
-
-        e.storage()
-            .persistent()
-            .set(&DataKey::UserCounter, &user_id);
-
-        let user = User {
-            id: user_id,
-            user: user_address.clone(),
-            name: name.clone(),
-            email: email.clone(),
-            registered: true,
-            timestamp: e.ledger().timestamp(),
-        };
-
-        e.storage()
-            .persistent()
-            .set(&DataKey::User(user_address.clone()), &user);
-
-        let user_reg_id = e.ledger().sequence();
-
-        e.storage()
-            .persistent()
-            .set(&DataKey::UserRegId(user_address.clone()), &user_reg_id);
-
-        return true;
-    }
-
-    pub fn login(e: Env, user_address: Address) -> String {
-        user_address.require_auth();
-    
-        let key = DataKey::User(user_address.clone());
-    
-        if let Some(user) = e.storage().persistent().get::<_, User>(&key) {
-            user.name
-        } else {
-            soroban_sdk::String::from_str(&e, "User not found")
-        }
-    }
 }
