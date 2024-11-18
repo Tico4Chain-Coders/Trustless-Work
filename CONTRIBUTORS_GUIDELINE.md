@@ -17,6 +17,18 @@ git clone https://github.com/YOUR_USERNAME/REPOSITORY_NAME.git
 
 ---
 
+## 3. Execute the tests
+
+- You need to execute the following command to start running the tests:
+
+```bash
+cargo test
+```
+
+- If you have successfully completed the tests you are ready to start contributing. 🚀 
+
+---
+
 ## 3. Create a New Branch
 
 - Create a new branch according to the guidelines in the following document: [Git Guidelines](https://github.com/Tico4Chain-Coders/Trustless-Work/blob/main/GIT_GUIDELINE.md).
