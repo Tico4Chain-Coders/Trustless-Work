@@ -91,26 +91,6 @@ impl EngagementContract {
             Ok(esc) => esc,
             Err(err) => return Err(err),
         };
-
-        // if escrow.cancelled == true {
-        //     return Err(ContractError::EscrowAlreadyCancelled);
-        // }
-
-        // if escrow.completed == true {
-        //     return Err(ContractError::EscrowAlreadyCompleted);
-        // }
-    
-        // if signer != escrow.signer {
-        //     return Err(ContractError::OnlySignerCanFundEscrow);
-        // }
-    
-        // if escrow.balance > 0 {
-        //     return Err(ContractError::EscrowAlreadyFunded);
-        // }
-    
-        // if escrow.balance == escrow.amount {
-        //     return Err(ContractError::EscrowFullyFunded);
-        // }
     
         let half_price_in_micro_usdc = (escrow.amount as i128) / 2;
         let usdc_client = TokenClient::new(&e, &usdc_contract);
@@ -141,14 +121,6 @@ impl EngagementContract {
         if invoker != escrow.service_provider {
             return Err(ContractError::OnlyServiceProviderCanClaimEarnings);
         }
-
-        // if escrow.cancelled == true {
-        //     return Err(ContractError::EscrowAlreadyCancelled);
-        // }
-
-        // if escrow.completed == false {
-        //     return Err(ContractError::EscrowNotCompleted);
-        // }
 
         if escrow.balance != escrow.amount {
             return Err(ContractError::EscrowBalanceNotSufficienteToSendEarnings);
@@ -188,13 +160,6 @@ impl EngagementContract {
         if invoker != escrow.release_signer {
             return Err(ContractError::OnlySignerCanRequestRefund);
         }
-        // if !escrow.cancelled {
-        //     return Err(ContractError::EscrowNotCancelled);
-        // }
-
-        // if escrow.completed {
-        //     return Err(ContractError::EscrowAlreadyCompleted);
-        // }
 
         let usdc_client = TokenClient::new(&e, &usdc_contract);
         let contract_balance = usdc_client.balance(&contract_address);
