@@ -208,5 +208,50 @@ impl EngagementContract {
         let balance = usdc_token.balance(&address);
         balance_retrieved_event(&e, address, usdc_token_address, balance);
     }
-      
+
+    pub fn change_escrow_properties(
+        e: Env,
+        engagement_id: String,
+        client: Address,
+        service_provider: Address,
+        platform_address: Address,
+        amount: u128,
+        platform_fee: u128,
+        milestones: Vec<Milestone>,
+        release_signer: Address,
+        dispute_resolver: Address,
+    ) -> Result<(), ContractError> {
+        let existing_escrow = Self::get_escrow_by_id(e.clone(), engagement_id.clone())?;
+
+        if platform_address != existing_escrow.platform_address {
+            return Err(ContractError::OnlyPlatformAddressExecuteThisFunction);
+        }
+        
+        platform_address.require_auth();
+
+        let updated_escrow = Escrow {
+            engagement_id: engagement_id.clone(),
+            client,
+            platform_address,
+            release_signer,
+            service_provider,
+            amount,
+            balance: amount,
+            tw_fee: (0.3 * 10u128.pow(18) as f64) as u128,
+            platform_fee,
+            milestones,
+            dispute_resolver,
+            dispute_flag: false,
+        };
+
+        e.storage().instance().set(
+            &DataKey::Escrow(engagement_id.into()),
+            &updated_escrow
+        );
+
+        escrows_by_engagement_id(&e, updated_escrow.engagement_id.clone(), updated_escrow);
+
+        Ok(())
+    }
+
 }
