@@ -26,6 +26,7 @@ pub enum ContractError {
     EscrowNotCompleted = 20,
     EscrowBalanceNotSufficienteToSendEarnings = 21,
     ContractInsufficientFunds = 22,
+    OnlyPlatformAddressExecuteThisFunction = 23,
 }
 
 impl fmt::Display for ContractError {
@@ -52,7 +53,8 @@ impl fmt::Display for ContractError {
             ContractError::OnlyServiceProviderCanClaimEarnings => write!(f, "Only the service provider can claim escrow earnings"),
             ContractError::EscrowNotCompleted => write!(f, "The escrow must be completed to claim earnings"),
             ContractError::EscrowBalanceNotSufficienteToSendEarnings => write!(f, "The escrow balance must be equal to the amount of earnings defined for the escrow"),
-            ContractError::ContractInsufficientFunds => write!(f, "The contract does not have sufficient funds")
+            ContractError::ContractInsufficientFunds => write!(f, "The contract does not have sufficient funds"),
+            ContractError::OnlyPlatformAddressExecuteThisFunction => write!(f, "Only the plataform address should be able to execute this function")
         }
     }
 }
