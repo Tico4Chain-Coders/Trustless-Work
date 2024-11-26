@@ -81,7 +81,7 @@ impl EngagementContract {
         Ok(engagement_id_copy)
     }
     
-    pub fn fund_escrow(e: Env, engagement_id: String, signer: Address, usdc_contract: Address, contract_address: Address) -> Result<(), ContractError> {
+    pub fn fund_escrow(e: Env, engagement_id: String, signer: Address, usdc_contract: Address, contract_address: Address, amount_to_deposit: i128) -> Result<(), ContractError> {
         signer.require_auth();
 
         let escrow_key = DataKey::Escrow(engagement_id.clone());
@@ -91,18 +91,30 @@ impl EngagementContract {
             Ok(esc) => esc,
             Err(err) => return Err(err),
         };
+
+        if escrow.dispute_flag == false {
+            return Err("Escrow has been opened for dispute resolution");
+        }
     
-        let half_price_in_micro_usdc = (escrow.amount as i128) / 2;
         let usdc_client = TokenClient::new(&e, &usdc_contract);
-    
+
         let signer_balance = usdc_client.balance(&signer);
-        if signer_balance < half_price_in_micro_usdc {
+        
+        if escrow.balance > escrow.amount {
+            return Err("Escrow fully funded");
+        }
+
+        if amount_to_deposit > escrow.amount {
+            return Err("Amount to deposit is greather thant the escrow amount");
+        }
+
+        if signer_balance < amount_to_deposit {
             return Err(ContractError::SignerInsufficientFunds);
         }
     
-        usdc_client.transfer(&signer, &contract_address, &half_price_in_micro_usdc);
+        usdc_client.transfer(&signer, &contract_address, &amount_to_deposit);
     
-        escrow.balance = half_price_in_micro_usdc as u128;
+        escrow.balance = amount_to_deposit;
         e.storage().instance().set(&escrow_key, &escrow);
     
         Ok(())
