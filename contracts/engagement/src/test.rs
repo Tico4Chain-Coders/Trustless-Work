@@ -198,3 +198,168 @@ fn test_change_escrow_properties() {
     );
     assert!(result.is_err());
 }
+
+#[test]
+fn test_change_milestone_status_and_flag() {
+    let env = Env::default();
+    env.mock_all_auths();
+    
+    let client_address = Address::generate(&env);
+    let service_provider_address = Address::generate(&env);
+    let platform_address = Address::generate(&env);
+    let release_signer_address = Address::generate(&env);
+    let dispute_resolver_address = Address::generate(&env);
+    let amount: u128 = 100_000_000;
+    let platform_fee = (0.3 * 10u128.pow(18) as f64) as u128;
+
+    let initial_milestones = vec![
+        &env,
+        Milestone {
+            description: String::from_str(&env, "Milestone 1"),
+            status: String::from_str(&env, "in-progress"),
+            flag: false,
+        },
+        Milestone {
+            description: String::from_str(&env, "Milestone 2"),
+            status: String::from_str(&env, "in-progress"),
+            flag: false,
+        },
+    ];
+
+    let engagement_contract_address = env.register_contract(None, EngagementContract);
+    let engagement_client = EngagementContractClient::new(&env, &engagement_contract_address);
+
+    let engagement_id = String::from_str(&env, "test_engagement");
+    engagement_client.initialize_escrow(
+        &engagement_id.clone(),
+        &client_address,
+        &service_provider_address,
+        &platform_address,
+        &amount,
+        &platform_fee,
+        &initial_milestones,
+        &release_signer_address,
+        &dispute_resolver_address,
+    );
+
+    // Change milestone status (valid case)
+    let new_status = String::from_str(&env, "completed");
+    engagement_client.change_milestone_status(
+        &engagement_id.clone(),
+        &(0 as i128), // Milestone index
+        &new_status,
+        &service_provider_address,
+    );
+
+    // Verify milestone status change
+    let updated_escrow = engagement_client.get_escrow_by_id(&engagement_id);
+    assert_eq!(updated_escrow.milestones.get(0).unwrap().status, new_status);
+
+    // Change milestone flag (valid case)
+    engagement_client.change_milestone_flag(
+        &engagement_id,
+        &(0 as i128), // Milestone index
+        &true, // New flag
+        &client_address,
+    );
+
+    // Verify milestone flag change
+    let final_escrow = engagement_client.get_escrow_by_id(&engagement_id);
+    assert!(final_escrow.milestones.get(0).unwrap().flag);
+
+    // Invalid index test
+    let invalid_index = 10 as i128;
+    let new_status = String::from_str(&env, "completed");
+
+    // Test for `change_status` with invalid index
+    let result = engagement_client.try_change_milestone_status(
+        &engagement_id,
+        &invalid_index,
+        &new_status,
+        &service_provider_address,
+    );
+    assert!(result.is_err());
+
+    // Test for `change_flag` with invalid index
+    let result = engagement_client.try_change_milestone_flag(
+        &engagement_id,
+        &invalid_index,
+        &true,
+        &client_address,
+    );
+    assert!(result.is_err());
+
+    // Invalid Engagement ID test
+    let invalid_engagement_id = String::from_str(&env, "invalid_engagement");
+
+    // Test for `change_status` with invalid engagement ID
+    let result = engagement_client.try_change_milestone_status(
+        &invalid_engagement_id,
+        &(0 as i128),
+        &new_status,
+        &service_provider_address,
+    );
+    assert!(result.is_err());
+
+    // Test for `change_flag` with invalid engagement ID
+    let result = engagement_client.try_change_milestone_flag(
+        &invalid_engagement_id,
+        &(0 as i128),
+        &true,
+        &client_address,
+    );
+    assert!(result.is_err());
+
+    // Test only authorized party can perform the function
+    let unauthorized_address = Address::generate(&env);
+
+    // Test for `change_status` by invalid service provider
+    let result = engagement_client.try_change_milestone_status(
+        &engagement_id,
+        &(0 as i128),
+        &new_status,
+        &unauthorized_address,
+    );
+    assert!(result.is_err());
+
+    // Test for `change_flag` by invalid client
+    let result = engagement_client.try_change_milestone_flag(
+        &engagement_id,
+        &(0 as i128),
+        &true,
+        &unauthorized_address,
+    );
+    assert!(result.is_err());
+
+    //Escrow Test with no milestone
+    engagement_client.change_escrow_properties(
+        &engagement_id,
+        &client_address,
+        &service_provider_address,
+        &platform_address,
+        &amount,
+        &platform_fee,
+        &vec![&env],
+        &release_signer_address,
+        &dispute_resolver_address
+    );
+    // Test for `change_status` on escrow with no milestones
+    let result = engagement_client.try_change_milestone_status(
+    &engagement_id,
+        &(0 as i128),
+        &new_status,
+        &service_provider_address,
+    );
+    assert!(result.is_err());
+
+    // Test for `change_flag` on escrow with no milestones
+    let result = engagement_client.try_change_milestone_flag(
+        &engagement_id,
+        &(0 as i128),
+        &true,
+        &client_address,
+    );
+    assert!(result.is_err());
+
+}
+
