@@ -81,8 +81,8 @@ impl EngagementContract {
         Ok(engagement_id_copy)
     }
     
-    pub fn fund_escrow(e: Env, engagement_id: String, client: Address, usdc_contract: Address, contract_address: Address) -> Result<(), ContractError> {
-        client.require_auth();
+    pub fn fund_escrow(e: Env, engagement_id: String, signer: Address, usdc_contract: Address, contract_address: Address) -> Result<(), ContractError> {
+        signer.require_auth();
 
         let escrow_key = DataKey::Escrow(engagement_id.clone());
         let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id);
@@ -95,12 +95,12 @@ impl EngagementContract {
         let half_price_in_micro_usdc = (escrow.amount as i128) / 2;
         let usdc_client = TokenClient::new(&e, &usdc_contract);
     
-        let signer_balance = usdc_client.balance(&client);
+        let signer_balance = usdc_client.balance(&signer);
         if signer_balance < half_price_in_micro_usdc {
             return Err(ContractError::SignerInsufficientFunds);
         }
     
-        usdc_client.transfer(&client, &contract_address, &half_price_in_micro_usdc);
+        usdc_client.transfer(&signer, &contract_address, &half_price_in_micro_usdc);
     
         escrow.balance = half_price_in_micro_usdc as u128;
         e.storage().instance().set(&escrow_key, &escrow);
@@ -145,8 +145,8 @@ impl EngagementContract {
         Ok(())
     }
 
-    pub fn refund_remaining_funds(e: Env, engagement_id: String, client: Address, usdc_contract: Address, contract_address: Address) -> Result<(), ContractError> {
-        client.require_auth();
+    pub fn refund_remaining_funds(e: Env, engagement_id: String, signer: Address, usdc_contract: Address, contract_address: Address) -> Result<(), ContractError> {
+        signer.require_auth();
 
         let escrow_key = DataKey::Escrow(engagement_id.clone());
         let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id);
@@ -156,7 +156,7 @@ impl EngagementContract {
             Err(err) => return Err(err),
         };
         
-        let invoker = client.clone();
+        let invoker = signer.clone();
         if invoker != escrow.release_signer {
             return Err(ContractError::OnlySignerCanRequestRefund);
         }
@@ -310,7 +310,7 @@ impl EngagementContract {
         engagement_id: String,
         milestone_index: i128,
         new_flag: bool,
-        client: Address,
+        signer: Address,
     ) -> Result<(), ContractError> {
         let existing_escrow = Self::get_escrow_by_id(e.clone(), engagement_id.clone())?;
     
@@ -318,10 +318,10 @@ impl EngagementContract {
             return Err(ContractError::EscrowNotInitialized);
         }
     
-        if client != existing_escrow.client {
+        if signer != existing_escrow.client {
             return Err(ContractError::OnlyClientChangeMilstoneFlag);
         }
-        client.require_auth();
+        signer.require_auth();
     
         if existing_escrow.milestones.is_empty() {
             return Err(ContractError::NoMileStoneDefined);

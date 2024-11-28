@@ -258,8 +258,8 @@ fn test_change_milestone_status_and_flag() {
     // Change milestone flag (valid case)
     engagement_client.change_milestone_flag(
         &engagement_id,
-        &(0 as i128), // Milestone index
-        &true, // New flag
+        &(0 as i128),
+        &true,
         &client_address,
     );
 
