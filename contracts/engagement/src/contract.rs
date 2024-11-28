@@ -108,40 +108,79 @@ impl EngagementContract {
         Ok(())
     }
 
-    pub fn claim_escrow_earnings(e: Env, engagement_id: String, service_provider: Address, usdc_contract: Address, contract_address: Address) -> Result<(), ContractError> {
+    pub fn claim_escrow_earnings(
+        e: Env, 
+        engagement_id: String, 
+        service_provider: Address, 
+        usdc_contract: Address
+    ) -> Result<(), String> {
         let escrow_key = DataKey::Escrow(engagement_id.clone());
-        let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id);
-
-        let mut escrow = match escrow_result {
+        let mut escrow = match Self::get_escrow_by_id(e.clone(), engagement_id.clone()) {
             Ok(esc) => esc,
-            Err(err) => return Err(err),
+            Err(_) => return Err(soroban_sdk::String::from_str(&e,"Escrow is not initialized for this commitment.")),
         };
 
-        let invoker = service_provider;
-        if invoker != escrow.service_provider {
-            return Err(ContractError::OnlyServiceProviderCanClaimEarnings);
+        if service_provider != escrow.service_provider {
+            return Err(soroban_sdk::String::from_str(&e,"Only the service provider can claim the profits").into());
+        }
+    
+        if escrow.milestones.is_empty() {
+            return Err(soroban_sdk::String::from_str(&e,"The escrow must have at least one milestone").into());
+        }
+    
+        if !escrow.milestones.iter().all(|milestone| milestone.flag) {
+            return Err(soroban_sdk::String::from_str(&e,"Not all milestones have been completed").into());
         }
 
+        if escrow.dispute_flag {
+            return Err(soroban_sdk::String::from_str(&e,"Escrow is currently in dispute").into());
+        }
+    
         if escrow.balance != escrow.amount {
-            return Err(ContractError::EscrowBalanceNotSufficienteToSendEarnings);
+            return Err(soroban_sdk::String::from_str(&e,"The escrow balance is not enough to send the profits").into());
         }
-
+    
         let usdc_client = TokenClient::new(&e, &usdc_contract);
-
-        let escrow_balance = usdc_client.balance(&contract_address);
-        if escrow_balance < escrow.amount as i128 {
-            return Err(ContractError::ContractInsufficientFunds);
-        }
-
+    
+        let contract_address = e.current_contract_address();
+    
+        let platform_fee_percentage: u128 = e.storage().instance()
+            .get(&DataKey::PlatformFee)
+            .unwrap_or(0);
+    
+        let platform_address = e.storage().instance()
+            .get(&DataKey::PlatformAddress)
+            .expect("Platform address not configured");
+    
+        let total_amount = escrow.amount as f64;
+        let trustless_work_commission = (total_amount * 0.003).floor() as i128; 
+        let platform_commission = (total_amount * platform_fee_percentage as f64).floor() as i128;
+        
+        let trustless_work_address = Address::from_string(&soroban_sdk::String::from_str(&e, "GBPUACN7QETR4TCYTKINBDHTYTFXD3BQQQV7VSMZC5CX74E4MTUL2AMUB"));
+    
         usdc_client.transfer(
-            &contract_address,
-            &escrow.service_provider,
-            &(escrow.amount as i128)
+            &contract_address, 
+            &trustless_work_address, 
+            &trustless_work_commission
         );
-
+    
+        usdc_client.transfer(
+            &contract_address, 
+            &platform_address, 
+            &platform_commission
+        );
+    
+        let service_provider_amount = (total_amount - trustless_work_commission as f64 - platform_commission as f64).floor() as i128;
+    
+        usdc_client.transfer(
+            &contract_address, 
+            &escrow.service_provider, 
+            &service_provider_amount
+        );
+    
         escrow.balance = 0;
-
         e.storage().instance().set(&escrow_key, &escrow);
+    
         Ok(())
     }
 

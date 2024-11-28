@@ -61,6 +61,8 @@ pub enum DataKey {
     Balance(Address),
     Allowance(AllowanceDataKey),
     Admin,
+    PlatformFee,
+    PlatformAddress,
 
     // User storage
     User(Address),
