@@ -31,7 +31,11 @@ pub enum ContractError {
     OnlyServiceProviderChangeMilstoneStatus = 25,
     NoMileStoneDefined = 26,
     InvalidMileStoneIndex = 27,
-    OnlyClientChangeMilstoneFlag = 28
+    OnlyClientChangeMilstoneFlag = 28,
+    OnlyDisputeResolverCanExecuteThisFunction = 29,
+    EscrowAlreadyInDispute = 30,
+    EscrowNotInDispute = 31,
+    InsufficientFundsForResolution = 32,
 }
 
 impl fmt::Display for ContractError {
@@ -64,7 +68,11 @@ impl fmt::Display for ContractError {
             ContractError::OnlyServiceProviderChangeMilstoneStatus => write!(f, "Only ServiceProvider can change MilstoneStatus"),
             ContractError::NoMileStoneDefined => write!(f, "Escrow initialized without Milestone"),
             ContractError::InvalidMileStoneIndex => write!(f, "Invalid Milestone Index"),
-            ContractError::OnlyClientChangeMilstoneFlag => write!(f, "Only Client Can change Milestone Flag")
+            ContractError::OnlyClientChangeMilstoneFlag => write!(f, "Only Client Can change Milestone Flag"),
+            ContractError::OnlyDisputeResolverCanExecuteThisFunction => write!(f, "Only Dispute Resolver can execute this function"),
+            ContractError::EscrowAlreadyInDispute => write!(f, "Escrow already in dispute"),
+            ContractError::EscrowNotInDispute => write!(f, "Escrow not in dispute"),
+            ContractError::InsufficientFundsForResolution => write!(f, "Insufficient funds for resolution")
         }
     }
 }
