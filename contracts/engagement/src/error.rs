@@ -27,6 +27,11 @@ pub enum ContractError {
     EscrowBalanceNotSufficienteToSendEarnings = 21,
     ContractInsufficientFunds = 22,
     OnlyPlatformAddressExecuteThisFunction = 23,
+    EscrowNotInitialized = 24,
+    OnlyServiceProviderChangeMilstoneStatus = 25,
+    NoMileStoneDefined = 26,
+    InvalidMileStoneIndex = 27,
+    OnlyClientChangeMilstoneFlag = 28
 }
 
 impl fmt::Display for ContractError {
@@ -54,7 +59,12 @@ impl fmt::Display for ContractError {
             ContractError::EscrowNotCompleted => write!(f, "The escrow must be completed to claim earnings"),
             ContractError::EscrowBalanceNotSufficienteToSendEarnings => write!(f, "The escrow balance must be equal to the amount of earnings defined for the escrow"),
             ContractError::ContractInsufficientFunds => write!(f, "The contract does not have sufficient funds"),
-            ContractError::OnlyPlatformAddressExecuteThisFunction => write!(f, "Only the plataform address should be able to execute this function")
+            ContractError::OnlyPlatformAddressExecuteThisFunction => write!(f, "Only the plataform address should be able to execute this function"),
+            ContractError::EscrowNotInitialized => write!(f, "Escrow not Initialized"),
+            ContractError::OnlyServiceProviderChangeMilstoneStatus => write!(f, "Only ServiceProvider can change MilstoneStatus"),
+            ContractError::NoMileStoneDefined => write!(f, "Escrow initialized without Milestone"),
+            ContractError::InvalidMileStoneIndex => write!(f, "Invalid Milestone Index"),
+            ContractError::OnlyClientChangeMilstoneFlag => write!(f, "Only Client Can change Milestone Flag")
         }
     }
 }
