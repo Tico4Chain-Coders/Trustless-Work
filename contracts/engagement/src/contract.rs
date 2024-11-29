@@ -81,7 +81,7 @@ impl EngagementContract {
         Ok(engagement_id_copy)
     }
     
-    pub fn fund_escrow(e: Env, engagement_id: String, signer: Address, usdc_contract: Address, contract_address: Address, amount_to_deposit: i128) -> Result<(), ContractError> {
+    pub fn fund_escrow(e: Env, engagement_id: String, signer: Address, usdc_contract: Address, amount_to_deposit: i128) -> Result<(), ContractError> {
         signer.require_auth();
 
         let escrow_key = DataKey::Escrow(engagement_id.clone());
@@ -111,6 +111,8 @@ impl EngagementContract {
         if signer_balance < amount_to_deposit {
             return Err(ContractError::SignerInsufficientFunds);
         }
+
+        let contract_address = e.current_contract();
     
         usdc_client.transfer(&signer, &contract_address, &amount_to_deposit);
     
