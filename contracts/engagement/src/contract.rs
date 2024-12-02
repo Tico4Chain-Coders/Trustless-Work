@@ -112,7 +112,8 @@ impl EngagementContract {
         e: Env, 
         engagement_id: String, 
         service_provider: Address, 
-        usdc_contract: Address
+        usdc_contract: Address,
+        trustless_work_address: Address
     ) -> Result<(), ContractError> {
         let escrow_key = DataKey::Escrow(engagement_id.clone());
         let escrow = Self::get_escrow_by_id(e.clone(), engagement_id.clone())?;
@@ -142,20 +143,13 @@ impl EngagementContract {
             return Err(ContractError::EscrowBalanceNotSufficienteToSendEarnings);
         }
     
-        let platform_fee_percentage: u128 = e.storage().instance()
-            .get(&DataKey::PlatformFee)
-            .unwrap_or(0);
-    
-        let platform_address = e.storage().instance()
-            .get(&DataKey::PlatformAddress)
-            .expect("Platform address not configured");
+        let platform_fee_percentage: u128 = escrow.platform_fee;
+        let platform_address = escrow.platform_address.clone();
     
         let total_amount = escrow.amount as f64;
         let trustless_work_commission = (total_amount * 0.003).floor() as i128; 
         let platform_commission = (total_amount * platform_fee_percentage as f64).floor() as i128;
-        
-        let trustless_work_address = Address::from_string(&soroban_sdk::String::from_str(&e, "GBPUACN7QETR4TCYTKINBDHTYTFXD3BQQQV7VSMZC5CX74E4MTUL2AMUB"));
-    
+            
         usdc_client.transfer(
             &contract_address, 
             &trustless_work_address, 

@@ -19,7 +19,6 @@ fn test_initialize_excrow() {
     let release_signer_address = Address::generate(&env);
     let dispute_resolver_address = Address::generate(&env);
     let platform_fee = (0.3 * 10u128.pow(18) as f64) as u128;
-
     let milestones = vec![
         &env,
         Milestone {
@@ -367,24 +366,20 @@ fn test_claim_escrow_earnings_successful_flow() {
     let env = Env::default();
     env.mock_all_auths();
 
-    // Generate addresses
     let admin = Address::generate(&env);
     let client_address = Address::generate(&env);
     let service_provider_address = Address::generate(&env);
     let platform_address = Address::generate(&env);
     let release_signer_address = Address::generate(&env);
     let dispute_resolver_address = Address::generate(&env);
-    let trustless_work_address = Address::from_string(&String::from_str(
-        &env,
-        "GBPUACN7QETR4TCYTKINBDHTYTFXD3BQQQV7VSMZC5CX74E4MTUL2AMUB",
-    ));
+    let trustless_work_address = Address::generate(&env);
 
     let usdc_token = create_usdc_token(&env, &admin);
 
     let amount: u128 = 100_000_000;
     usdc_token.mint(&client_address, &(amount as i128));
 
-    let platform_fee = (0.3 * 10u128.pow(18) as f64) as u128;
+    let platform_fee = 0.03 as u128;
 
     let milestones = vec![
         &env,
@@ -422,6 +417,7 @@ fn test_claim_escrow_earnings_successful_flow() {
         &engagement_id,
         &service_provider_address,
         &usdc_token.address,
+        &trustless_work_address,
     );
 
     let total_amount = amount as f64;
@@ -457,8 +453,10 @@ fn test_claim_escrow_earnings_successful_flow() {
     );
 }
 
+//test claim escrow earnings in failure scenarios
+// Scenario 1: Escrow with no milestones:
 #[test]
-fn test_claim_escrow_earnings_failure_scenarios() {
+fn test_claim_escrow_earnings_no_milestones() {
     let env = Env::default();
     env.mock_all_auths();
 
@@ -474,7 +472,6 @@ fn test_claim_escrow_earnings_failure_scenarios() {
     let engagement_contract_address = env.register_contract(None, EngagementContract);
     let engagement_client = EngagementContractClient::new(&env, &engagement_contract_address);
 
-    // Scenario 1: Escrow with no milestones
     let engagement_id_no_milestones = String::from_str(&env, "test_no_milestones");
     let amount: u128 = 100_000_000;
     let platform_fee = (0.3 * 10u128.pow(18) as f64) as u128;
@@ -496,13 +493,32 @@ fn test_claim_escrow_earnings_failure_scenarios() {
         &engagement_id_no_milestones,
         &service_provider_address,
         &usdc_token.address,
+        &platform_address, 
     );
     assert!(
         result.is_err(),
         "Should fail when no milestones are defined"
     );
+}
 
-    // Scenario 2: Milestones not completed
+// Scenario 2: Milestones incomplete
+#[test]
+fn test_claim_escrow_earnings_milestones_incomplete() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let admin = Address::generate(&env);
+    let client_address = Address::generate(&env);
+    let service_provider_address = Address::generate(&env);
+    let platform_address = Address::generate(&env);
+    let release_signer_address = Address::generate(&env);
+    let dispute_resolver_address = Address::generate(&env);
+
+    let usdc_token = create_usdc_token(&env, &admin);
+
+    let engagement_contract_address = env.register_contract(None, EngagementContract);
+    let engagement_client = EngagementContractClient::new(&env, &engagement_contract_address);
+
     let engagement_id_incomplete = String::from_str(&env, "test_incomplete_milestones");
     let milestones_incomplete = vec![
         &env,
@@ -512,6 +528,9 @@ fn test_claim_escrow_earnings_failure_scenarios() {
             flag: false,
         },
     ];
+
+    let amount: u128 = 100_000_000;
+    let platform_fee = (0.3 * 10u128.pow(18) as f64) as u128;
 
     engagement_client.initialize_escrow(
         &engagement_id_incomplete,
@@ -530,6 +549,7 @@ fn test_claim_escrow_earnings_failure_scenarios() {
         &engagement_id_incomplete,
         &service_provider_address,
         &usdc_token.address,
+        &platform_address,
     );
     assert!(
         result.is_err(),
