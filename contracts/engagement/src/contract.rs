@@ -108,40 +108,70 @@ impl EngagementContract {
         Ok(())
     }
 
-    pub fn claim_escrow_earnings(e: Env, engagement_id: String, service_provider: Address, usdc_contract: Address, contract_address: Address) -> Result<(), ContractError> {
+    pub fn claim_escrow_earnings(
+        e: Env, 
+        engagement_id: String, 
+        service_provider: Address, 
+        usdc_contract: Address,
+        trustless_work_address: Address
+    ) -> Result<(), ContractError> {
         let escrow_key = DataKey::Escrow(engagement_id.clone());
-        let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id);
-
-        let mut escrow = match escrow_result {
-            Ok(esc) => esc,
-            Err(err) => return Err(err),
-        };
-
-        let invoker = service_provider;
-        if invoker != escrow.service_provider {
+        let escrow = Self::get_escrow_by_id(e.clone(), engagement_id.clone())?;
+    
+        if service_provider != escrow.service_provider {
             return Err(ContractError::OnlyServiceProviderCanClaimEarnings);
         }
-
-        if escrow.balance != escrow.amount {
+    
+        if escrow.milestones.is_empty() {
+            return Err(ContractError::NoMileStoneDefined);
+        }
+    
+        if !escrow.milestones.iter().all(|milestone| milestone.flag) {
+            return Err(ContractError::EscrowNotCompleted);
+        }
+    
+        if escrow.dispute_flag {
+            return Err(ContractError::InvalidState);
+        }
+    
+        let usdc_client = TokenClient::new(&e, &usdc_contract);
+        let contract_address = e.current_contract_address();
+    
+        // Check the actual balance of the contract for this escrow
+        let contract_balance = usdc_client.balance(&contract_address);
+        if contract_balance != escrow.amount as i128 {
             return Err(ContractError::EscrowBalanceNotSufficienteToSendEarnings);
         }
-
-        let usdc_client = TokenClient::new(&e, &usdc_contract);
-
-        let escrow_balance = usdc_client.balance(&contract_address);
-        if escrow_balance < escrow.amount as i128 {
-            return Err(ContractError::ContractInsufficientFunds);
-        }
-
+    
+        let platform_fee_percentage: u128 = escrow.platform_fee;
+        let platform_address = escrow.platform_address.clone();
+    
+        let total_amount = escrow.amount as f64;
+        let trustless_work_commission = (total_amount * 0.003).floor() as i128; 
+        let platform_commission = (total_amount * platform_fee_percentage as f64).floor() as i128;
+            
         usdc_client.transfer(
-            &contract_address,
-            &escrow.service_provider,
-            &(escrow.amount as i128)
+            &contract_address, 
+            &trustless_work_address, 
+            &trustless_work_commission
         );
-
-        escrow.balance = 0;
-
+    
+        usdc_client.transfer(
+            &contract_address, 
+            &platform_address, 
+            &platform_commission
+        );
+    
+        let service_provider_amount = (total_amount - trustless_work_commission as f64 - platform_commission as f64).floor() as i128;
+    
+        usdc_client.transfer(
+            &contract_address, 
+            &escrow.service_provider, 
+            &service_provider_amount
+        );
+    
         e.storage().instance().set(&escrow_key, &escrow);
+    
         Ok(())
     }
 
