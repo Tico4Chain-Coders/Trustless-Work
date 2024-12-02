@@ -99,8 +99,10 @@ impl EngagementContract {
         let usdc_client = TokenClient::new(&e, &usdc_contract);
 
         let signer_balance = usdc_client.balance(&signer);
+
+        let contract_address = e.current_contract_address();
         
-        if escrow.balance > escrow.amount {
+        if usdc_client.balance(contract_address) > escrow.amount {
             return Err("Escrow fully funded");
         }
 
@@ -112,7 +114,6 @@ impl EngagementContract {
             return Err(ContractError::SignerInsufficientFunds);
         }
 
-        let contract_address = e.current_contract();
     
         usdc_client.transfer(&signer, &contract_address, &amount_to_deposit);
     
