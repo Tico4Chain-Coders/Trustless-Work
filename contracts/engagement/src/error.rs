@@ -31,7 +31,8 @@ pub enum ContractError {
     OnlyServiceProviderChangeMilstoneStatus = 25,
     NoMileStoneDefined = 26,
     InvalidMileStoneIndex = 27,
-    OnlyClientChangeMilstoneFlag = 28
+    OnlyClientChangeMilstoneFlag = 28,
+    InvalidState = 29,
 }
 
 impl fmt::Display for ContractError {
@@ -64,7 +65,8 @@ impl fmt::Display for ContractError {
             ContractError::OnlyServiceProviderChangeMilstoneStatus => write!(f, "Only ServiceProvider can change MilstoneStatus"),
             ContractError::NoMileStoneDefined => write!(f, "Escrow initialized without Milestone"),
             ContractError::InvalidMileStoneIndex => write!(f, "Invalid Milestone Index"),
-            ContractError::OnlyClientChangeMilstoneFlag => write!(f, "Only Client Can change Milestone Flag")
+            ContractError::OnlyClientChangeMilstoneFlag => write!(f, "Only Client Can change Milestone Flag"),
+            ContractError::InvalidState => write!(f, "Invalid State"),
         }
     }
 }

@@ -113,36 +113,34 @@ impl EngagementContract {
         engagement_id: String, 
         service_provider: Address, 
         usdc_contract: Address
-    ) -> Result<(), String> {
+    ) -> Result<(), ContractError> {
         let escrow_key = DataKey::Escrow(engagement_id.clone());
-        let mut escrow = match Self::get_escrow_by_id(e.clone(), engagement_id.clone()) {
-            Ok(esc) => esc,
-            Err(_) => return Err(soroban_sdk::String::from_str(&e,"Escrow is not initialized for this commitment.")),
-        };
-
+        let escrow = Self::get_escrow_by_id(e.clone(), engagement_id.clone())?;
+    
         if service_provider != escrow.service_provider {
-            return Err(soroban_sdk::String::from_str(&e,"Only the service provider can claim the profits").into());
+            return Err(ContractError::OnlyServiceProviderCanClaimEarnings);
         }
     
         if escrow.milestones.is_empty() {
-            return Err(soroban_sdk::String::from_str(&e,"The escrow must have at least one milestone").into());
+            return Err(ContractError::NoMileStoneDefined);
         }
     
         if !escrow.milestones.iter().all(|milestone| milestone.flag) {
-            return Err(soroban_sdk::String::from_str(&e,"Not all milestones have been completed").into());
-        }
-
-        if escrow.dispute_flag {
-            return Err(soroban_sdk::String::from_str(&e,"Escrow is currently in dispute").into());
+            return Err(ContractError::EscrowNotCompleted);
         }
     
-        if escrow.balance != escrow.amount {
-            return Err(soroban_sdk::String::from_str(&e,"The escrow balance is not enough to send the profits").into());
+        if escrow.dispute_flag {
+            return Err(ContractError::InvalidState);
         }
     
         let usdc_client = TokenClient::new(&e, &usdc_contract);
-    
         let contract_address = e.current_contract_address();
+    
+        // Check the actual balance of the contract for this escrow
+        let contract_balance = usdc_client.balance(&contract_address);
+        if contract_balance != escrow.amount as i128 {
+            return Err(ContractError::EscrowBalanceNotSufficienteToSendEarnings);
+        }
     
         let platform_fee_percentage: u128 = e.storage().instance()
             .get(&DataKey::PlatformFee)
@@ -178,7 +176,6 @@ impl EngagementContract {
             &service_provider_amount
         );
     
-        escrow.balance = 0;
         e.storage().instance().set(&escrow_key, &escrow);
     
         Ok(())
