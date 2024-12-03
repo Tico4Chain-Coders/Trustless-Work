@@ -972,10 +972,9 @@ fn test_fund_escrow_dispute_flag_error() {
     usdc_token.mint(&engagement_contract_address, &(amount as i128));
     usdc_token.mint(&release_signer_address, &(amount as i128));
 
-    engagement_client.update_dispute_flag(
+    engagement_client.change_dispute_flag(
         &engagement_id,
-        &release_signer_address,
-        &true
+        &dispute_resolver_address
     );
 
     let amount_to_deposit: i128 = 80_000;

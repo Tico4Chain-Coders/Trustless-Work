@@ -37,8 +37,8 @@ pub enum ContractError {
     EscrowNotInDispute = 31,
     InsufficientFundsForResolution = 32,
     InvalidState = 33,
-    EscrowOpenedForDisputeResolution = 30,
-    AmountToDepositGreatherThanEscrowAmount = 31,
+    EscrowOpenedForDisputeResolution = 34,
+    AmountToDepositGreatherThanEscrowAmount = 35,
 
 }
 
