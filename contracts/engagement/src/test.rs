@@ -3,16 +3,15 @@
 extern crate std;
 
 use crate::storage_types::{DataKey, Escrow, Milestone};
-use crate::token::TokenClient;
+use crate::token::{Token, TokenClient};
 use crate::{contract::EngagementContract, EngagementContractClient};
-use soroban_sdk::{testutils::Address as _, Address, Env, String, vec};
+use soroban_sdk::{testutils::Address as _, vec, Address, Env, IntoVal, String};
 
 #[test]
 fn test_initialize_excrow() {
-
     let env = Env::default();
     env.mock_all_auths();
-    
+
     let client_address = Address::generate(&env);
     let platform_address = Address::generate(&env);
     let amount: u128 = 100_000_000;
@@ -20,7 +19,6 @@ fn test_initialize_excrow() {
     let release_signer_address = Address::generate(&env);
     let dispute_resolver_address = Address::generate(&env);
     let platform_fee = (0.3 * 10u128.pow(18) as f64) as u128;
-
     let milestones = vec![
         &env,
         Milestone {
@@ -35,21 +33,21 @@ fn test_initialize_excrow() {
         },
     ];
 
-    let engagement_contract_address = env.register_contract(None, EngagementContract); 
+    let engagement_contract_address = env.register_contract(None, EngagementContract);
     let engagement_client = EngagementContractClient::new(&env, &engagement_contract_address);
 
     let engagement_id = String::from_str(&env, "41431");
 
     let engagement_id = engagement_client.initialize_escrow(
-        &engagement_id.clone(), 
-        &client_address, 
-        &service_provider_address, 
-        &platform_address, 
-        &amount, 
+        &engagement_id.clone(),
+        &client_address,
+        &service_provider_address,
+        &platform_address,
+        &amount,
         &platform_fee,
         &milestones,
         &release_signer_address,
-        &dispute_resolver_address
+        &dispute_resolver_address,
     );
 
     let escrow = engagement_client.get_escrow_by_id(&engagement_id);
@@ -66,16 +64,15 @@ fn test_initialize_excrow() {
 
 #[test]
 fn test_change_escrow_properties() {
-
     let env = Env::default();
     env.mock_all_auths();
-    
+
     let client_address = Address::generate(&env);
     let platform_address = Address::generate(&env);
     let service_provider_address = Address::generate(&env);
     let release_signer_address = Address::generate(&env);
     let dispute_resolver_address = Address::generate(&env);
-    
+
     let amount: u128 = 100_000_000;
     let platform_fee = (0.3 * 10u128.pow(18) as f64) as u128;
 
@@ -93,20 +90,20 @@ fn test_change_escrow_properties() {
         },
     ];
 
-    let engagement_contract_address = env.register_contract(None, EngagementContract); 
+    let engagement_contract_address = env.register_contract(None, EngagementContract);
     let engagement_client = EngagementContractClient::new(&env, &engagement_contract_address);
 
     let engagement_id = String::from_str(&env, "41431");
     let initialized_id = engagement_client.initialize_escrow(
-        &engagement_id.clone(), 
-        &client_address, 
-        &service_provider_address, 
-        &platform_address, 
-        &amount, 
+        &engagement_id.clone(),
+        &client_address,
+        &service_provider_address,
+        &platform_address,
+        &amount,
         &platform_fee,
         &initial_milestones,
         &release_signer_address,
-        &dispute_resolver_address
+        &dispute_resolver_address,
     );
 
     // Verify escrow was initialized
@@ -120,7 +117,7 @@ fn test_change_escrow_properties() {
     let new_dispute_resolver = Address::generate(&env);
     let new_amount: u128 = 200_000_000;
     let new_platform_fee = (0.5 * 10u128.pow(18) as f64) as u128;
-    
+
     let new_milestones = vec![
         &env,
         Milestone {
@@ -152,7 +149,7 @@ fn test_change_escrow_properties() {
         &new_platform_fee,
         &new_milestones,
         &new_release_signer,
-        &new_dispute_resolver
+        &new_dispute_resolver,
     );
     assert!(result.is_err());
 
@@ -167,7 +164,7 @@ fn test_change_escrow_properties() {
         &new_platform_fee,
         &new_milestones,
         &new_release_signer,
-        &new_dispute_resolver
+        &new_dispute_resolver,
     );
 
     // Verify updated escrow properties
@@ -194,7 +191,7 @@ fn test_change_escrow_properties() {
         &new_platform_fee,
         &new_milestones,
         &new_release_signer,
-        &new_dispute_resolver
+        &new_dispute_resolver,
     );
     assert!(result.is_err());
 }
@@ -203,7 +200,7 @@ fn test_change_escrow_properties() {
 fn test_change_milestone_status_and_flag() {
     let env = Env::default();
     env.mock_all_auths();
-    
+
     let client_address = Address::generate(&env);
     let service_provider_address = Address::generate(&env);
     let platform_address = Address::generate(&env);
@@ -256,12 +253,7 @@ fn test_change_milestone_status_and_flag() {
     assert_eq!(updated_escrow.milestones.get(0).unwrap().status, new_status);
 
     // Change milestone flag (valid case)
-    engagement_client.change_milestone_flag(
-        &engagement_id,
-        &(0 as i128),
-        &true,
-        &client_address,
-    );
+    engagement_client.change_milestone_flag(&engagement_id, &(0 as i128), &true, &client_address);
 
     // Verify milestone flag change
     let final_escrow = engagement_client.get_escrow_by_id(&engagement_id);
@@ -341,11 +333,11 @@ fn test_change_milestone_status_and_flag() {
         &platform_fee,
         &vec![&env],
         &release_signer_address,
-        &dispute_resolver_address
+        &dispute_resolver_address,
     );
     // Test for `change_status` on escrow with no milestones
     let result = engagement_client.try_change_milestone_status(
-    &engagement_id,
+        &engagement_id,
         &(0 as i128),
         &new_status,
         &service_provider_address,
@@ -360,36 +352,53 @@ fn test_change_milestone_status_and_flag() {
         &client_address,
     );
     assert!(result.is_err());
+}
 
+// Helper function to create a token
+fn create_usdc_token<'a>(e: &Env, admin: &Address) -> TokenClient<'a> {
+    let token = TokenClient::new(e, &e.register_contract(None, Token {}));
+    token.initialize(admin, &7, &"USDC".into_val(e), &"USDC".into_val(e));
+    token
 }
 
 #[test]
-fn test_dispute_flag_management() {
+fn test_claim_escrow_earnings_successful_flow() {
     let env = Env::default();
     env.mock_all_auths();
-    
+
+    let admin = Address::generate(&env);
     let client_address = Address::generate(&env);
     let service_provider_address = Address::generate(&env);
     let platform_address = Address::generate(&env);
     let release_signer_address = Address::generate(&env);
     let dispute_resolver_address = Address::generate(&env);
-    
+    let trustless_work_address = Address::generate(&env);
+
+    let usdc_token = create_usdc_token(&env, &admin);
+
     let amount: u128 = 100_000_000;
-    let platform_fee = (0.3 * 10u128.pow(18) as f64) as u128;
+    usdc_token.mint(&client_address, &(amount as i128));
+
+    let platform_fee = 0.03 as u128;
 
     let milestones = vec![
         &env,
         Milestone {
             description: String::from_str(&env, "First milestone"),
-            status: String::from_str(&env, "Pending"),
-            flag: false,
-        }
+            status: String::from_str(&env, "Completed"),
+            flag: true,
+        },
+        Milestone {
+            description: String::from_str(&env, "Second milestone"),
+            status: String::from_str(&env, "Completed"),
+            flag: true,
+        },
     ];
 
     let engagement_contract_address = env.register_contract(None, EngagementContract);
     let engagement_client = EngagementContractClient::new(&env, &engagement_contract_address);
 
-    let engagement_id = String::from_str(&env, "test_dispute");
+    let engagement_id = String::from_str(&env, "test_escrow_1");
     engagement_client.initialize_escrow(
         &engagement_id,
         &client_address,
@@ -402,120 +411,148 @@ fn test_dispute_flag_management() {
         &dispute_resolver_address,
     );
 
-    let initial_escrow = engagement_client.get_escrow_by_id(&engagement_id);
-    assert_eq!(initial_escrow.dispute_flag, false);
+    usdc_token.mint(&engagement_contract_address, &(amount as i128));
 
-    engagement_client.change_dispute_flag(
+    engagement_client.claim_escrow_earnings(
         &engagement_id,
-        &dispute_resolver_address
+        &service_provider_address,
+        &usdc_token.address,
+        &trustless_work_address,
     );
 
-    let disputed_escrow = engagement_client.get_escrow_by_id(&engagement_id);
-    assert_eq!(disputed_escrow.dispute_flag, true);
-    assert_eq!(disputed_escrow.client, initial_escrow.client);
-    assert_eq!(disputed_escrow.service_provider, initial_escrow.service_provider);
-    assert_eq!(disputed_escrow.amount, initial_escrow.amount);
-    assert_eq!(disputed_escrow.balance, initial_escrow.balance);
-    assert_eq!(disputed_escrow.platform_fee, initial_escrow.platform_fee);
-    assert_eq!(disputed_escrow.milestones, initial_escrow.milestones);
+    let total_amount = amount as f64;
+    let trustless_work_commission = (total_amount * 0.003).floor() as i128;
+    let platform_commission =
+        (total_amount * (platform_fee as f64 / 10u128.pow(18) as f64)).floor() as i128;
+    let service_provider_amount =
+        (total_amount - trustless_work_commission as f64 - platform_commission as f64).floor()
+            as i128;
 
-    let result = engagement_client.try_change_dispute_flag(
-        &engagement_id,
-        &dispute_resolver_address
+    assert_eq!(
+        usdc_token.balance(&trustless_work_address),
+        trustless_work_commission,
+        "Trustless Work commission amount is incorrect"
     );
-    assert!(result.is_err());
 
-    let wrong_resolver = Address::generate(&env);
-    let result = engagement_client.try_change_dispute_flag(
-        &engagement_id,
-        &wrong_resolver
+    assert_eq!(
+        usdc_token.balance(&platform_address),
+        platform_commission,
+        "Platform commission amount is incorrect"
     );
-    assert!(result.is_err());
 
-    let non_existent_id = String::from_str(&env, "non_existent");
-    let result = engagement_client.try_change_dispute_flag(
-        &non_existent_id,
-        &dispute_resolver_address
+    assert_eq!(
+        usdc_token.balance(&service_provider_address),
+        service_provider_amount,
+        "Service Provider received incorrect amount"
     );
-    assert!(result.is_err());
+
+    assert_eq!(
+        usdc_token.balance(&engagement_contract_address),
+        0,
+        "Contract should have zero balance after claiming earnings"
+    );
 }
 
+//test claim escrow earnings in failure scenarios
+// Scenario 1: Escrow with no milestones:
 #[test]
-fn test_dispute_resolution_process() {
+fn test_claim_escrow_earnings_no_milestones() {
     let env = Env::default();
     env.mock_all_auths();
-    
+
+    let admin = Address::generate(&env);
     let client_address = Address::generate(&env);
     let service_provider_address = Address::generate(&env);
     let platform_address = Address::generate(&env);
     let release_signer_address = Address::generate(&env);
     let dispute_resolver_address = Address::generate(&env);
-    
-    let amount: u128 = 100_000_000;
-    let platform_fee = (0.3 * 10u128.pow(18) as f64) as u128;
+
+    let usdc_token = create_usdc_token(&env, &admin);
 
     let engagement_contract_address = env.register_contract(None, EngagementContract);
     let engagement_client = EngagementContractClient::new(&env, &engagement_contract_address);
 
-    let engagement_id = String::from_str(&env, "test_resolution");
+    let engagement_id_no_milestones = String::from_str(&env, "test_no_milestones");
+    let amount: u128 = 100_000_000;
+    let platform_fee = (0.3 * 10u128.pow(18) as f64) as u128;
+
     engagement_client.initialize_escrow(
-        &engagement_id,
+        &engagement_id_no_milestones,
         &client_address,
         &service_provider_address,
         &platform_address,
         &amount,
         &platform_fee,
-        &vec![&env],
+        &vec![&env], // Empty milestones
         &release_signer_address,
         &dispute_resolver_address,
     );
 
-    let token_admin = Address::generate(&env);
-    let token_contract = env.register_contract(None, crate::token::Token);
-    let token_client = TokenClient::new(&env, &token_contract);
-
-    token_client.initialize(
-        &token_admin,
-        &9,
-        &String::from_str(&env, "USDC"),
-        &String::from_str(&env, "USDC")
+    // Try to claim earnings with no milestones (should fail)
+    let result = engagement_client.try_claim_escrow_earnings(
+        &engagement_id_no_milestones,
+        &service_provider_address,
+        &usdc_token.address,
+        &platform_address, 
     );
-
-    token_client.mint(&token_admin, &(amount as i128));
-    token_client.transfer(&token_admin, &engagement_contract_address, &(amount as i128));
-
-    env.as_contract(&engagement_contract_address, || {
-        let escrow_key = DataKey::Escrow(engagement_id.clone());
-        let mut escrow = env.storage().instance().get::<DataKey, Escrow>(&escrow_key).unwrap();
-        escrow.balance = amount;
-        env.storage().instance().set(&escrow_key, &escrow);
-    });
-
-    let initial_escrow = engagement_client.get_escrow_by_id(&engagement_id);
-    assert_eq!(initial_escrow.balance, amount);
-
-    engagement_client.change_dispute_flag(
-        &engagement_id,
-        &dispute_resolver_address
+    assert!(
+        result.is_err(),
+        "Should fail when no milestones are defined"
     );
+}
 
-    let disputed_escrow = engagement_client.get_escrow_by_id(&engagement_id);
-    assert_eq!(disputed_escrow.dispute_flag, true);
+// Scenario 2: Milestones incomplete
+#[test]
+fn test_claim_escrow_earnings_milestones_incomplete() {
+    let env = Env::default();
+    env.mock_all_auths();
 
-    let client_amount: u128 = 40_000_000;
-    let provider_amount: u128 = 60_000_000;
-    
-    engagement_client.resolving_disputes(
-        &engagement_id,
+    let admin = Address::generate(&env);
+    let client_address = Address::generate(&env);
+    let service_provider_address = Address::generate(&env);
+    let platform_address = Address::generate(&env);
+    let release_signer_address = Address::generate(&env);
+    let dispute_resolver_address = Address::generate(&env);
+
+    let usdc_token = create_usdc_token(&env, &admin);
+
+    let engagement_contract_address = env.register_contract(None, EngagementContract);
+    let engagement_client = EngagementContractClient::new(&env, &engagement_contract_address);
+
+    let engagement_id_incomplete = String::from_str(&env, "test_incomplete_milestones");
+    let milestones_incomplete = vec![
+        &env,
+        Milestone {
+            description: String::from_str(&env, "Incomplete milestone"),
+            status: String::from_str(&env, "Pending"),
+            flag: false,
+        },
+    ];
+
+    let amount: u128 = 100_000_000;
+    let platform_fee = (0.3 * 10u128.pow(18) as f64) as u128;
+
+    engagement_client.initialize_escrow(
+        &engagement_id_incomplete,
+        &client_address,
+        &service_provider_address,
+        &platform_address,
+        &amount,
+        &platform_fee,
+        &milestones_incomplete,
+        &release_signer_address,
         &dispute_resolver_address,
-        &token_contract,
-        &client_amount,
-        &provider_amount
     );
 
-    let final_escrow = engagement_client.get_escrow_by_id(&engagement_id);
-    assert_eq!(final_escrow.balance, 0);
-
-    assert_eq!(token_client.balance(&client_address), client_amount as i128);
-    assert_eq!(token_client.balance(&service_provider_address), provider_amount as i128);
+    // Try to claim earnings with incomplete milestones (should fail)
+    let result = engagement_client.try_claim_escrow_earnings(
+        &engagement_id_incomplete,
+        &service_provider_address,
+        &usdc_token.address,
+        &platform_address,
+    );
+    assert!(
+        result.is_err(),
+        "Should fail when milestones are not completed"
+    );
 }

@@ -36,6 +36,7 @@ pub enum ContractError {
     EscrowAlreadyInDispute = 30,
     EscrowNotInDispute = 31,
     InsufficientFundsForResolution = 32,
+    InvalidState = 33,
 }
 
 impl fmt::Display for ContractError {
@@ -72,7 +73,8 @@ impl fmt::Display for ContractError {
             ContractError::OnlyDisputeResolverCanExecuteThisFunction => write!(f, "Only Dispute Resolver can execute this function"),
             ContractError::EscrowAlreadyInDispute => write!(f, "Escrow already in dispute"),
             ContractError::EscrowNotInDispute => write!(f, "Escrow not in dispute"),
-            ContractError::InsufficientFundsForResolution => write!(f, "Insufficient funds for resolution")
+            ContractError::InsufficientFundsForResolution => write!(f, "Insufficient funds for resolution"),
+            ContractError::InvalidState => write!(f, "Invalid State"),
         }
     }
 }
