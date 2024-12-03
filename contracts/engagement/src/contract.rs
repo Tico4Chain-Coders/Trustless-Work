@@ -200,12 +200,13 @@ impl EngagementContract {
             return Err(ContractError::EscrowNotInDispute);
         }
  
+        let usdc_client = TokenClient::new(&e, &usdc_contract);
+        let contract_balance = usdc_client.balance(&e.current_contract_address()) as u128;
+
         let total_funds = client_funds + service_provider_funds;
-        if total_funds > escrow.balance {
+        if total_funds > contract_balance {
             return Err(ContractError::InsufficientFundsForResolution);
         }
-    
-        let usdc_client = TokenClient::new(&e, &usdc_contract);
     
         if client_funds > 0 {
             usdc_client.transfer(
@@ -419,10 +420,6 @@ impl EngagementContract {
             Ok(esc) => esc,
             Err(err) => return Err(err),
         };
-    
-        if dispute_resolver != escrow.dispute_resolver {
-            return Err(ContractError::OnlyDisputeResolverCanExecuteThisFunction);
-        }
     
         if escrow.dispute_flag {
             return Err(ContractError::EscrowAlreadyInDispute);
