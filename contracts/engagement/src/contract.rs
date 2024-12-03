@@ -122,40 +122,70 @@ impl EngagementContract {
         Ok(())
     }
 
-    pub fn claim_escrow_earnings(e: Env, engagement_id: String, service_provider: Address, usdc_contract: Address, contract_address: Address) -> Result<(), ContractError> {
+    pub fn claim_escrow_earnings(
+        e: Env, 
+        engagement_id: String, 
+        service_provider: Address, 
+        usdc_contract: Address,
+        trustless_work_address: Address
+    ) -> Result<(), ContractError> {
         let escrow_key = DataKey::Escrow(engagement_id.clone());
-        let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id);
-
-        let mut escrow = match escrow_result {
-            Ok(esc) => esc,
-            Err(err) => return Err(err),
-        };
-
-        let invoker = service_provider;
-        if invoker != escrow.service_provider {
+        let escrow = Self::get_escrow_by_id(e.clone(), engagement_id.clone())?;
+    
+        if service_provider != escrow.service_provider {
             return Err(ContractError::OnlyServiceProviderCanClaimEarnings);
         }
-
-        if escrow.balance != escrow.amount {
+    
+        if escrow.milestones.is_empty() {
+            return Err(ContractError::NoMileStoneDefined);
+        }
+    
+        if !escrow.milestones.iter().all(|milestone| milestone.flag) {
+            return Err(ContractError::EscrowNotCompleted);
+        }
+    
+        if escrow.dispute_flag {
+            return Err(ContractError::InvalidState);
+        }
+    
+        let usdc_client = TokenClient::new(&e, &usdc_contract);
+        let contract_address = e.current_contract_address();
+    
+        // Check the actual balance of the contract for this escrow
+        let contract_balance = usdc_client.balance(&contract_address);
+        if contract_balance != escrow.amount as i128 {
             return Err(ContractError::EscrowBalanceNotSufficienteToSendEarnings);
         }
-
-        let usdc_client = TokenClient::new(&e, &usdc_contract);
-
-        let escrow_balance = usdc_client.balance(&contract_address);
-        if escrow_balance < escrow.amount as i128 {
-            return Err(ContractError::ContractInsufficientFunds);
-        }
-
+    
+        let platform_fee_percentage: u128 = escrow.platform_fee;
+        let platform_address = escrow.platform_address.clone();
+    
+        let total_amount = escrow.amount as f64;
+        let trustless_work_commission = (total_amount * 0.003).floor() as i128; 
+        let platform_commission = (total_amount * platform_fee_percentage as f64).floor() as i128;
+            
         usdc_client.transfer(
-            &contract_address,
-            &escrow.service_provider,
-            &(escrow.amount as i128)
+            &contract_address, 
+            &trustless_work_address, 
+            &trustless_work_commission
         );
-
-        escrow.balance = 0;
-
+    
+        usdc_client.transfer(
+            &contract_address, 
+            &platform_address, 
+            &platform_commission
+        );
+    
+        let service_provider_amount = (total_amount - trustless_work_commission as f64 - platform_commission as f64).floor() as i128;
+    
+        usdc_client.transfer(
+            &contract_address, 
+            &escrow.service_provider, 
+            &service_provider_amount
+        );
+    
         e.storage().instance().set(&escrow_key, &escrow);
+    
         Ok(())
     }
 
@@ -268,4 +298,104 @@ impl EngagementContract {
         Ok(())
     }
 
-}
+    pub fn change_milestone_status(
+        e: Env,
+        engagement_id: String,
+        milestone_index: i128,
+        new_status: String,
+        service_provider: Address,
+    ) -> Result<(), ContractError> {
+        let existing_escrow = Self::get_escrow_by_id(e.clone(), engagement_id.clone())?;
+    
+        if existing_escrow.engagement_id != engagement_id {
+            return Err(ContractError::EscrowNotInitialized);
+        }
+    
+        if service_provider != existing_escrow.service_provider {
+            return Err(ContractError::OnlyServiceProviderChangeMilstoneStatus);
+        }
+        service_provider.require_auth();
+    
+        if existing_escrow.milestones.is_empty() {
+            return Err(ContractError::NoMileStoneDefined);
+        }
+    
+        if milestone_index < 0 || milestone_index >= existing_escrow.milestones.len() as i128 {
+            return Err(ContractError::InvalidMileStoneIndex);
+        }
+
+        let mut updated_milestones = Vec::<Milestone>::new(&e);
+        for (index, milestone) in existing_escrow.milestones.iter().enumerate() {
+            let mut new_milestone = milestone.clone();
+            if index as i128 == milestone_index {
+                new_milestone.status = new_status.clone();
+            }
+            updated_milestones.push_back(new_milestone);
+        }
+    
+        let updated_escrow = Escrow {
+            milestones: updated_milestones,
+            ..existing_escrow
+        };
+    
+        e.storage().instance().set(
+            &DataKey::Escrow(engagement_id.clone().into()),
+            &updated_escrow,
+        );
+    
+        escrows_by_engagement_id(&e, engagement_id, updated_escrow);
+    
+        Ok(())
+    }
+    
+    
+    pub fn change_milestone_flag(
+        e: Env,
+        engagement_id: String,
+        milestone_index: i128,
+        new_flag: bool,
+        signer: Address,
+    ) -> Result<(), ContractError> {
+        let existing_escrow = Self::get_escrow_by_id(e.clone(), engagement_id.clone())?;
+    
+        if existing_escrow.engagement_id != engagement_id {
+            return Err(ContractError::EscrowNotInitialized);
+        }
+    
+        if signer != existing_escrow.client {
+            return Err(ContractError::OnlyClientChangeMilstoneFlag);
+        }
+        signer.require_auth();
+    
+        if existing_escrow.milestones.is_empty() {
+            return Err(ContractError::NoMileStoneDefined);
+        }
+
+        if milestone_index < 0 || milestone_index >= existing_escrow.milestones.len() as i128 {
+            return Err(ContractError::InvalidMileStoneIndex);
+        }
+    
+        let mut updated_milestones = Vec::<Milestone>::new(&e);
+        for (index, milestone) in existing_escrow.milestones.iter().enumerate() {
+            let mut new_milestone = milestone.clone();
+            if index as i128 == milestone_index {
+                new_milestone.flag = new_flag;
+            }
+            updated_milestones.push_back(new_milestone);
+        }
+    
+        let updated_escrow = Escrow {
+            milestones: updated_milestones,
+            ..existing_escrow
+        };
+    
+        e.storage().instance().set(
+            &DataKey::Escrow(engagement_id.clone().into()),
+            &updated_escrow,
+        );
+    
+        escrows_by_engagement_id(&e, engagement_id, updated_escrow);
+    
+        Ok(())
+    }
+}    
