@@ -117,7 +117,6 @@ impl EngagementContract {
     
         usdc_client.transfer(&signer, &contract_address, &amount_to_deposit);
     
-        escrow.balance = amount_to_deposit;
         e.storage().instance().set(&escrow_key, &escrow);
     
         Ok(())
