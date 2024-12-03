@@ -162,7 +162,6 @@ impl EngagementContract {
             Err(err) => return Err(err),
         };
     
-        // Only dispute_resolver can execute this function
         if dispute_resolver != escrow.dispute_resolver {
             return Err(ContractError::OnlyDisputeResolverCanExecuteThisFunction);
         }
@@ -170,8 +169,7 @@ impl EngagementContract {
         if !escrow.dispute_flag {
             return Err(ContractError::EscrowNotInDispute);
         }
-    
-        // Contract has sufficient balance for both transfers
+ 
         let total_funds = client_funds + service_provider_funds;
         if total_funds > escrow.balance {
             return Err(ContractError::InsufficientFundsForResolution);
@@ -179,7 +177,6 @@ impl EngagementContract {
     
         let usdc_client = TokenClient::new(&e, &usdc_contract);
     
-        // Transfer funds to client
         if client_funds > 0 {
             usdc_client.transfer(
                 &e.current_contract_address(),
@@ -187,8 +184,7 @@ impl EngagementContract {
                 &(client_funds as i128)
             );
         }
-    
-        // Transfer funds to service provider
+
         if service_provider_funds > 0 {
             usdc_client.transfer(
                 &e.current_contract_address(),
@@ -197,11 +193,9 @@ impl EngagementContract {
             );
         }
     
-        // Update escrow balance
         escrow.balance = 0;
         e.storage().instance().set(&escrow_key, &escrow);
     
-        // Emit event
         escrows_by_engagement_id(&e, engagement_id, escrow);
     
         Ok(())
@@ -396,21 +390,17 @@ impl EngagementContract {
             Err(err) => return Err(err),
         };
     
-        // Validate that only the dispute_resolver can execute this function
         if dispute_resolver != escrow.dispute_resolver {
             return Err(ContractError::OnlyDisputeResolverCanExecuteThisFunction);
         }
     
-        // Vaidate that the escrow is not already in dispute
         if escrow.dispute_flag {
             return Err(ContractError::EscrowAlreadyInDispute);
         }
     
-        // Change the flag to true
         escrow.dispute_flag = true;
         e.storage().instance().set(&escrow_key, &escrow);
     
-        // Emit event of dispute started
         escrows_by_engagement_id(&e, engagement_id, escrow);
     
         Ok(())

@@ -2,7 +2,6 @@
 
 extern crate std;
 
-use crate::balance::receive_balance;
 use crate::storage_types::{DataKey, Escrow, Milestone};
 use crate::token::TokenClient;
 use crate::{contract::EngagementContract, EngagementContractClient};
@@ -403,17 +402,14 @@ fn test_dispute_flag_management() {
         &dispute_resolver_address,
     );
 
-    // Save initial state for later comparison
     let initial_escrow = engagement_client.get_escrow_by_id(&engagement_id);
     assert_eq!(initial_escrow.dispute_flag, false);
 
-    // Test 1: Change dispute flag successfully
     engagement_client.change_dispute_flag(
         &engagement_id,
         &dispute_resolver_address
     );
 
-    // Verify dispute flag changed but nothing else did
     let disputed_escrow = engagement_client.get_escrow_by_id(&engagement_id);
     assert_eq!(disputed_escrow.dispute_flag, true);
     assert_eq!(disputed_escrow.client, initial_escrow.client);
@@ -423,14 +419,12 @@ fn test_dispute_flag_management() {
     assert_eq!(disputed_escrow.platform_fee, initial_escrow.platform_fee);
     assert_eq!(disputed_escrow.milestones, initial_escrow.milestones);
 
-    // Test 2: Try to change flag when already in dispute
     let result = engagement_client.try_change_dispute_flag(
         &engagement_id,
         &dispute_resolver_address
     );
     assert!(result.is_err());
 
-    // Test 3: Try with wrong dispute resolver
     let wrong_resolver = Address::generate(&env);
     let result = engagement_client.try_change_dispute_flag(
         &engagement_id,
@@ -438,7 +432,6 @@ fn test_dispute_flag_management() {
     );
     assert!(result.is_err());
 
-    // Test 4: Try with non-existent escrow
     let non_existent_id = String::from_str(&env, "non_existent");
     let result = engagement_client.try_change_dispute_flag(
         &non_existent_id,
@@ -452,7 +445,6 @@ fn test_dispute_resolution_process() {
     let env = Env::default();
     env.mock_all_auths();
     
-    // Setup addresses
     let client_address = Address::generate(&env);
     let service_provider_address = Address::generate(&env);
     let platform_address = Address::generate(&env);
@@ -462,11 +454,9 @@ fn test_dispute_resolution_process() {
     let amount: u128 = 100_000_000;
     let platform_fee = (0.3 * 10u128.pow(18) as f64) as u128;
 
-    // Initialize contract
     let engagement_contract_address = env.register_contract(None, EngagementContract);
     let engagement_client = EngagementContractClient::new(&env, &engagement_contract_address);
 
-    // Initialize escrow
     let engagement_id = String::from_str(&env, "test_resolution");
     engagement_client.initialize_escrow(
         &engagement_id,
@@ -480,7 +470,6 @@ fn test_dispute_resolution_process() {
         &dispute_resolver_address,
     );
 
-    // Setup test token
     let token_admin = Address::generate(&env);
     let token_contract = env.register_contract(None, crate::token::Token);
     let token_client = TokenClient::new(&env, &token_contract);
@@ -492,11 +481,9 @@ fn test_dispute_resolution_process() {
         &String::from_str(&env, "USDC")
     );
 
-    // Mint tokens and transfer to contract
     token_client.mint(&token_admin, &(amount as i128));
     token_client.transfer(&token_admin, &engagement_contract_address, &(amount as i128));
 
-    // Update escrow balance
     env.as_contract(&engagement_contract_address, || {
         let escrow_key = DataKey::Escrow(engagement_id.clone());
         let mut escrow = env.storage().instance().get::<DataKey, Escrow>(&escrow_key).unwrap();
@@ -504,21 +491,17 @@ fn test_dispute_resolution_process() {
         env.storage().instance().set(&escrow_key, &escrow);
     });
 
-    // Verify initial state
     let initial_escrow = engagement_client.get_escrow_by_id(&engagement_id);
     assert_eq!(initial_escrow.balance, amount);
 
-    // Change dispute flag
     engagement_client.change_dispute_flag(
         &engagement_id,
         &dispute_resolver_address
     );
 
-    // Verify flag changed
     let disputed_escrow = engagement_client.get_escrow_by_id(&engagement_id);
     assert_eq!(disputed_escrow.dispute_flag, true);
 
-    // Resolve dispute
     let client_amount: u128 = 40_000_000;
     let provider_amount: u128 = 60_000_000;
     
@@ -530,11 +513,9 @@ fn test_dispute_resolution_process() {
         &provider_amount
     );
 
-    // Verify final state
     let final_escrow = engagement_client.get_escrow_by_id(&engagement_id);
     assert_eq!(final_escrow.balance, 0);
 
-    // Verify token balances
     assert_eq!(token_client.balance(&client_address), client_amount as i128);
     assert_eq!(token_client.balance(&service_provider_address), provider_amount as i128);
 }
