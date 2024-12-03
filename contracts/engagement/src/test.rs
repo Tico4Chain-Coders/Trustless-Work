@@ -601,7 +601,6 @@ fn test_fund_escrow_successful_deposit() {
         &dispute_resolver_address,
     );
 
-    
     let usdc_token = create_usdc_token(&env, &admin);
     usdc_token.mint(&engagement_contract_address, &(amount as i128));
     usdc_token.mint(&release_signer_address, &(amount as i128));
@@ -622,5 +621,203 @@ fn test_fund_escrow_successful_deposit() {
         expected_result_amount,
         "Escrow balance is incorrect"
     );
+}
 
+#[test]
+fn test_fund_escrow_fully_funded_error() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let admin = Address::generate(&env);
+    let client_address = Address::generate(&env);
+    let platform_address = Address::generate(&env);
+    let amount: u128 = 100_000;
+    let service_provider_address = Address::generate(&env);
+    let release_signer_address = Address::generate(&env);
+    let dispute_resolver_address = Address::generate(&env);
+    let platform_fee = (0.3 * 10u128.pow(18) as f64) as u128;
+    let milestones = vec![
+        &env,
+        Milestone {
+            description: String::from_str(&env, "First milestone"),
+            status: String::from_str(&env, "Pending"),
+            flag: false,
+        },
+        Milestone {
+            description: String::from_str(&env, "Second milestone"),
+            status: String::from_str(&env, "Pending"),
+            flag: false,
+        },
+    ];
+
+    let engagement_contract_address = env.register_contract(None, EngagementContract);
+    let engagement_client = EngagementContractClient::new(&env, &engagement_contract_address);
+
+    let engagement_id = String::from_str(&env, "12345");
+
+    let engagement_id = engagement_client.initialize_escrow(
+        &engagement_id.clone(),
+        &client_address,
+        &service_provider_address,
+        &platform_address,
+        &amount,
+        &platform_fee,
+        &milestones,
+        &release_signer_address,
+        &dispute_resolver_address,
+    );
+
+    let usdc_token = create_usdc_token(&env, &admin);
+    let funded_amount: u128 = 100_000_000; 
+    usdc_token.mint(&engagement_contract_address, &(funded_amount as i128));
+    usdc_token.mint(&release_signer_address, &(amount as i128));
+
+    let amount_to_deposit: i128 = 100_000;
+
+    let result = engagement_client.try_fund_escrow(
+        &engagement_id, 
+        &release_signer_address, 
+        &usdc_token.address, 
+        &amount_to_deposit
+    );
+
+    assert!(
+        result.is_err(),
+        "Should fail when the escrow is fully funded"
+    );
+}
+
+#[test]
+fn test_fund_escrow_signer_insufficient_funds_error() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let admin = Address::generate(&env);
+    let client_address = Address::generate(&env);
+    let platform_address = Address::generate(&env);
+    let amount: u128 = 100_000_000;
+    let service_provider_address = Address::generate(&env);
+    let release_signer_address = Address::generate(&env);
+    let dispute_resolver_address = Address::generate(&env);
+    let platform_fee = (0.3 * 10u128.pow(18) as f64) as u128;
+    let milestones = vec![
+        &env,
+        Milestone {
+            description: String::from_str(&env, "First milestone"),
+            status: String::from_str(&env, "Pending"),
+            flag: false,
+        },
+        Milestone {
+            description: String::from_str(&env, "Second milestone"),
+            status: String::from_str(&env, "Pending"),
+            flag: false,
+        },
+    ];
+
+    let engagement_contract_address = env.register_contract(None, EngagementContract);
+    let engagement_client = EngagementContractClient::new(&env, &engagement_contract_address);
+
+    let engagement_id = String::from_str(&env, "12345");
+
+    let engagement_id = engagement_client.initialize_escrow(
+        &engagement_id.clone(),
+        &client_address,
+        &service_provider_address,
+        &platform_address,
+        &amount,
+        &platform_fee,
+        &milestones,
+        &release_signer_address,
+        &dispute_resolver_address,
+    );
+
+    let usdc_token = create_usdc_token(&env, &admin);
+    usdc_token.mint(&engagement_contract_address, &(amount as i128));
+
+    let signer_funds: u128 = 100_000; 
+    usdc_token.mint(&release_signer_address, &(signer_funds as i128));
+
+    let amount_to_deposit: i128 = 180_000;
+
+    let result = engagement_client.try_fund_escrow(
+        &engagement_id, 
+        &release_signer_address, 
+        &usdc_token.address, 
+        &amount_to_deposit
+    );
+
+    assert!(
+        result.is_err(),
+        "Should fail when the signer has insufficient funds"
+    );
+}
+
+
+#[test]
+fn test_fund_escrow_dispute_flag_error() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let admin = Address::generate(&env);
+    let client_address = Address::generate(&env);
+    let platform_address = Address::generate(&env);
+    let amount: u128 = 100_000_000;
+    let service_provider_address = Address::generate(&env);
+    let release_signer_address = Address::generate(&env);
+    let dispute_resolver_address = Address::generate(&env);
+    let platform_fee = (0.3 * 10u128.pow(18) as f64) as u128;
+    let milestones = vec![
+        &env,
+        Milestone {
+            description: String::from_str(&env, "First milestone"),
+            status: String::from_str(&env, "Pending"),
+            flag: false,
+        },
+        Milestone {
+            description: String::from_str(&env, "Second milestone"),
+            status: String::from_str(&env, "Pending"),
+            flag: false,
+        },
+    ];
+
+    let engagement_contract_address = env.register_contract(None, EngagementContract);
+    let engagement_client = EngagementContractClient::new(&env, &engagement_contract_address);
+
+    let engagement_id = String::from_str(&env, "12345");
+
+    let engagement_id = engagement_client.initialize_escrow(
+        &engagement_id.clone(),
+        &client_address,
+        &service_provider_address,
+        &platform_address,
+        &amount,
+        &platform_fee,
+        &milestones,
+        &release_signer_address,
+        &dispute_resolver_address,
+    );
+
+    let usdc_token = create_usdc_token(&env, &admin);
+    usdc_token.mint(&engagement_contract_address, &(amount as i128));
+    usdc_token.mint(&release_signer_address, &(amount as i128));
+
+    engagement_client.update_dispute_flag(
+        &engagement_id,
+        &release_signer_address,
+        &true
+    );
+
+    let amount_to_deposit: i128 = 80_000;
+
+    let result = engagement_client.try_fund_escrow(
+        &engagement_id, 
+        &release_signer_address, 
+        &usdc_token.address, 
+        &amount_to_deposit
+    );
+
+    assert!(
+        result.is_err(),
+        "Should fail when the dispute flag is true"
+    );
 }

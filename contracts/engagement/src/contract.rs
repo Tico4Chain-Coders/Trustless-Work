@@ -80,6 +80,24 @@ impl EngagementContract {
 
         Ok(engagement_id_copy)
     }
+
+    pub fn update_dispute_flag(e: Env, engagement_id: String, signer: Address, new_flag_value: bool) -> Result<(), ContractError> {
+        signer.require_auth();
+
+        let escrow_key = DataKey::Escrow(engagement_id.clone());
+        let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id);
+    
+        let mut escrow = match escrow_result {
+            Ok(esc) => esc,
+            Err(err) => return Err(err),
+        };
+        
+        escrow.dispute_flag = new_flag_value;
+        
+        e.storage().instance().set(&escrow_key, &escrow);
+
+        Ok(())
+    }
     
     pub fn fund_escrow(e: Env, engagement_id: String, signer: Address, usdc_contract: Address, amount_to_deposit: i128) -> Result<(), ContractError> {
         signer.require_auth();
@@ -92,7 +110,7 @@ impl EngagementContract {
             Err(err) => return Err(err),
         };
 
-        if escrow.dispute_flag == true {
+        if escrow.dispute_flag {
             return Err(ContractError::EscrowOpenedForDisputeResolution);
         }
     
