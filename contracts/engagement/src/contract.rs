@@ -87,13 +87,13 @@ impl EngagementContract {
         let escrow_key = DataKey::Escrow(engagement_id.clone());
         let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id);
     
-        let mut escrow = match escrow_result {
+        let escrow = match escrow_result {
             Ok(esc) => esc,
             Err(err) => return Err(err),
         };
 
         if escrow.dispute_flag == false {
-            return Err("Escrow has been opened for dispute resolution");
+            return Err(ContractError::EscrowOpenedForDisputeResolution);
         }
     
         let usdc_client = TokenClient::new(&e, &usdc_contract);
@@ -102,12 +102,12 @@ impl EngagementContract {
 
         let contract_address = e.current_contract_address();
         
-        if usdc_client.balance(contract_address) > escrow.amount {
-            return Err("Escrow fully funded");
+        if usdc_client.balance(&contract_address) as u128 > escrow.amount {
+            return Err(ContractError::EscrowFullyFunded);
         }
 
-        if amount_to_deposit > escrow.amount {
-            return Err("Amount to deposit is greather thant the escrow amount");
+        if amount_to_deposit as u128 > escrow.amount {
+            return Err(ContractError::AmountToDepositGreatherThanEscrowAmount);
         }
 
         if signer_balance < amount_to_deposit {

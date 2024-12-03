@@ -33,6 +33,9 @@ pub enum ContractError {
     InvalidMileStoneIndex = 27,
     OnlyClientChangeMilstoneFlag = 28,
     InvalidState = 29,
+    EscrowOpenedForDisputeResolution = 30,
+    AmountToDepositGreatherThanEscrowAmount = 31,
+
 }
 
 impl fmt::Display for ContractError {
@@ -67,6 +70,8 @@ impl fmt::Display for ContractError {
             ContractError::InvalidMileStoneIndex => write!(f, "Invalid Milestone Index"),
             ContractError::OnlyClientChangeMilstoneFlag => write!(f, "Only Client Can change Milestone Flag"),
             ContractError::InvalidState => write!(f, "Invalid State"),
+            ContractError::EscrowOpenedForDisputeResolution => write!(f, "Escrow has been opened for dispute resolution"),
+            ContractError::AmountToDepositGreatherThanEscrowAmount => write!(f, "Amount to deposit is greather thant the escrow amount"),
         }
     }
 }
