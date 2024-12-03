@@ -556,3 +556,71 @@ fn test_claim_escrow_earnings_milestones_incomplete() {
         "Should fail when milestones are not completed"
     );
 }
+
+#[test]
+fn test_fund_escrow_successful_deposit() {
+    let env = Env::default();
+    env.mock_all_auths();
+
+    let admin = Address::generate(&env);
+    let client_address = Address::generate(&env);
+    let platform_address = Address::generate(&env);
+    let amount: u128 = 100_000_000;
+    let service_provider_address = Address::generate(&env);
+    let release_signer_address = Address::generate(&env);
+    let dispute_resolver_address = Address::generate(&env);
+    let platform_fee = (0.3 * 10u128.pow(18) as f64) as u128;
+    let milestones = vec![
+        &env,
+        Milestone {
+            description: String::from_str(&env, "First milestone"),
+            status: String::from_str(&env, "Pending"),
+            flag: false,
+        },
+        Milestone {
+            description: String::from_str(&env, "Second milestone"),
+            status: String::from_str(&env, "Pending"),
+            flag: false,
+        },
+    ];
+
+    let engagement_contract_address = env.register_contract(None, EngagementContract);
+    let engagement_client = EngagementContractClient::new(&env, &engagement_contract_address);
+
+    let engagement_id = String::from_str(&env, "12345");
+
+    let engagement_id = engagement_client.initialize_escrow(
+        &engagement_id.clone(),
+        &client_address,
+        &service_provider_address,
+        &platform_address,
+        &amount,
+        &platform_fee,
+        &milestones,
+        &release_signer_address,
+        &dispute_resolver_address,
+    );
+
+    
+    let usdc_token = create_usdc_token(&env, &admin);
+    usdc_token.mint(&engagement_contract_address, &(amount as i128));
+    usdc_token.mint(&release_signer_address, &(amount as i128));
+
+    let amount_to_deposit: i128 = 100_000;
+
+    engagement_client.fund_escrow(
+        &engagement_id, 
+        &release_signer_address, 
+        &usdc_token.address, 
+        &amount_to_deposit
+    );
+
+    let expected_result_amount: i128 = 100_100_000;
+
+    assert_eq!(
+        usdc_token.balance(&engagement_contract_address),
+        expected_result_amount,
+        "Escrow balance is incorrect"
+    );
+
+}

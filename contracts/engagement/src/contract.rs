@@ -92,7 +92,7 @@ impl EngagementContract {
             Err(err) => return Err(err),
         };
 
-        if escrow.dispute_flag == false {
+        if escrow.dispute_flag == true {
             return Err(ContractError::EscrowOpenedForDisputeResolution);
         }
     
@@ -114,7 +114,6 @@ impl EngagementContract {
             return Err(ContractError::SignerInsufficientFunds);
         }
 
-    
         usdc_client.transfer(&signer, &contract_address, &amount_to_deposit);
     
         e.storage().instance().set(&escrow_key, &escrow);
