@@ -66,7 +66,6 @@ impl EngagementContract {
             release_signer: release_signer.clone(),
             service_provider: service_provider.clone(),
             amount,
-            balance: 0,
             tw_fee: (0.3 * 10u128.pow(18) as f64) as u128,
             platform_fee: platform_fee,
             milestones: milestones,
@@ -128,7 +127,12 @@ impl EngagementContract {
         trustless_work_address: Address
     ) -> Result<(), ContractError> {
         let escrow_key = DataKey::Escrow(engagement_id.clone());
-        let escrow = Self::get_escrow_by_id(e.clone(), engagement_id.clone())?;
+        let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id);
+        
+        let escrow = match escrow_result {
+            Ok(esc) => esc,
+            Err(err) => return Err(err),
+        };
     
         if service_provider != escrow.service_provider {
             return Err(ContractError::OnlyServiceProviderCanClaimEarnings);
@@ -151,7 +155,7 @@ impl EngagementContract {
     
         // Check the actual balance of the contract for this escrow
         let contract_balance = usdc_client.balance(&contract_address);
-        if contract_balance != escrow.amount as i128 {
+        if contract_balance < escrow.amount as i128 {
             return Err(ContractError::EscrowBalanceNotSufficienteToSendEarnings);
         }
     
@@ -200,7 +204,7 @@ impl EngagementContract {
         let escrow_key = DataKey::Escrow(engagement_id.clone());
         let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id.clone());
     
-        let mut escrow = match escrow_result {
+        let escrow = match escrow_result {
             Ok(esc) => esc,
             Err(err) => return Err(err),
         };
@@ -237,7 +241,6 @@ impl EngagementContract {
             );
         }
     
-        escrow.balance = 0;
         e.storage().instance().set(&escrow_key, &escrow);
     
         escrows_by_engagement_id(&e, engagement_id, escrow);
@@ -301,7 +304,6 @@ impl EngagementContract {
             release_signer,
             service_provider,
             amount,
-            balance: amount,
             tw_fee: (0.3 * 10u128.pow(18) as f64) as u128,
             platform_fee,
             milestones,
@@ -422,9 +424,7 @@ impl EngagementContract {
     pub fn change_dispute_flag(
         e: Env, 
         engagement_id: String,
-        dispute_resolver: Address
     ) -> Result<(), ContractError> {
-        dispute_resolver.require_auth();
     
         let escrow_key = DataKey::Escrow(engagement_id.clone());
         let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id.clone());
