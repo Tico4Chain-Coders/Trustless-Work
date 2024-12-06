@@ -12,7 +12,6 @@ pub struct Escrow {
     pub service_provider: Address,
     pub platform_address: Address,
     pub amount: u128,
-    pub balance: u128,
     pub tw_fee: u128,
     pub platform_fee: u128,
     pub milestones: Vec<Milestone>,
@@ -61,8 +60,6 @@ pub enum DataKey {
     Balance(Address),
     Allowance(AllowanceDataKey),
     Admin,
-    PlatformFee,
-    PlatformAddress,
 
     // User storage
     User(Address),
