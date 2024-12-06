@@ -78,17 +78,6 @@
                             },
                             {
                               "key": {
-                                "symbol": "balance"
-                              },
-                              "val": {
-                                "u128": {
-                                  "hi": 0,
-                                  "lo": 0
-                                }
-                              }
-                            },
-                            {
-                              "key": {
                                 "symbol": "client"
                               },
                               "val": {
@@ -465,17 +454,6 @@
                     },
                     {
                       "key": {
-                        "symbol": "balance"
-                      },
-                      "val": {
-                        "u128": {
-                          "hi": 0,
-                          "lo": 0
-                        }
-                      }
-                    },
-                    {
-                      "key": {
                         "symbol": "client"
                       },
                       "val": {
@@ -651,17 +629,6 @@
                     "u128": {
                       "hi": 0,
                       "lo": 100000000
-                    }
-                  }
-                },
-                {
-                  "key": {
-                    "symbol": "balance"
-                  },
-                  "val": {
-                    "u128": {
-                      "hi": 0,
-                      "lo": 0
                     }
                   }
                 },
