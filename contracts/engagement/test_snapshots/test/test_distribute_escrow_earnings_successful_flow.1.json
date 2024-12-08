@@ -1082,7 +1082,7 @@
                 "bytes": "0000000000000000000000000000000000000000000000000000000000000009"
               },
               {
-                "symbol": "claim_escrow_earnings"
+                "symbol": "distribute_escrow_earnings"
               }
             ],
             "data": {
@@ -1619,7 +1619,7 @@
                 "symbol": "fn_return"
               },
               {
-                "symbol": "claim_escrow_earnings"
+                "symbol": "distribute_escrow_earnings"
               }
             ],
             "data": "void"

@@ -2,10 +2,9 @@
 
 extern crate std;
 
-use crate::storage_types::{DataKey, Escrow, Milestone};
+use crate::storage_types::Milestone;
 use crate::token::{Token, TokenClient};
 use crate::{contract::EngagementContract, EngagementContractClient};
-use soroban_sdk::token;
 use soroban_sdk::{testutils::Address as _, vec, Address, Env, IntoVal, String};
 
 fn create_usdc_token<'a>(e: &Env, admin: &Address) -> TokenClient<'a> {
@@ -362,7 +361,7 @@ fn test_change_milestone_status_and_flag() {
 }
 
 #[test]
-fn test_claim_escrow_earnings_successful_flow() {
+fn test_distribute_escrow_earnings_successful_flow() {
     let env = Env::default();
     env.mock_all_auths();
 
@@ -413,9 +412,9 @@ fn test_claim_escrow_earnings_successful_flow() {
 
     usdc_token.mint(&engagement_contract_address, &(amount as i128));
 
-    engagement_client.claim_escrow_earnings(
+    engagement_client.distribute_escrow_earnings(
         &engagement_id,
-        &service_provider_address,
+        &release_signer_address,
         &usdc_token.address,
         &trustless_work_address,
     );
@@ -456,7 +455,7 @@ fn test_claim_escrow_earnings_successful_flow() {
 //test claim escrow earnings in failure scenarios
 // Scenario 1: Escrow with no milestones:
 #[test]
-fn test_claim_escrow_earnings_no_milestones() {
+fn test_distribute_escrow_earnings_no_milestones() {
     let env = Env::default();
     env.mock_all_auths();
 
@@ -489,9 +488,9 @@ fn test_claim_escrow_earnings_no_milestones() {
     );
 
     // Try to claim earnings with no milestones (should fail)
-    let result = engagement_client.try_claim_escrow_earnings(
+    let result = engagement_client.try_distribute_escrow_earnings(
         &engagement_id_no_milestones,
-        &service_provider_address,
+        &release_signer_address,
         &usdc_token.address,
         &platform_address, 
     );
@@ -503,7 +502,7 @@ fn test_claim_escrow_earnings_no_milestones() {
 
 // Scenario 2: Milestones incomplete
 #[test]
-fn test_claim_escrow_earnings_milestones_incomplete() {
+fn test_distribute_escrow_earnings_milestones_incomplete() {
     let env = Env::default();
     env.mock_all_auths();
 
@@ -545,9 +544,9 @@ fn test_claim_escrow_earnings_milestones_incomplete() {
     );
 
     // Try to claim earnings with incomplete milestones (should fail)
-    let result = engagement_client.try_claim_escrow_earnings(
+    let result = engagement_client.try_distribute_escrow_earnings(
         &engagement_id_incomplete,
-        &service_provider_address,
+        &release_signer_address,
         &usdc_token.address,
         &platform_address,
     );

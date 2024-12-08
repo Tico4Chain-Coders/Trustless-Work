@@ -436,7 +436,7 @@
                 "bytes": "0000000000000000000000000000000000000000000000000000000000000008"
               },
               {
-                "symbol": "claim_escrow_earnings"
+                "symbol": "distribute_escrow_earnings"
               }
             ],
             "data": {
@@ -597,7 +597,7 @@
                 "symbol": "fn_return"
               },
               {
-                "symbol": "claim_escrow_earnings"
+                "symbol": "distribute_escrow_earnings"
               }
             ],
             "data": {
@@ -658,7 +658,7 @@
                   "string": "contract try_call failed"
                 },
                 {
-                  "symbol": "claim_escrow_earnings"
+                  "symbol": "distribute_escrow_earnings"
                 },
                 {
                   "vec": [

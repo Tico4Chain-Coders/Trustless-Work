@@ -138,7 +138,7 @@
                               "symbol": "Escrow"
                             },
                             {
-                              "string": "test_no_milestones"
+                              "string": "test_incomplete_milestones"
                             }
                           ]
                         },
@@ -184,7 +184,7 @@
                                 "symbol": "engagement_id"
                               },
                               "val": {
-                                "string": "test_no_milestones"
+                                "string": "test_incomplete_milestones"
                               }
                             },
                             {
@@ -192,7 +192,36 @@
                                 "symbol": "milestones"
                               },
                               "val": {
-                                "vec": []
+                                "vec": [
+                                  {
+                                    "map": [
+                                      {
+                                        "key": {
+                                          "symbol": "description"
+                                        },
+                                        "val": {
+                                          "string": "Incomplete milestone"
+                                        }
+                                      },
+                                      {
+                                        "key": {
+                                          "symbol": "flag"
+                                        },
+                                        "val": {
+                                          "bool": false
+                                        }
+                                      },
+                                      {
+                                        "key": {
+                                          "symbol": "status"
+                                        },
+                                        "val": {
+                                          "string": "Pending"
+                                        }
+                                      }
+                                    ]
+                                  }
+                                ]
                               }
                             },
                             {
@@ -359,7 +388,7 @@
             "data": {
               "vec": [
                 {
-                  "string": "test_no_milestones"
+                  "string": "test_incomplete_milestones"
                 },
                 {
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
@@ -383,7 +412,36 @@
                   }
                 },
                 {
-                  "vec": []
+                  "vec": [
+                    {
+                      "map": [
+                        {
+                          "key": {
+                            "symbol": "description"
+                          },
+                          "val": {
+                            "string": "Incomplete milestone"
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "flag"
+                          },
+                          "val": {
+                            "bool": false
+                          }
+                        },
+                        {
+                          "key": {
+                            "symbol": "status"
+                          },
+                          "val": {
+                            "string": "Pending"
+                          }
+                        }
+                      ]
+                    }
+                  ]
                 },
                 {
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAK3IM"
@@ -414,7 +472,7 @@
               }
             ],
             "data": {
-              "string": "test_no_milestones"
+              "string": "test_incomplete_milestones"
             }
           }
         }
@@ -436,13 +494,13 @@
                 "bytes": "0000000000000000000000000000000000000000000000000000000000000008"
               },
               {
-                "symbol": "claim_escrow_earnings"
+                "symbol": "distribute_escrow_earnings"
               }
             ],
             "data": {
               "vec": [
                 {
-                  "string": "test_no_milestones"
+                  "string": "test_incomplete_milestones"
                 },
                 {
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAK3IM"
@@ -475,7 +533,7 @@
             "data": {
               "vec": [
                 {
-                  "string": "test_no_milestones"
+                  "string": "test_incomplete_milestones"
                 },
                 {
                   "map": [
@@ -519,7 +577,7 @@
                         "symbol": "engagement_id"
                       },
                       "val": {
-                        "string": "test_no_milestones"
+                        "string": "test_incomplete_milestones"
                       }
                     },
                     {
@@ -527,7 +585,36 @@
                         "symbol": "milestones"
                       },
                       "val": {
-                        "vec": []
+                        "vec": [
+                          {
+                            "map": [
+                              {
+                                "key": {
+                                  "symbol": "description"
+                                },
+                                "val": {
+                                  "string": "Incomplete milestone"
+                                }
+                              },
+                              {
+                                "key": {
+                                  "symbol": "flag"
+                                },
+                                "val": {
+                                  "bool": false
+                                }
+                              },
+                              {
+                                "key": {
+                                  "symbol": "status"
+                                },
+                                "val": {
+                                  "string": "Pending"
+                                }
+                              }
+                            ]
+                          }
+                        ]
                       }
                     },
                     {
@@ -597,12 +684,12 @@
                 "symbol": "fn_return"
               },
               {
-                "symbol": "claim_escrow_earnings"
+                "symbol": "distribute_escrow_earnings"
               }
             ],
             "data": {
               "error": {
-                "contract": 26
+                "contract": 20
               }
             }
           }
@@ -623,7 +710,7 @@
               },
               {
                 "error": {
-                  "contract": 26
+                  "contract": 20
                 }
               }
             ],
@@ -648,7 +735,7 @@
               },
               {
                 "error": {
-                  "contract": 26
+                  "contract": 20
                 }
               }
             ],
@@ -658,12 +745,12 @@
                   "string": "contract try_call failed"
                 },
                 {
-                  "symbol": "claim_escrow_earnings"
+                  "symbol": "distribute_escrow_earnings"
                 },
                 {
                   "vec": [
                     {
-                      "string": "test_no_milestones"
+                      "string": "test_incomplete_milestones"
                     },
                     {
                       "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAK3IM"
