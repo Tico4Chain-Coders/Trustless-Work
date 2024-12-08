@@ -6,7 +6,7 @@ use soroban_sdk::token::Client as TokenClient;
 use crate::storage_types::{DataKey, Escrow, Milestone};
 use crate::error::ContractError;
 use crate::events::{
-    escrows_by_engagement_id, balance_retrieved_event, allowance_retrieved_event
+    escrows_by_engagement_id, balance_retrieved_event
 };
 
 #[contract]
@@ -119,10 +119,10 @@ impl EngagementContract {
         Ok(())
     }
 
-    pub fn claim_escrow_earnings(
+    pub fn distribute_escrow_earnings(
         e: Env, 
         engagement_id: String, 
-        service_provider: Address, 
+        release_signer: Address, 
         usdc_contract: Address,
         trustless_work_address: Address
     ) -> Result<(), ContractError> {
@@ -134,7 +134,7 @@ impl EngagementContract {
             Err(err) => return Err(err),
         };
     
-        if service_provider != escrow.service_provider {
+        if release_signer != escrow.release_signer {
             return Err(ContractError::OnlyServiceProviderCanClaimEarnings);
         }
     
@@ -258,19 +258,6 @@ impl EngagementContract {
         }
     }
 
-    pub fn approve_amounts(e: Env, from: Address, spender: Address, amount: i128, usdc_token_address: Address ) {
-        from.require_auth();
-        let expiration_ledger = e.ledger().sequence() + 1000;
-        let usdc_token = TokenClient::new(&e, &usdc_token_address);
-        usdc_token.approve(&from, &spender, &amount, &expiration_ledger);
-    }
-
-    pub fn get_allowance(e: Env, from: Address, spender: Address, usdc_token_address: Address ) {
-        let usdc_token = TokenClient::new(&e, &usdc_token_address);
-        let allowance = usdc_token.allowance(&from, &spender);
-        allowance_retrieved_event(&e, from, spender, allowance);
-    }
-
     pub fn get_balance(e: Env, address: Address, usdc_token_address: Address) {
         let usdc_token = TokenClient::new(&e, &usdc_token_address);
         let balance = usdc_token.balance(&address);
@@ -376,7 +363,7 @@ impl EngagementContract {
         engagement_id: String,
         milestone_index: i128,
         new_flag: bool,
-        signer: Address,
+        client: Address,
     ) -> Result<(), ContractError> {
         let existing_escrow = Self::get_escrow_by_id(e.clone(), engagement_id.clone())?;
     
@@ -384,10 +371,11 @@ impl EngagementContract {
             return Err(ContractError::EscrowNotInitialized);
         }
     
-        if signer != existing_escrow.client {
+        if client != existing_escrow.client {
             return Err(ContractError::OnlyClientChangeMilstoneFlag);
         }
-        signer.require_auth();
+
+        client.require_auth();
     
         if existing_escrow.milestones.is_empty() {
             return Err(ContractError::NoMileStoneDefined);
@@ -445,6 +433,4 @@ impl EngagementContract {
     
         Ok(())
     }
-
-
-}    
+}
