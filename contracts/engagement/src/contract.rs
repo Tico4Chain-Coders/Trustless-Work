@@ -66,7 +66,7 @@ impl EngagementContract {
             release_signer: release_signer.clone(),
             service_provider: service_provider.clone(),
             amount,
-            tw_fee: (0.3 * 10u128.pow(18) as f64) as u128,
+            tw_fee: (3 * 10u128.pow(17)),
             platform_fee: platform_fee,
             milestones: milestones,
             dispute_resolver: dispute_resolver.clone(),
@@ -159,12 +159,12 @@ impl EngagementContract {
             return Err(ContractError::EscrowBalanceNotSufficienteToSendEarnings);
         }
     
-        let platform_fee_percentage: u128 = escrow.platform_fee;
+        let platform_fee_percentage = escrow.platform_fee as i128;
         let platform_address = escrow.platform_address.clone();
     
-        let total_amount = escrow.amount as f64;
-        let trustless_work_commission = (total_amount * 0.003).floor() as i128; 
-        let platform_commission = (total_amount * platform_fee_percentage as f64).floor() as i128;
+        let total_amount = escrow.amount as i128;
+        let trustless_work_commission = ((total_amount * 30) / 10000) as i128; 
+        let platform_commission = (total_amount * platform_fee_percentage) as i128;
             
         usdc_client.transfer(
             &contract_address, 
@@ -178,7 +178,7 @@ impl EngagementContract {
             &platform_commission
         );
     
-        let service_provider_amount = (total_amount - trustless_work_commission as f64 - platform_commission as f64).floor() as i128;
+        let service_provider_amount = total_amount - trustless_work_commission - platform_commission;
     
         usdc_client.transfer(
             &contract_address, 
@@ -291,7 +291,7 @@ impl EngagementContract {
             release_signer,
             service_provider,
             amount,
-            tw_fee: (0.3 * 10u128.pow(18) as f64) as u128,
+            tw_fee: (3 * 10u128.pow(17)),
             platform_fee,
             milestones,
             dispute_resolver,
