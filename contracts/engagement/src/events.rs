@@ -23,13 +23,3 @@ pub (crate) fn balance_retrieved_event(e: &Env, address: Address, usdc_token_add
     let event_payload = vec![e, address_val, token_address_val, balance_val];
     e.events().publish(topics, event_payload);
 }
-
-pub (crate) fn allowance_retrieved_event(e: &Env, from: Address, spender: Address, balance: i128) {
-    let topics = (symbol_short!("blnc"),);
-    let from_val: Val = from.into_val(e);
-    let spender_address_val: Val = spender.into_val(e);
-    let balance_val: Val = balance.into_val(e);
-
-    let event_payload = vec![e, from_val, spender_address_val, balance_val];
-    e.events().publish(topics, event_payload);
-}
