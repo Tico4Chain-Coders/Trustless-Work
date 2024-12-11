@@ -24,7 +24,7 @@ fn test_initialize_excrow() {
     let service_provider_address = Address::generate(&env);
     let release_signer_address = Address::generate(&env);
     let dispute_resolver_address = Address::generate(&env);
-    let platform_fee = (0.3 * 10u128.pow(18) as f64) as u128;
+    let platform_fee = 3;
     let milestones = vec![
         &env,
         Milestone {
@@ -378,7 +378,7 @@ fn test_distribute_escrow_earnings_successful_flow() {
     let amount: u128 = 100_000_000;
     usdc_token.mint(&client_address, &(amount as i128));
 
-    let platform_fee = 0.03 as u128;
+    let platform_fee = 5;
 
     let milestones = vec![
         &env,
@@ -411,7 +411,7 @@ fn test_distribute_escrow_earnings_successful_flow() {
     );
 
     usdc_token.mint(&engagement_contract_address, &(amount as i128));
-
+    
     engagement_client.distribute_escrow_earnings(
         &engagement_id,
         &release_signer_address,
@@ -419,13 +419,11 @@ fn test_distribute_escrow_earnings_successful_flow() {
         &trustless_work_address,
     );
 
-    let total_amount = amount as f64;
-    let trustless_work_commission = (total_amount * 0.003).floor() as i128;
-    let platform_commission =
-        (total_amount * (platform_fee as f64 / 10u128.pow(18) as f64)).floor() as i128;
+    let total_amount = amount as i128;
+    let trustless_work_commission = ((total_amount * 30) / 10000) as i128;
+    let platform_commission = (total_amount * platform_fee as i128) / 100 as i128;
     let service_provider_amount =
-        (total_amount - trustless_work_commission as f64 - platform_commission as f64).floor()
-            as i128;
+        (total_amount - (trustless_work_commission + platform_commission)) as i128;
 
     assert_eq!(
         usdc_token.balance(&trustless_work_address),
@@ -473,7 +471,7 @@ fn test_distribute_escrow_earnings_no_milestones() {
 
     let engagement_id_no_milestones = String::from_str(&env, "test_no_milestones");
     let amount: u128 = 100_000_000;
-    let platform_fee = (0.3 * 10u128.pow(18) as f64) as u128;
+    let platform_fee = (0.3 * 10u128 as f64) as u128;
 
     engagement_client.initialize_escrow(
         &engagement_id_no_milestones,
