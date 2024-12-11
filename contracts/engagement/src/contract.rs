@@ -136,7 +136,7 @@ impl EngagementContract {
         };
         
         if release_signer != escrow.release_signer {
-            return Err(ContractError::OnlyServiceProviderCanClaimEarnings);
+            return Err(ContractError::OnlyReleaseSignerCanClaimEarnings);
         }
     
         if escrow.milestones.is_empty() {
