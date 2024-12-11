@@ -1,5 +1,5 @@
 use soroban_sdk::{
-    contract, contractimpl, Address, Env, String, BytesN, Val, Vec, Symbol
+    contract, contractimpl, Address, BytesN, Env, String, Symbol, Val, Vec
 };
 use soroban_sdk::token::Client as TokenClient;
 
@@ -126,6 +126,7 @@ impl EngagementContract {
         usdc_contract: Address,
         trustless_work_address: Address
     ) -> Result<(), ContractError> {
+        release_signer.require_auth();
         let escrow_key = DataKey::Escrow(engagement_id.clone());
         let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id);
         
@@ -133,7 +134,7 @@ impl EngagementContract {
             Ok(esc) => esc,
             Err(err) => return Err(err),
         };
-    
+        
         if release_signer != escrow.release_signer {
             return Err(ContractError::OnlyServiceProviderCanClaimEarnings);
         }
@@ -164,7 +165,7 @@ impl EngagementContract {
     
         let total_amount = escrow.amount as i128;
         let trustless_work_commission = ((total_amount * 30) / 10000) as i128; 
-        let platform_commission = (total_amount * platform_fee_percentage) as i128;
+        let platform_commission = (total_amount * platform_fee_percentage) / 100 as i128;
             
         usdc_client.transfer(
             &contract_address, 
