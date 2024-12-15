@@ -6,7 +6,8 @@ use crate::storage::types::{Escrow, DataKey};
 use crate::{contract::EngagementContract, EngagementContractClient};
 use crate::error::ContractError;
 use soroban_sdk::{testutils::{Address as _, AuthorizedFunction, AuthorizedInvocation}, Address, Env, IntoVal, String, symbol_short};
-use crate::token::{ Token, TokenClient };
+use crate::token::token::{ Token, TokenClient };
+
 
 fn create_token<'a>(e: &Env, admin: &Address) -> TokenClient<'a> {
     let token = TokenClient::new(e, &e.register_contract(None, Token {}));

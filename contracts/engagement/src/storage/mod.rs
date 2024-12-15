@@ -1,2 +1,2 @@
 pub mod types;
-mod persistence;
+pub mod persistence;
