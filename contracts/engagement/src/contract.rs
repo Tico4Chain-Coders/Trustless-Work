@@ -3,11 +3,11 @@ use soroban_sdk::{
 };
 use soroban_sdk::token::Client as TokenClient;
 
-use crate::storage_types::{Escrow, DataKey, User};
+use crate::storage::types::{Escrow};
 use crate::error::ContractError;
-use crate::events::{
-    escrows_by_engagement_id, balance_retrieved_event, allowance_retrieved_event
-};
+use crate::events::{balance_retrieved_event, allowance_retrieved_event};
+
+use crate::core::{EscrowManager, UserManager};
 
 #[contract]
 pub struct EngagementContract;
@@ -46,79 +46,79 @@ impl EngagementContract {
         amount: u128,
         signer: Address,
     ) -> Result<String, ContractError> {
-        // if e.storage().instance().has(&DataKey::Admin) {
-        //     panic!("An escrow has already been initialized for this contract");
-        // }
+        EscrowManager::initialize_escrow(
+            e, 
+            engagement_id, 
+            description, 
+            issuer, 
+            service_provider, 
+            amount, 
+            signer
+        )
+    }
 
-        if amount == 0 {
-            return Err(ContractError::AmountCannotBeZero);
-        }
-
-        let engagement_id_copy = engagement_id.clone();
-        let escrow = Escrow {
-            engagement_id: engagement_id.clone(),
-            description,
-            issuer,
-            signer: signer.clone(),
-            service_provider: service_provider.clone(),
-            amount,
-            balance: 0,
-            cancelled: false,
-            completed: false,
-        };
-        
-        e.storage().instance().set(&DataKey::Escrow(engagement_id.clone().into()), &escrow);
-        // e.storage().instance().set(&DataKey::Admin, &true);
-
-        Ok(engagement_id_copy)
+    pub fn fund_escrow(
+        e: Env, 
+        engagement_id: String, 
+        signer: Address, 
+        usdc_contract: Address, 
+        contract_address: Address
+    ) -> Result<(), ContractError> {
+        EscrowManager::fund_escrow(
+            e, 
+            engagement_id, 
+            signer, 
+            usdc_contract, 
+            contract_address
+        )
     }
     
-    pub fn fund_escrow(e: Env, engagement_id: String, signer: Address, usdc_contract: Address, contract_address: Address) -> Result<(), ContractError> {
-        signer.require_auth();
+    // pub fn fund_escrow(e: Env, engagement_id: String, signer: Address, usdc_contract: Address, contract_address: Address) -> Result<(), ContractError> {
+    //     signer.require_auth();
 
-        let escrow_key = DataKey::Escrow(engagement_id.clone());
-        let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id);
+    //     let escrow_key = DataKey::Escrow(engagement_id.clone());
+    //     let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id);
     
-        let mut escrow = match escrow_result {
-            Ok(esc) => esc,
-            Err(err) => return Err(err),
-        };
+    //     let mut escrow = match escrow_result {
+    //         Ok(esc) => esc,
+    //         Err(err) => return Err(err),
+    //     };
 
-        if escrow.cancelled == true {
-            return Err(ContractError::EscrowAlreadyCancelled);
-        }
+    //     if escrow.cancelled == true {
+    //         return Err(ContractError::EscrowAlreadyCancelled);
+    //     }
 
-        if escrow.completed == true {
-            return Err(ContractError::EscrowAlreadyCompleted);
-        }
+    //     if escrow.completed == true {
+    //         return Err(ContractError::EscrowAlreadyCompleted);
+    //     }
     
-        if signer != escrow.signer {
-            return Err(ContractError::OnlySignerCanFundEscrow);
-        }
+    //     if signer != escrow.signer {
+    //         return Err(ContractError::OnlySignerCanFundEscrow);
+    //     }
     
-        if escrow.balance > 0 {
-            return Err(ContractError::EscrowAlreadyFunded);
-        }
+    //     if escrow.balance > 0 {
+    //         return Err(ContractError::EscrowAlreadyFunded);
+    //     }
     
-        if escrow.balance == escrow.amount {
-            return Err(ContractError::EscrowFullyFunded);
-        }
+    //     if escrow.balance == escrow.amount {
+    //         return Err(ContractError::EscrowFullyFunded);
+    //     }
     
-        let half_price_in_micro_usdc = (escrow.amount as i128) / 2;
-        let usdc_client = TokenClient::new(&e, &usdc_contract);
+    //     let half_price_in_micro_usdc = (escrow.amount as i128) / 2;
+    //     let usdc_client = TokenClient::new(&e, &usdc_contract);
     
-        let signer_balance = usdc_client.balance(&signer);
-        if signer_balance < half_price_in_micro_usdc {
-            return Err(ContractError::SignerInsufficientFunds);
-        }
+    //     let signer_balance = usdc_client.balance(&signer);
+    //     if signer_balance < half_price_in_micro_usdc {
+    //         return Err(ContractError::SignerInsufficientFunds);
+    //     }
     
-        usdc_client.transfer(&signer, &contract_address, &half_price_in_micro_usdc);
+    //     usdc_client.transfer(&signer, &contract_address, &half_price_in_micro_usdc);
     
-        escrow.balance = half_price_in_micro_usdc as u128;
-        e.storage().instance().set(&escrow_key, &escrow);
+    //     escrow.balance = half_price_in_micro_usdc as u128;
+    //     e.storage().instance().set(&escrow_key, &escrow);
     
-        Ok(())
-    }
+    //     Ok(())
+    // }
 
     pub fn complete_escrow(
         e: Env,
@@ -127,177 +127,248 @@ impl EngagementContract {
         usdc_contract: Address,
         contract_address: Address,
     ) -> Result<(), ContractError> {
-        signer.require_auth();
-    
-        let escrow_key = DataKey::Escrow(engagement_id.clone());
-        let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id);
-    
-        let mut escrow = match escrow_result {
-            Ok(esc) => esc,
-            Err(err) => return Err(err),
-        };
-
-        if escrow.cancelled == true {
-            return Err(ContractError::EscrowAlreadyCancelled);
-        }
-    
-        if signer != escrow.signer {
-            return Err(ContractError::OnlySignerCanCompleteEscrow);
-        }
-    
-        if escrow.balance == 0 {
-            return Err(ContractError::EscrowNotFunded);
-        }
-    
-        if escrow.completed {
-            return Err(ContractError::EscrowAlreadyCompleted);
-        }
-    
-        let remaining_price = (escrow.amount - escrow.balance) as i128;
-    
-        let usdc_client = TokenClient::new(&e, &usdc_contract);
-
-        let signer_balance = usdc_client.balance(&escrow.signer);
-        if signer_balance < remaining_price {
-            return Err(ContractError::SignerInsufficientFunds);
-        }
-
-        usdc_client.transfer(
-            &signer,              
-            &contract_address,
-            &remaining_price
-        );
-
-        escrow.completed = true;
-        escrow.balance = escrow.amount;
-    
-        e.storage().instance().set(&escrow_key, &escrow);
-        Ok(())
+        EscrowManager::complete_escrow(
+            e, 
+            engagement_id, 
+            signer, 
+            usdc_contract, 
+            contract_address
+        )
     }
 
-    pub fn claim_escrow_earnings(e: Env, engagement_id: String, service_provider: Address, usdc_contract: Address, contract_address: Address) -> Result<(), ContractError> {
-        let escrow_key = DataKey::Escrow(engagement_id.clone());
-        let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id);
+    // pub fn complete_escrow(
+    //     e: Env,
+    //     engagement_id: String,
+    //     signer: Address,
+    //     usdc_contract: Address,
+    //     contract_address: Address,
+    // ) -> Result<(), ContractError> {
+    //     signer.require_auth();
+    
+    //     let escrow_key = DataKey::Escrow(engagement_id.clone());
+    //     let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id);
+    
+    //     let mut escrow = match escrow_result {
+    //         Ok(esc) => esc,
+    //         Err(err) => return Err(err),
+    //     };
 
-        let mut escrow = match escrow_result {
-            Ok(esc) => esc,
-            Err(err) => return Err(err),
-        };
+    //     if escrow.cancelled == true {
+    //         return Err(ContractError::EscrowAlreadyCancelled);
+    //     }
+    
+    //     if signer != escrow.signer {
+    //         return Err(ContractError::OnlySignerCanCompleteEscrow);
+    //     }
+    
+    //     if escrow.balance == 0 {
+    //         return Err(ContractError::EscrowNotFunded);
+    //     }
+    
+    //     if escrow.completed {
+    //         return Err(ContractError::EscrowAlreadyCompleted);
+    //     }
+    
+    //     let remaining_price = (escrow.amount - escrow.balance) as i128;
+    
+    //     let usdc_client = TokenClient::new(&e, &usdc_contract);
 
-        let invoker = service_provider;
-        if invoker != escrow.service_provider {
-            return Err(ContractError::OnlyServiceProviderCanClaimEarnings);
-        }
+    //     let signer_balance = usdc_client.balance(&escrow.signer);
+    //     if signer_balance < remaining_price {
+    //         return Err(ContractError::SignerInsufficientFunds);
+    //     }
 
-        if escrow.cancelled == true {
-            return Err(ContractError::EscrowAlreadyCancelled);
-        }
+    //     usdc_client.transfer(
+    //         &signer,              
+    //         &contract_address,
+    //         &remaining_price
+    //     );
 
-        if escrow.completed == false {
-            return Err(ContractError::EscrowNotCompleted);
-        }
+    //     escrow.completed = true;
+    //     escrow.balance = escrow.amount;
+    
+    //     e.storage().instance().set(&escrow_key, &escrow);
+    //     Ok(())
+    // }
 
-        if escrow.balance != escrow.amount {
-            return Err(ContractError::EscrowBalanceNotSufficienteToSendEarnings);
-        }
-
-        let usdc_client = TokenClient::new(&e, &usdc_contract);
-
-        let escrow_balance = usdc_client.balance(&contract_address);
-        if escrow_balance < escrow.amount as i128 {
-            return Err(ContractError::ContractInsufficientFunds);
-        }
-
-        usdc_client.transfer(
-            &contract_address,
-            &escrow.service_provider,
-            &(escrow.amount as i128)
-        );
-
-        escrow.balance = 0;
-
-        e.storage().instance().set(&escrow_key, &escrow);
-        Ok(())
+    pub fn claim_escrow_earnings(
+        e: Env, 
+        engagement_id: String, 
+        service_provider: Address, 
+        usdc_contract: Address, 
+        contract_address: Address
+    ) -> Result<(), ContractError> {
+        EscrowManager::claim_escrow_earnings(
+            e, 
+            engagement_id, 
+            service_provider, 
+            usdc_contract, 
+            contract_address
+        )
     }
 
-    pub fn cancel_escrow(e: Env, engagement_id: String, service_provider:Address) -> Result<(), ContractError> {
-        let escrow_key = DataKey::Escrow(engagement_id.clone());
-        let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id);
-    
-        let mut escrow = match escrow_result {
-            Ok(esc) => esc,
-            Err(err) => return Err(err),
-        };
+    // pub fn claim_escrow_earnings(e: Env, engagement_id: String, service_provider: Address, usdc_contract: Address, contract_address: Address) -> Result<(), ContractError> {
+    //     let escrow_key = DataKey::Escrow(engagement_id.clone());
+    //     let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id);
 
-        let invoker = service_provider;
-        if invoker != escrow.service_provider {
-            return Err(ContractError::OnlyServiceProviderCanCancelEscrow);
-        }
+    //     let mut escrow = match escrow_result {
+    //         Ok(esc) => esc,
+    //         Err(err) => return Err(err),
+    //     };
 
-        if escrow.completed {
-            return Err(ContractError::EscrowAlreadyCompleted);
-        }
+    //     let invoker = service_provider;
+    //     if invoker != escrow.service_provider {
+    //         return Err(ContractError::OnlyServiceProviderCanClaimEarnings);
+    //     }
 
-        if escrow.cancelled {
-            return Err(ContractError::EscrowAlreadyCancelled);
-        }
+    //     if escrow.cancelled == true {
+    //         return Err(ContractError::EscrowAlreadyCancelled);
+    //     }
 
-        escrow.cancelled = true;
+    //     if escrow.completed == false {
+    //         return Err(ContractError::EscrowNotCompleted);
+    //     }
 
-        e.storage().instance().set(&escrow_key, &escrow);
-        Ok(())
+    //     if escrow.balance != escrow.amount {
+    //         return Err(ContractError::EscrowBalanceNotSufficienteToSendEarnings);
+    //     }
+
+    //     let usdc_client = TokenClient::new(&e, &usdc_contract);
+
+    //     let escrow_balance = usdc_client.balance(&contract_address);
+    //     if escrow_balance < escrow.amount as i128 {
+    //         return Err(ContractError::ContractInsufficientFunds);
+    //     }
+
+    //     usdc_client.transfer(
+    //         &contract_address,
+    //         &escrow.service_provider,
+    //         &(escrow.amount as i128)
+    //     );
+
+    //     escrow.balance = 0;
+
+    //     e.storage().instance().set(&escrow_key, &escrow);
+    //     Ok(())
+    // }
+
+    pub fn cancel_escrow(
+        e: Env, 
+        engagement_id: String, 
+        service_provider:Address
+    ) -> Result<(), ContractError> {
+        EscrowManager::cancel_escrow(
+            e, 
+            engagement_id, 
+            service_provider
+        )
     }
 
-    pub fn refund_remaining_funds(e: Env, engagement_id: String, signer: Address, usdc_contract: Address, contract_address: Address) -> Result<(), ContractError> {
-        signer.require_auth();
-
-        let escrow_key = DataKey::Escrow(engagement_id.clone());
-        let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id);
+    // pub fn cancel_escrow(e: Env, engagement_id: String, service_provider:Address) -> Result<(), ContractError> {
+    //     let escrow_key = DataKey::Escrow(engagement_id.clone());
+    //     let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id);
     
-        let mut escrow = match escrow_result {
-            Ok(esc) => esc,
-            Err(err) => return Err(err),
-        };
+    //     let mut escrow = match escrow_result {
+    //         Ok(esc) => esc,
+    //         Err(err) => return Err(err),
+    //     };
+
+    //     let invoker = service_provider;
+    //     if invoker != escrow.service_provider {
+    //         return Err(ContractError::OnlyServiceProviderCanCancelEscrow);
+    //     }
+
+    //     if escrow.completed {
+    //         return Err(ContractError::EscrowAlreadyCompleted);
+    //     }
+
+    //     if escrow.cancelled {
+    //         return Err(ContractError::EscrowAlreadyCancelled);
+    //     }
+
+    //     escrow.cancelled = true;
+
+    //     e.storage().instance().set(&escrow_key, &escrow);
+    //     Ok(())
+    // }
+
+    pub fn refund_remaining_funds(
+        e: Env, 
+        engagement_id: String, 
+        signer: Address, 
+        usdc_contract: Address, 
+        contract_address: Address
+    ) -> Result<(), ContractError> {
+        EscrowManager::refund_remaining_funds(
+            e, 
+            engagement_id, 
+            signer, 
+            usdc_contract, 
+            contract_address
+        )
+    }
+
+    // pub fn refund_remaining_funds(e: Env, engagement_id: String, signer: Address, usdc_contract: Address, contract_address: Address) -> Result<(), ContractError> {
+    //     signer.require_auth();
+
+    //     let escrow_key = DataKey::Escrow(engagement_id.clone());
+    //     let escrow_result = Self::get_escrow_by_id(e.clone(), engagement_id);
+    
+    //     let mut escrow = match escrow_result {
+    //         Ok(esc) => esc,
+    //         Err(err) => return Err(err),
+    //     };
         
-        let invoker = signer.clone();
-        if invoker != escrow.signer {
-            return Err(ContractError::OnlySignerCanRequestRefund);
-        }
-        if !escrow.cancelled {
-            return Err(ContractError::EscrowNotCancelled);
-        }
+    //     let invoker = signer.clone();
+    //     if invoker != escrow.signer {
+    //         return Err(ContractError::OnlySignerCanRequestRefund);
+    //     }
+    //     if !escrow.cancelled {
+    //         return Err(ContractError::EscrowNotCancelled);
+    //     }
 
-        if escrow.completed {
-            return Err(ContractError::EscrowAlreadyCompleted);
-        }
+    //     if escrow.completed {
+    //         return Err(ContractError::EscrowAlreadyCompleted);
+    //     }
 
-        let usdc_client = TokenClient::new(&e, &usdc_contract);
-        let contract_balance = usdc_client.balance(&contract_address);
+    //     let usdc_client = TokenClient::new(&e, &usdc_contract);
+    //     let contract_balance = usdc_client.balance(&contract_address);
 
-        if  contract_balance == 0 {
-            return Err(ContractError::ContractHasInsufficientBalance);
-        }
+    //     if  contract_balance == 0 {
+    //         return Err(ContractError::ContractHasInsufficientBalance);
+    //     }
 
-        usdc_client.transfer(
-            &e.current_contract_address(),
-            &escrow.signer,
-            &contract_balance
-        );
+    //     usdc_client.transfer(
+    //         &e.current_contract_address(),
+    //         &escrow.signer,
+    //         &contract_balance
+    //     );
 
-        escrow.balance = 0;
-        e.storage().instance().set(&escrow_key, &escrow);
+    //     escrow.balance = 0;
+    //     e.storage().instance().set(&escrow_key, &escrow);
 
-        Ok(())
-    }
+    //     Ok(())
+    // }
 
     pub fn get_escrow_by_id(e: Env, engagement_id: String) -> Result<Escrow, ContractError> {
-        let escrow_key = DataKey::Escrow(engagement_id.clone());
-        if let Some(escrow) = e.storage().instance().get::<DataKey, Escrow>(&escrow_key) {
-            escrows_by_engagement_id(&e, engagement_id.clone(), escrow.clone());
-            Ok(escrow)
-        } else {
-            return Err(ContractError::EscrowNotFound)
-        }
+        EscrowManager::get_escrow_by_id(&e, engagement_id)
+    }
+    // pub fn get_escrow_by_id(e: Env, engagement_id: String) -> Result<Escrow, ContractError> {
+    //     let escrow_key = DataKey::Escrow(engagement_id.clone());
+    //     if let Some(escrow) = e.storage().instance().get::<DataKey, Escrow>(&escrow_key) {
+    //         escrows_by_engagement_id(&e, engagement_id.clone(), escrow.clone());
+    //         Ok(escrow)
+    //     } else {
+    //         return Err(ContractError::EscrowNotFound)
+    //     }
+    // }
+
+    pub fn register(e: Env, user_address: Address, name: String, email: String) -> bool {
+        UserManager::register(e, user_address, name, email)
+    }
+
+    pub fn login(e: Env, user_address: Address) -> String {
+        UserManager::login(&e, user_address)
     }
 
     pub fn approve_amounts(e: Env, from: Address, spender: Address, amount: i128, usdc_token_address: Address ) {
@@ -319,57 +390,57 @@ impl EngagementContract {
         balance_retrieved_event(&e, address, usdc_token_address, balance);
     }
       
-    pub fn register(e: Env, user_address: Address, name: String, email: String) -> bool {
-        user_address.require_auth();
+    // pub fn register(e: Env, user_address: Address, name: String, email: String) -> bool {
+    //     user_address.require_auth();
 
-        let key = DataKey::User(user_address.clone());
+    //     let key = DataKey::User(user_address.clone());
 
-        if e.storage().persistent().has(&key) {
-            return false;
-        }
+    //     if e.storage().persistent().has(&key) {
+    //         return false;
+    //     }
 
-        let user_id = e
-            .storage()
-            .persistent()
-            .get(&DataKey::UserCounter)
-            .unwrap_or(0)
-            + 1;
+    //     let user_id = e
+    //         .storage()
+    //         .persistent()
+    //         .get(&DataKey::UserCounter)
+    //         .unwrap_or(0)
+    //         + 1;
 
-        e.storage()
-            .persistent()
-            .set(&DataKey::UserCounter, &user_id);
+    //     e.storage()
+    //         .persistent()
+    //         .set(&DataKey::UserCounter, &user_id);
 
-        let user = User {
-            id: user_id,
-            user: user_address.clone(),
-            name: name.clone(),
-            email: email.clone(),
-            registered: true,
-            timestamp: e.ledger().timestamp(),
-        };
+    //     let user = User {
+    //         id: user_id,
+    //         user: user_address.clone(),
+    //         name: name.clone(),
+    //         email: email.clone(),
+    //         registered: true,
+    //         timestamp: e.ledger().timestamp(),
+    //     };
 
-        e.storage()
-            .persistent()
-            .set(&DataKey::User(user_address.clone()), &user);
+    //     e.storage()
+    //         .persistent()
+    //         .set(&DataKey::User(user_address.clone()), &user);
 
-        let user_reg_id = e.ledger().sequence();
+    //     let user_reg_id = e.ledger().sequence();
 
-        e.storage()
-            .persistent()
-            .set(&DataKey::UserRegId(user_address.clone()), &user_reg_id);
+    //     e.storage()
+    //         .persistent()
+    //         .set(&DataKey::UserRegId(user_address.clone()), &user_reg_id);
 
-        return true;
-    }
+    //     return true;
+    // }
 
-    pub fn login(e: Env, user_address: Address) -> String {
-        user_address.require_auth();
+    // pub fn login(e: Env, user_address: Address) -> String {
+    //     user_address.require_auth();
     
-        let key = DataKey::User(user_address.clone());
+    //     let key = DataKey::User(user_address.clone());
     
-        if let Some(user) = e.storage().persistent().get::<_, User>(&key) {
-            user.name
-        } else {
-            soroban_sdk::String::from_str(&e, "User not found")
-        }
-    }
+    //     if let Some(user) = e.storage().persistent().get::<_, User>(&key) {
+    //         user.name
+    //     } else {
+    //         soroban_sdk::String::from_str(&e, "User not found")
+    //     }
+    // }
 }

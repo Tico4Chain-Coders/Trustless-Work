@@ -2,11 +2,11 @@ use soroban_sdk::{contract, contractimpl, Address, Env, String};
 use soroban_sdk::token::{self, Interface as _};
 use soroban_token_sdk::metadata::TokenMetadata;
 
-use crate::admin::{has_administrator, write_administrator, read_administrator};
-use crate::allowance::{read_allowance, write_allowance, spend_allowance};
-use crate::balance::{receive_balance, read_balance, spend_balance};
-use crate::storage_types::{INSTANCE_BUMP_AMOUNT, INSTANCE_LIFETIME_THRESHOLD};
-use crate::metadata::write_metadata;
+use crate::core::admin::{has_administrator, write_administrator, read_administrator};
+use crate::token::allowance::{read_allowance, write_allowance, spend_allowance};
+use crate::token::balance::{receive_balance, read_balance, spend_balance};
+use crate::storage::types::{INSTANCE_BUMP_AMOUNT, INSTANCE_LIFETIME_THRESHOLD};
+use crate::token::metadata::write_metadata;
 use soroban_token_sdk::TokenUtils;
 
 fn check_nonnegative_amount(amount: i128) {

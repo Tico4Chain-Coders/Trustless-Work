@@ -1,16 +1,11 @@
 #![no_std]
 
+mod core;
 mod storage;
-mod storage_types;
-mod allowance;
-mod balance;
-mod admin;
-mod metadata;
 mod token;
 mod events;
-mod contract;
-mod utils;
 mod error;
-mod test;
+mod contract;
+mod tests;
 
 pub use crate::contract::EngagementContractClient;

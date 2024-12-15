@@ -2,7 +2,7 @@
 
 extern crate std;
 
-use crate::storage_types::{Escrow, DataKey};
+use crate::storage::types::{Escrow, DataKey};
 use crate::{contract::EngagementContract, EngagementContractClient};
 use crate::error::ContractError;
 use soroban_sdk::{testutils::{Address as _, AuthorizedFunction, AuthorizedInvocation}, Address, Env, IntoVal, String, symbol_short};
