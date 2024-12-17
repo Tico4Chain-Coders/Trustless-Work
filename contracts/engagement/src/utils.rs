@@ -1,1 +1,0 @@
-// Here will go future functions

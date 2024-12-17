@@ -1,8 +1,8 @@
 use soroban_sdk::{Env, vec, IntoVal, Val, Address, String, symbol_short};
-use crate::storage_types::Escrow;
+use crate::storage::types::Escrow;
 
 // ------ Escrows
-pub (crate) fn escrows_by_engagement_id(e: &Env, engagement_id: String, escrow: Escrow) {
+pub fn escrows_by_engagement_id(e: &Env, engagement_id: String, escrow: Escrow) {
     let topics = (symbol_short!("p_by_spdr"),);
     
     let engagement_id_val: Val = engagement_id.into_val(e);
@@ -14,7 +14,7 @@ pub (crate) fn escrows_by_engagement_id(e: &Env, engagement_id: String, escrow: 
 
 // ------ Token
 
-pub (crate) fn balance_retrieved_event(e: &Env, address: Address, usdc_token_address: Address, balance: i128) {
+pub fn balance_retrieved_event(e: &Env, address: Address, usdc_token_address: Address, balance: i128) {
     let topics = (symbol_short!("blnc"),);
     let address_val: Val = address.into_val(e);
     let token_address_val: Val = usdc_token_address.into_val(e);

@@ -2,9 +2,10 @@
 
 extern crate std;
 
-use crate::storage_types::Milestone;
-use crate::token::{Token, TokenClient};
-use crate::{contract::EngagementContract, EngagementContractClient};
+use crate::storage::types::Milestone;
+use crate::token::token::{Token, TokenClient};
+use crate::contract::EngagementContract;
+use crate::contract::EngagementContractClient;
 use soroban_sdk::{testutils::Address as _, vec, Address, Env, IntoVal, String};
 
 fn create_usdc_token<'a>(e: &Env, admin: &Address) -> TokenClient<'a> {
@@ -659,7 +660,7 @@ fn test_dispute_resolution_process() {
     );
 
     let token_admin = Address::generate(&env);
-    let token_contract = env.register_contract(None, crate::token::Token);
+    let token_contract = env.register_contract(None, crate::token::token::Token);
     let token_client = TokenClient::new(&env, &token_contract);
 
     token_client.initialize(

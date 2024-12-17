@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-use crate::storage_types::DataKey;
+use crate::storage::types::DataKey;
 use soroban_sdk::{Address, Env};
 
 const BALANCE_BUMP_AMOUNT: u32 = 1000;
