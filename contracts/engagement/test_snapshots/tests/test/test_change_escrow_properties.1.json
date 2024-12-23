@@ -29,13 +29,13 @@
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
                 },
                 {
-                  "u128": {
+                  "i128": {
                     "hi": 0,
                     "lo": 200000000
                   }
                 },
                 {
-                  "u128": {
+                  "i128": {
                     "hi": 0,
                     "lo": 500000000000000000
                   }
@@ -240,7 +240,7 @@
                                 "symbol": "amount"
                               },
                               "val": {
-                                "u128": {
+                                "i128": {
                                   "hi": 0,
                                   "lo": 200000000
                                 }
@@ -384,7 +384,7 @@
                                 "symbol": "platform_fee"
                               },
                               "val": {
-                                "u128": {
+                                "i128": {
                                   "hi": 0,
                                   "lo": 500000000000000000
                                 }
@@ -404,17 +404,6 @@
                               },
                               "val": {
                                 "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARQG5"
-                              }
-                            },
-                            {
-                              "key": {
-                                "symbol": "tw_fee"
-                              },
-                              "val": {
-                                "u128": {
-                                  "hi": 0,
-                                  "lo": 300000000000000000
-                                }
                               }
                             }
                           ]
@@ -487,13 +476,13 @@
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
                 },
                 {
-                  "u128": {
+                  "i128": {
                     "hi": 0,
                     "lo": 100000000
                   }
                 },
                 {
-                  "u128": {
+                  "i128": {
                     "hi": 0,
                     "lo": 300000000000000000
                   }
@@ -644,7 +633,7 @@
                         "symbol": "amount"
                       },
                       "val": {
-                        "u128": {
+                        "i128": {
                           "hi": 0,
                           "lo": 100000000
                         }
@@ -760,7 +749,7 @@
                         "symbol": "platform_fee"
                       },
                       "val": {
-                        "u128": {
+                        "i128": {
                           "hi": 0,
                           "lo": 300000000000000000
                         }
@@ -780,17 +769,6 @@
                       },
                       "val": {
                         "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
-                      }
-                    },
-                    {
-                      "key": {
-                        "symbol": "tw_fee"
-                      },
-                      "val": {
-                        "u128": {
-                          "hi": 0,
-                          "lo": 300000000000000000
-                        }
                       }
                     }
                   ]
@@ -824,7 +802,7 @@
                     "symbol": "amount"
                   },
                   "val": {
-                    "u128": {
+                    "i128": {
                       "hi": 0,
                       "lo": 100000000
                     }
@@ -940,7 +918,7 @@
                     "symbol": "platform_fee"
                   },
                   "val": {
-                    "u128": {
+                    "i128": {
                       "hi": 0,
                       "lo": 300000000000000000
                     }
@@ -960,17 +938,6 @@
                   },
                   "val": {
                     "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
-                  }
-                },
-                {
-                  "key": {
-                    "symbol": "tw_fee"
-                  },
-                  "val": {
-                    "u128": {
-                      "hi": 0,
-                      "lo": 300000000000000000
-                    }
                   }
                 }
               ]
@@ -1013,13 +980,13 @@
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXI7N"
                 },
                 {
-                  "u128": {
+                  "i128": {
                     "hi": 0,
                     "lo": 200000000
                   }
                 },
                 {
-                  "u128": {
+                  "i128": {
                     "hi": 0,
                     "lo": 500000000000000000
                   }
@@ -1149,7 +1116,7 @@
                         "symbol": "amount"
                       },
                       "val": {
-                        "u128": {
+                        "i128": {
                           "hi": 0,
                           "lo": 100000000
                         }
@@ -1265,7 +1232,7 @@
                         "symbol": "platform_fee"
                       },
                       "val": {
-                        "u128": {
+                        "i128": {
                           "hi": 0,
                           "lo": 300000000000000000
                         }
@@ -1285,17 +1252,6 @@
                       },
                       "val": {
                         "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
-                      }
-                    },
-                    {
-                      "key": {
-                        "symbol": "tw_fee"
-                      },
-                      "val": {
-                        "u128": {
-                          "hi": 0,
-                          "lo": 300000000000000000
-                        }
                       }
                     }
                   ]
@@ -1397,13 +1353,13 @@
                       "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXI7N"
                     },
                     {
-                      "u128": {
+                      "i128": {
                         "hi": 0,
                         "lo": 200000000
                       }
                     },
                     {
-                      "u128": {
+                      "i128": {
                         "hi": 0,
                         "lo": 500000000000000000
                       }
@@ -1544,13 +1500,13 @@
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
                 },
                 {
-                  "u128": {
+                  "i128": {
                     "hi": 0,
                     "lo": 200000000
                   }
                 },
                 {
-                  "u128": {
+                  "i128": {
                     "hi": 0,
                     "lo": 500000000000000000
                   }
@@ -1680,7 +1636,7 @@
                         "symbol": "amount"
                       },
                       "val": {
-                        "u128": {
+                        "i128": {
                           "hi": 0,
                           "lo": 100000000
                         }
@@ -1796,7 +1752,7 @@
                         "symbol": "platform_fee"
                       },
                       "val": {
-                        "u128": {
+                        "i128": {
                           "hi": 0,
                           "lo": 300000000000000000
                         }
@@ -1816,17 +1772,6 @@
                       },
                       "val": {
                         "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
-                      }
-                    },
-                    {
-                      "key": {
-                        "symbol": "tw_fee"
-                      },
-                      "val": {
-                        "u128": {
-                          "hi": 0,
-                          "lo": 300000000000000000
-                        }
                       }
                     }
                   ]
@@ -1862,7 +1807,7 @@
                         "symbol": "amount"
                       },
                       "val": {
-                        "u128": {
+                        "i128": {
                           "hi": 0,
                           "lo": 200000000
                         }
@@ -2006,7 +1951,7 @@
                         "symbol": "platform_fee"
                       },
                       "val": {
-                        "u128": {
+                        "i128": {
                           "hi": 0,
                           "lo": 500000000000000000
                         }
@@ -2026,17 +1971,6 @@
                       },
                       "val": {
                         "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARQG5"
-                      }
-                    },
-                    {
-                      "key": {
-                        "symbol": "tw_fee"
-                      },
-                      "val": {
-                        "u128": {
-                          "hi": 0,
-                          "lo": 300000000000000000
-                        }
                       }
                     }
                   ]
@@ -2119,7 +2053,7 @@
                         "symbol": "amount"
                       },
                       "val": {
-                        "u128": {
+                        "i128": {
                           "hi": 0,
                           "lo": 200000000
                         }
@@ -2263,7 +2197,7 @@
                         "symbol": "platform_fee"
                       },
                       "val": {
-                        "u128": {
+                        "i128": {
                           "hi": 0,
                           "lo": 500000000000000000
                         }
@@ -2283,17 +2217,6 @@
                       },
                       "val": {
                         "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARQG5"
-                      }
-                    },
-                    {
-                      "key": {
-                        "symbol": "tw_fee"
-                      },
-                      "val": {
-                        "u128": {
-                          "hi": 0,
-                          "lo": 300000000000000000
-                        }
                       }
                     }
                   ]
@@ -2327,7 +2250,7 @@
                     "symbol": "amount"
                   },
                   "val": {
-                    "u128": {
+                    "i128": {
                       "hi": 0,
                       "lo": 200000000
                     }
@@ -2471,7 +2394,7 @@
                     "symbol": "platform_fee"
                   },
                   "val": {
-                    "u128": {
+                    "i128": {
                       "hi": 0,
                       "lo": 500000000000000000
                     }
@@ -2491,17 +2414,6 @@
                   },
                   "val": {
                     "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARQG5"
-                  }
-                },
-                {
-                  "key": {
-                    "symbol": "tw_fee"
-                  },
-                  "val": {
-                    "u128": {
-                      "hi": 0,
-                      "lo": 300000000000000000
-                    }
                   }
                 }
               ]
@@ -2544,13 +2456,13 @@
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
                 },
                 {
-                  "u128": {
+                  "i128": {
                     "hi": 0,
                     "lo": 200000000
                   }
                 },
                 {
-                  "u128": {
+                  "i128": {
                     "hi": 0,
                     "lo": 500000000000000000
                   }
@@ -2746,13 +2658,13 @@
                       "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFCT4"
                     },
                     {
-                      "u128": {
+                      "i128": {
                         "hi": 0,
                         "lo": 200000000
                       }
                     },
                     {
-                      "u128": {
+                      "i128": {
                         "hi": 0,
                         "lo": 500000000000000000
                       }

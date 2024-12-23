@@ -188,7 +188,7 @@
                                 "symbol": "amount"
                               },
                               "val": {
-                                "u128": {
+                                "i128": {
                                   "hi": 0,
                                   "lo": 100000000
                                 }
@@ -304,7 +304,7 @@
                                 "symbol": "platform_fee"
                               },
                               "val": {
-                                "u128": {
+                                "i128": {
                                   "hi": 0,
                                   "lo": 300000000000000000
                                 }
@@ -324,17 +324,6 @@
                               },
                               "val": {
                                 "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
-                              }
-                            },
-                            {
-                              "key": {
-                                "symbol": "tw_fee"
-                              },
-                              "val": {
-                                "u128": {
-                                  "hi": 0,
-                                  "lo": 300000000000000000
-                                }
                               }
                             }
                           ]
@@ -581,13 +570,13 @@
                   "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHK3M"
                 },
                 {
-                  "u128": {
+                  "i128": {
                     "hi": 0,
                     "lo": 100000000
                   }
                 },
                 {
-                  "u128": {
+                  "i128": {
                     "hi": 0,
                     "lo": 300000000000000000
                   }
@@ -970,7 +959,7 @@
                         "symbol": "amount"
                       },
                       "val": {
-                        "u128": {
+                        "i128": {
                           "hi": 0,
                           "lo": 100000000
                         }
@@ -1086,7 +1075,7 @@
                         "symbol": "platform_fee"
                       },
                       "val": {
-                        "u128": {
+                        "i128": {
                           "hi": 0,
                           "lo": 300000000000000000
                         }
@@ -1106,17 +1095,6 @@
                       },
                       "val": {
                         "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
-                      }
-                    },
-                    {
-                      "key": {
-                        "symbol": "tw_fee"
-                      },
-                      "val": {
-                        "u128": {
-                          "hi": 0,
-                          "lo": 300000000000000000
-                        }
                       }
                     }
                   ]
@@ -1152,7 +1130,7 @@
                         "symbol": "amount"
                       },
                       "val": {
-                        "u128": {
+                        "i128": {
                           "hi": 0,
                           "lo": 100000000
                         }
@@ -1268,7 +1246,7 @@
                         "symbol": "platform_fee"
                       },
                       "val": {
-                        "u128": {
+                        "i128": {
                           "hi": 0,
                           "lo": 300000000000000000
                         }
@@ -1288,17 +1266,6 @@
                       },
                       "val": {
                         "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
-                      }
-                    },
-                    {
-                      "key": {
-                        "symbol": "tw_fee"
-                      },
-                      "val": {
-                        "u128": {
-                          "hi": 0,
-                          "lo": 300000000000000000
-                        }
                       }
                     }
                   ]
@@ -1397,7 +1364,7 @@
                         "symbol": "amount"
                       },
                       "val": {
-                        "u128": {
+                        "i128": {
                           "hi": 0,
                           "lo": 100000000
                         }
@@ -1513,7 +1480,7 @@
                         "symbol": "platform_fee"
                       },
                       "val": {
-                        "u128": {
+                        "i128": {
                           "hi": 0,
                           "lo": 300000000000000000
                         }
@@ -1533,17 +1500,6 @@
                       },
                       "val": {
                         "address": "CAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAITA4"
-                      }
-                    },
-                    {
-                      "key": {
-                        "symbol": "tw_fee"
-                      },
-                      "val": {
-                        "u128": {
-                          "hi": 0,
-                          "lo": 300000000000000000
-                        }
                       }
                     }
                   ]
