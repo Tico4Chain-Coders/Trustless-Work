@@ -1,7 +1,7 @@
 use soroban_sdk::{Address, Env, String};
 use soroban_sdk::token::Client as TokenClient;
 
-use crate::storage::types::{DataKey};
+use crate::storage::types::DataKey;
 use crate::error::ContractError;
 use crate::events::escrows_by_engagement_id;
 use crate::core::escrow::EscrowManager;
@@ -15,8 +15,8 @@ impl DisputeManager {
         engagement_id: String,
         dispute_resolver: Address,
         usdc_contract: Address,
-        client_funds: u128,
-        service_provider_funds: u128
+        client_funds: i128,
+        service_provider_funds: i128
     ) -> Result<(), ContractError> {
         dispute_resolver.require_auth();
     
@@ -37,7 +37,7 @@ impl DisputeManager {
         }
  
         let usdc_client = TokenClient::new(&e, &usdc_contract);
-        let contract_balance = usdc_client.balance(&e.current_contract_address()) as u128;
+        let contract_balance = usdc_client.balance(&e.current_contract_address());
 
         let total_funds = client_funds + service_provider_funds;
         if total_funds > contract_balance {

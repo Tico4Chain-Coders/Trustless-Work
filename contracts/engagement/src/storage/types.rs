@@ -5,15 +5,14 @@ pub(crate) const INSTANCE_BUMP_AMOUNT: u32 = 7 * DAY_IN_LEDGERS;
 pub(crate) const INSTANCE_LIFETIME_THRESHOLD: u32 = INSTANCE_BUMP_AMOUNT - DAY_IN_LEDGERS;
 
 #[contracttype]
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Escrow {
     pub engagement_id: String,
     pub client: Address,
     pub service_provider: Address,
     pub platform_address: Address,
-    pub amount: u128,
-    pub tw_fee: u128,
-    pub platform_fee: u128,
+    pub amount: i128,
+    pub platform_fee: i128,
     pub milestones: Vec<Milestone>,
     pub release_signer: Address,
     pub dispute_resolver: Address,
@@ -21,7 +20,7 @@ pub struct Escrow {
 }
 
 #[contracttype]
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Milestone {
     pub description: String,
     pub status: String,

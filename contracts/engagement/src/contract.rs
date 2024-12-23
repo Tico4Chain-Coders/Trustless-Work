@@ -45,8 +45,8 @@ impl EngagementContract {
         client: Address,
         service_provider: Address,
         platform_address: Address,
-        amount: u128,
-        platform_fee: u128,
+        amount: i128,
+        platform_fee: i128,
         milestones: Vec<Milestone>,
         release_signer: Address,
         dispute_resolver: Address,
@@ -103,8 +103,8 @@ impl EngagementContract {
         client: Address,
         service_provider: Address,
         platform_address: Address,
-        amount: u128,
-        platform_fee: u128,
+        amount: i128,
+        platform_fee: i128,
         milestones: Vec<Milestone>,
         release_signer: Address,
         dispute_resolver: Address,
@@ -172,8 +172,8 @@ impl EngagementContract {
         engagement_id: String,
         dispute_resolver: Address,
         usdc_contract: Address,
-        client_funds: u128,
-        service_provider_funds: u128
+        client_funds: i128,
+        service_provider_funds: i128
     ) -> Result<(), ContractError> {
         DisputeManager::resolving_disputes(
             e,

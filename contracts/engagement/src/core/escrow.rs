@@ -15,8 +15,8 @@ impl EscrowManager{
         client: Address,
         service_provider: Address,
         platform_address: Address,
-        amount: u128,
-        platform_fee: u128,
+        amount: i128,
+        platform_fee: i128,
         milestones: Vec<Milestone>,
         release_signer: Address,
         dispute_resolver: Address,
@@ -39,7 +39,6 @@ impl EscrowManager{
             release_signer: release_signer.clone(),
             service_provider: service_provider.clone(),
             amount,
-            tw_fee: (3 * 10u128.pow(17)),
             platform_fee: platform_fee,
             milestones: milestones,
             dispute_resolver: dispute_resolver.clone(),
@@ -79,11 +78,11 @@ impl EscrowManager{
 
         let contract_address = e.current_contract_address();
         
-        if usdc_client.balance(&contract_address) as u128 > escrow.amount {
+        if usdc_client.balance(&contract_address) as i128 > escrow.amount {
             return Err(ContractError::EscrowFullyFunded);
         }
 
-        if amount_to_deposit as u128 > escrow.amount {
+        if amount_to_deposit as i128 > escrow.amount {
             return Err(ContractError::AmountToDepositGreatherThanEscrowAmount);
         }
 
@@ -177,8 +176,8 @@ impl EscrowManager{
         client: Address,
         service_provider: Address,
         platform_address: Address,
-        amount: u128,
-        platform_fee: u128,
+        amount: i128,
+        platform_fee: i128,
         milestones: Vec<Milestone>,
         release_signer: Address,
         dispute_resolver: Address,
@@ -198,7 +197,6 @@ impl EscrowManager{
             release_signer,
             service_provider,
             amount,
-            tw_fee: (3 * 10u128.pow(17)),
             platform_fee,
             milestones,
             dispute_resolver,
